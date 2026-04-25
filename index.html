@@ -1,0 +1,3298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>RootNivesh Research | SEBI Registered Research Analyst</title>
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2305101F'/%3E%3Crect x='1' y='1' width='30' height='30' rx='6' fill='none' stroke='%23C9A84C' stroke-width='1.2' opacity='0.6'/%3E%3Ctext x='16' y='22' font-family='Georgia%2C serif' font-weight='700' font-size='14' fill='%23C9A84C' text-anchor='middle' letter-spacing='0.5'%3ERN%3C/text%3E%3C/svg%3E">
+
+<meta name="description" content="RootNivesh Research - SEBI Registered Research Analyst offering stock research reports, trading calls, investment ideas and financial education.">
+
+<meta name="keywords" content="stock market research india, sebi research analyst, trading calls india, investment ideas india, portfolio management, sip strategy india">
+
+<meta name="robots" content="index, follow">
+
+<link rel="canonical" href="https://rootnivesh.in/">
+
+<meta property="og:title" content="RootNivesh - Stock Market Research India">
+
+<meta property="og:description" content="SEBI Registered Research Analyst providing stock market insights, trading calls and investment strategies.">
+
+<meta property="og:url" content="https://rootnivesh.in/">
+
+<meta property="og:type" content="website">
+
+<script type="application/ld+json">
+{
+"@context": "https://schema.org",
+"@type": "FinancialService",
+"name": "RootNivesh",
+"url": "https://rootnivesh.in",
+"description": "Saurabh this side SEBI Registered Research Analyst providing stock market research and investment ideas.",
+"areaServed": "India"
+}
+</script>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #05101F;
+    --navy2: #0B1E35;
+    --navy3: #0F2744;
+    --gold: #C9A84C;
+    --gold2: #E8C46A;
+    --gold-light: #F5E0A0;
+    --white: #F8F4ED;
+    --grey: #8A9BB0;
+    --grey2: #B0BEC5;
+    --card-bg: rgba(15,39,68,0.7);
+    --border: rgba(201,168,76,0.2);
+    --border2: rgba(201,168,76,0.5);
+    --green: #2ECC71;
+    --red: #E74C3C;
+    --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ====== NAVBAR ====== */
+  nav {
+    position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+    padding: 0 2rem;
+    background: rgba(5,16,31,0.97);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+    transition: var(--transition);
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    text-decoration: none; flex-shrink: 0;
+  }
+  .logo-mark {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 700; font-size: 18px; color: var(--navy);
+  }
+  .logo-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 700; font-size: 20px; color: var(--white); letter-spacing: 0.5px;
+  }
+  .logo-text span { color: var(--gold); }
+  .nav-links {
+    display: flex; align-items: center; gap: 2px; list-style: none;
+  }
+  .nav-links > li { position: relative; }
+  .nav-links a, .nav-dd-trigger {
+    display: flex; align-items: center; gap: 5px;
+    padding: 6px 12px; border-radius: 6px;
+    font-size: 13.5px; font-weight: 500; color: var(--grey2);
+    cursor: pointer; text-decoration: none;
+    transition: var(--transition); white-space: nowrap;
+    background: none; border: none; font-family: 'DM Sans', sans-serif;
+  }
+  .nav-links a:hover, .nav-dd-trigger:hover,
+  .nav-links a.active, .nav-dd-trigger.open { color: var(--gold); background: rgba(201,168,76,0.1); }
+  .nav-dd-trigger .dd-arrow {
+    font-size: 10px; transition: transform 0.25s ease; display: inline-block;
+  }
+  .nav-dd-trigger.open .dd-arrow { transform: rotate(180deg); }
+  .nav-cta {
+    background: linear-gradient(135deg, var(--gold), var(--gold2)) !important;
+    color: var(--navy) !important; font-weight: 600 !important; border-radius: 8px !important;
+    padding: 8px 16px !important;
+  }
+  .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,168,76,0.4) !important; }
+
+  /* ── Standard small dropdown ── */
+  .dd-menu {
+    display: none; position: absolute; top: calc(100% + 10px); left: 0;
+    background: #07131F; border: 1px solid var(--border2);
+    border-radius: 12px; min-width: 200px; overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+    animation: ddFade 0.2s ease;
+  }
+  .dd-menu.open { display: block; }
+  .dd-menu a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 18px; font-size: 13px; color: var(--grey2);
+    text-decoration: none; transition: var(--transition); cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .dd-menu a:last-child { border-bottom: none; }
+  .dd-menu a:hover { background: rgba(201,168,76,0.08); color: var(--white); }
+  .dd-menu a .dd-icon { font-size: 15px; flex-shrink: 0; }
+
+  /* ── MEGA MENU ── */
+  .mega-menu {
+    display: none; position: fixed; top: 64px; left: 0; width: 100%;
+    background: #07131F; border-bottom: 2px solid var(--border2);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    z-index: 1001; animation: ddFade 0.2s ease;
+  }
+  .mega-menu.open { display: block; }
+  @keyframes ddFade { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+  .mega-inner {
+    max-width: 1200px; margin: 0 auto;
+    padding: 28px 2rem 32px;
+    display: grid; gap: 0;
+  }
+  .mega-inner.cols-2 { grid-template-columns: 1fr 1fr; }
+  .mega-inner.cols-1 { grid-template-columns: 1fr; max-width: 480px; }
+  .mega-col { padding: 0 20px; }
+  .mega-col + .mega-col { border-left: 1px solid rgba(255,255,255,0.06); }
+
+  /* Section header inside mega */
+  .mega-col-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px; padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .mega-col-icon {
+    width: 30px; height: 30px; border-radius: 7px;
+    background: rgba(201,168,76,0.12); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .mega-col-title {
+    font-family: 'Space Mono', monospace; font-size: 10.5px;
+    font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--white);
+  }
+
+  /* Rows inside mega */
+  .mega-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: all 0.2s ease;
+  }
+  .mega-row:last-child { border-bottom: none; }
+  .mega-row:hover .mega-row-label { color: var(--white); }
+  .mega-row-label {
+    font-size: 13.5px; color: var(--grey2); transition: color 0.2s;
+    font-weight: 400;
+  }
+  .mega-plus {
+    width: 22px; height: 22px; border-radius: 5px;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: var(--grey); flex-shrink: 0;
+    transition: all 0.2s ease;
+  }
+  .mega-row:hover .mega-plus { background: rgba(201,168,76,0.12); border-color: var(--border2); color: var(--gold); }
+
+  /* Sub-expand inside mega */
+  .mega-sub {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1);
+    background: rgba(201,168,76,0.03);
+  }
+  .mega-sub.open { max-height: 120px; }
+  .mega-sub-inner {
+    padding: 8px 0 10px 12px;
+    border-left: 2px solid var(--border2); margin-left: 2px;
+  }
+  .mega-sub-inner p { font-size: 11.5px; color: var(--grey); line-height: 1.6; margin-bottom: 6px; }
+  .mega-sub-go {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    color: var(--gold); cursor: pointer; letter-spacing: 0.3px;
+  }
+  .mega-sub-go:hover { text-decoration: underline; }
+
+  .hamburger {
+    display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px;
+  }
+  .hamburger span {
+    display: block; width: 22px; height: 2px;
+    background: var(--white); border-radius: 2px; transition: var(--transition);
+  }
+  .mobile-menu {
+    display: none; position: fixed; top: 64px; left: 0; width: 100%;
+    background: var(--navy2); border-bottom: 1px solid var(--border);
+    padding: 16px; z-index: 999; flex-direction: column; gap: 4px;
+    max-height: calc(100vh - 64px); overflow-y: auto;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    display: block; padding: 12px 16px; color: var(--grey2);
+    text-decoration: none; font-size: 14px; border-radius: 8px;
+    transition: var(--transition);
+  }
+  .mobile-menu a:hover { color: var(--gold); background: rgba(201,168,76,0.1); }
+  .mob-section {
+    font-family: 'Space Mono', monospace; font-size: 10px; color: var(--grey);
+    text-transform: uppercase; letter-spacing: 1.5px; padding: 10px 16px 4px;
+  }
+  .mob-indent { padding-left: 28px !important; }
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+    .mega-menu { display: none; }
+    .hamburger { display: flex; }
+  }
+
+  /* ====== PAGES ====== */
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: block; }
+  section { padding: 80px 0; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+
+  /* ====== HERO ====== */
+  .hero {
+    min-height: 100vh;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201,168,76,0.07) 0%, transparent 60%),
+                linear-gradient(180deg, var(--navy) 0%, var(--navy2) 100%);
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; position: relative; overflow: hidden; padding-top: 64px;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .ticker-tape {
+    position: absolute; top: 64px; left: 0; width: 100%;
+    background: rgba(5,12,22,0.92); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; height: 36px; overflow: hidden; z-index: 10;
+  }
+  .ticker-live-bar {
+    display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+    padding: 0 14px; border-right: 1px solid var(--border);
+    height: 100%; background: rgba(201,168,76,0.07);
+  }
+  .ticker-live-dot {
+    display: flex; align-items: center; gap: 5px;
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    font-weight: 700; color: var(--gold); letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .tlive-pulse {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+    display: inline-block; animation: livepulse 1.5s infinite;
+  }
+  @keyframes livepulse {
+    0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(46,204,113,0.6); }
+    50%      { opacity: 0.7; box-shadow: 0 0 0 5px rgba(46,204,113,0); }
+  }
+  .ticker-market-status {
+    font-family: 'Space Mono', monospace; font-size: 9px;
+    color: var(--grey); letter-spacing: 0.5px; white-space: nowrap;
+  }
+  .ticker-scroll-wrap { flex: 1; overflow: hidden; height: 100%; position: relative; }
+  .ticker-inner {
+    display: inline-flex; align-items: center; height: 100%;
+    white-space: nowrap; font-family: 'Space Mono', monospace; font-size: 11.5px;
+    animation: ticker 50s linear infinite; padding-left: 24px;
+  }
+  .ticker-inner:hover { animation-play-state: paused; cursor: default; }
+  @keyframes ticker {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .ticker-item {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 0 20px 0 0;
+  }
+  .ticker-item::after {
+    content: '|'; color: rgba(255,255,255,0.1); margin-left: 20px;
+  }
+  .t-symbol { color: var(--white); font-weight: 700; font-size: 11px; }
+  .t-price  { color: var(--grey2); }
+  .t-up     { color: #2ECC71; }
+  .t-down   { color: #E74C3C; }
+  .t-arrow-up   { color: #2ECC71; }
+  .t-arrow-down { color: #E74C3C; }
+  .ticker-loading { color: var(--grey); font-size: 11px; padding-left: 20px; animation: none; }
+  .hero-content { position: relative; z-index: 1; max-width: 800px; padding: 0 1rem; margin-top: 40px; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(201,168,76,0.1); border: 1px solid var(--border2);
+    border-radius: 30px; padding: 6px 16px; font-size: 12px;
+    color: var(--gold); font-family: 'Space Mono', monospace; font-weight: 400;
+    margin-bottom: 24px; letter-spacing: 1px;
+  }
+  .hero-badge::before { content: '●'; font-size: 8px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.3 } }
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    line-height: 1.05; font-weight: 700; letter-spacing: -1px;
+    margin-bottom: 20px; color: var(--white);
+  }
+  h1 .accent { color: var(--gold); font-style: italic; }
+  .hero-sub {
+    font-size: 17px; color: var(--grey2); line-height: 1.7;
+    max-width: 560px; margin: 0 auto 36px; font-weight: 300;
+  }
+  .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 28px; border-radius: 10px; font-size: 14px;
+    font-weight: 600; cursor: pointer; border: none; text-decoration: none;
+    transition: var(--transition); font-family: 'DM Sans', sans-serif;
+  }
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    color: var(--navy);
+  }
+  .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(201,168,76,0.4); }
+  .btn-outline {
+    background: transparent; color: var(--white);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+  .hero-stats {
+    display: flex; justify-content: center; gap: 48px; margin-top: 60px;
+    padding-top: 40px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 32px;
+  }
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif; font-size: 2.8rem;
+    font-weight: 700; color: var(--gold); line-height: 1;
+  }
+  .stat-label { font-size: 12px; color: var(--grey); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+  /* ====== SECTION HEADER ====== */
+  .section-header { text-align: center; margin-bottom: 56px; }
+  .section-tag {
+    display: inline-block; font-family: 'Space Mono', monospace;
+    font-size: 11px; color: var(--gold); text-transform: uppercase;
+    letter-spacing: 2.5px; margin-bottom: 12px;
+  }
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700; color: var(--white); line-height: 1.15; margin-bottom: 14px;
+  }
+  h2 em { color: var(--gold); font-style: italic; }
+  .section-desc { color: var(--grey2); font-size: 16px; line-height: 1.7; max-width: 540px; margin: 0 auto; font-weight: 300; }
+
+  /* ====== CARDS ====== */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px;
+    transition: var(--transition); backdrop-filter: blur(12px);
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0; transition: var(--transition);
+  }
+  .card:hover { transform: translateY(-4px); border-color: var(--border2); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+  .card:hover::before { opacity: 1; }
+  .card-tag {
+    display: inline-block; font-size: 11px; font-family: 'Space Mono', monospace;
+    padding: 4px 10px; border-radius: 20px; margin-bottom: 14px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .tag-buy { background: rgba(46,204,113,0.15); color: var(--green); }
+  .tag-sell { background: rgba(231,76,60,0.15); color: var(--red); }
+  .tag-hold { background: rgba(201,168,76,0.15); color: var(--gold); }
+  .tag-free { background: rgba(46,204,113,0.15); color: var(--green); }
+  .tag-premium { background: rgba(201,168,76,0.15); color: var(--gold2); }
+  .card h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+  .card p { font-size: 13.5px; color: var(--grey2); line-height: 1.65; }
+  .card-meta { display: flex; gap: 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .meta-item { font-size: 12px; color: var(--grey); }
+  .meta-item span { color: var(--white); font-weight: 600; display: block; }
+  .card-footer { margin-top: 20px; }
+
+  /* ====== SERVICES ====== */
+  .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+  .service-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
+    padding: 32px 24px; text-align: center; transition: var(--transition);
+  }
+  .service-card:hover { transform: translateY(-4px); border-color: var(--border2); }
+  .service-icon {
+    width: 56px; height: 56px; border-radius: 14px;
+    background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05));
+    border: 1px solid var(--border2); display: flex; align-items: center;
+    justify-content: center; font-size: 24px; margin: 0 auto 18px;
+  }
+  .service-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; }
+  .service-card p { font-size: 13px; color: var(--grey2); line-height: 1.6; }
+
+  /* ====== PAGE HERO ====== */
+  .page-hero {
+    padding: 120px 0 60px;
+    background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(201,168,76,0.06) 0%, transparent 60%);
+    text-align: center; border-bottom: 1px solid var(--border);
+  }
+  .page-hero h1 { font-size: clamp(2.2rem, 5vw, 3.5rem); margin-bottom: 12px; }
+  .page-hero p { font-size: 16px; color: var(--grey2); max-width: 500px; margin: 0 auto; }
+
+  /* ====== TABS ====== */
+  .tabs { display: flex; gap: 8px; margin-bottom: 36px; flex-wrap: wrap; }
+  .tab {
+    padding: 8px 20px; border-radius: 8px; border: 1px solid var(--border);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    background: transparent; color: var(--grey2); transition: var(--transition);
+  }
+  .tab.active, .tab:hover { background: rgba(201,168,76,0.1); border-color: var(--border2); color: var(--gold); }
+
+  /* ====== PERFORMANCE ====== */
+  .perf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 40px; }
+  .perf-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px;
+    padding: 24px; text-align: center;
+  }
+  .perf-num { font-family: 'Space Mono', monospace; font-size: 2rem; font-weight: 700; margin-bottom: 4px; }
+  .perf-label { font-size: 12px; color: var(--grey2); text-transform: uppercase; letter-spacing: 1px; }
+  .perf-pos { color: var(--green); }
+  .perf-neg { color: var(--red); }
+  .table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: rgba(201,168,76,0.08); }
+  th {
+    padding: 14px 18px; text-align: left; font-size: 12px;
+    font-family: 'Space Mono', monospace; color: var(--gold);
+    text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
+  }
+  td {
+    padding: 14px 18px; font-size: 13.5px; color: var(--grey2);
+    border-top: 1px solid var(--border);
+  }
+  tr:hover td { background: rgba(201,168,76,0.03); }
+  .badge-pos { color: var(--green); font-weight: 600; }
+  .badge-neg { color: var(--red); font-weight: 600; }
+  .badge-buy { background: rgba(46,204,113,0.15); color: var(--green); padding: 3px 10px; border-radius: 20px; font-size: 11px; }
+  .badge-sell { background: rgba(231,76,60,0.15); color: var(--red); padding: 3px 10px; border-radius: 20px; font-size: 11px; }
+  .badge-tgt { background: rgba(201,168,76,0.15); color: var(--gold); padding: 3px 10px; border-radius: 20px; font-size: 11px; }
+
+  /* ====== TOOLS ====== */
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)); gap: 28px; }
+  .tool-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px;
+    padding: 36px; backdrop-filter: blur(12px);
+  }
+  .tool-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; }
+  .tool-card > p { font-size: 13px; color: var(--grey); margin-bottom: 28px; }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 12.5px; color: var(--grey2); margin-bottom: 6px; font-weight: 500; }
+  .form-group input, .form-group select {
+    width: 100%; padding: 11px 14px; background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border); border-radius: 10px; color: var(--white);
+    font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none;
+    transition: var(--transition);
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--gold); background: rgba(201,168,76,0.05); }
+  .form-group select option { background: var(--navy2); }
+  .calc-btn {
+    width: 100%; padding: 13px; background: linear-gradient(135deg, var(--gold), var(--gold2));
+    color: var(--navy); border: none; border-radius: 10px; font-size: 14px;
+    font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: var(--transition); margin-top: 8px;
+  }
+  .calc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.4); }
+  .calc-result {
+    margin-top: 24px; padding: 20px; background: rgba(201,168,76,0.05);
+    border: 1px solid var(--border2); border-radius: 12px; display: none;
+  }
+  .calc-result.show { display: block; }
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .result-item { text-align: center; }
+  .result-item .r-val { font-family: 'Space Mono', monospace; font-size: 1.3rem; color: var(--gold); font-weight: 700; }
+  .result-item .r-label { font-size: 11px; color: var(--grey); margin-top: 2px; text-transform: uppercase; }
+
+  /* ====== CONTACT ====== */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 48px; align-items: start; }
+  .contact-info h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; margin-bottom: 16px; }
+  .contact-info p { color: var(--grey2); font-size: 14px; line-height: 1.7; margin-bottom: 28px; }
+  .contact-item { display: flex; gap: 14px; margin-bottom: 20px; align-items: flex-start; }
+  .contact-icon { width: 42px; height: 42px; border-radius: 10px; background: rgba(201,168,76,0.1); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .contact-item-text { font-size: 13.5px; }
+  .contact-item-text strong { display: block; color: var(--white); margin-bottom: 2px; }
+  .contact-item-text span { color: var(--grey2); }
+  .contact-form {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 20px; padding: 36px; backdrop-filter: blur(12px);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .contact-form h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; margin-bottom: 24px; }
+  .form-group textarea {
+    width: 100%; padding: 11px 14px; background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border); border-radius: 10px; color: var(--white);
+    font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none;
+    transition: var(--transition); resize: vertical; min-height: 100px;
+  }
+  .form-group textarea:focus { border-color: var(--gold); background: rgba(201,168,76,0.05); }
+  .form-success { display:none; text-align:center; padding: 20px; }
+  .form-success.show { display:block; }
+  .form-success .check { font-size: 3rem; margin-bottom: 12px; }
+  .form-success p { color: var(--grey2); font-size: 14px; }
+
+  /* ====== ABOUT ====== */
+  .about-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 60px; align-items: center; }
+  .about-image-wrap { position: relative; }
+  .about-img-placeholder {
+    width: 100%; aspect-ratio: 4/5; border-radius: 20px;
+    background: linear-gradient(135deg, var(--navy3), var(--navy2));
+    border: 1px solid var(--border);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  }
+  .about-img-placeholder .avatar { font-size: 80px; }
+  .about-img-placeholder p { color: var(--grey); font-size: 12px; font-style: italic; }
+  .about-badge {
+    position: absolute; bottom: -16px; right: -16px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    color: var(--navy); border-radius: 14px; padding: 16px 20px; text-align: center;
+  }
+  .about-badge .badge-num { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; line-height: 1; }
+  .about-badge .badge-lbl { font-size: 11px; font-weight: 600; }
+  .about-content h2 { text-align: left; margin-bottom: 16px; }
+  .about-content p { color: var(--grey2); font-size: 14.5px; line-height: 1.8; margin-bottom: 16px; }
+  .reg-box {
+    background: rgba(201,168,76,0.07); border: 1px solid var(--border2);
+    border-radius: 12px; padding: 16px 20px; margin: 20px 0;
+    font-size: 13px; color: var(--grey2);
+  }
+  .reg-box strong { color: var(--gold); display: block; margin-bottom: 4px; font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 1px; }
+  .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-top: 48px; }
+  .team-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 28px 20px; text-align: center; transition: var(--transition); }
+  .team-card:hover { border-color: var(--border2); transform: translateY(-4px); }
+  .team-avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--navy3), var(--navy2)); border: 2px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 14px; }
+  .team-card h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+  .team-card p { font-size: 12px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ====== LEARNER CLUB ====== */
+  .course-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
+    padding: 28px; transition: var(--transition); overflow: hidden;
+  }
+  .course-card:hover { transform: translateY(-4px); border-color: var(--border2); }
+  .course-icon { font-size: 2.5rem; margin-bottom: 14px; }
+  .course-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 8px; }
+  .course-card p { font-size: 13px; color: var(--grey2); line-height: 1.65; margin-bottom: 16px; }
+  .course-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+  .course-meta span { font-size: 12px; color: var(--grey); }
+  .course-meta span strong { color: var(--white); }
+
+  /* ====== CALLS ====== */
+  .call-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
+    padding: 24px; display: grid; grid-template-columns: 1fr auto; gap: 16px;
+    align-items: center; transition: var(--transition);
+  }
+  .call-card:hover { border-color: var(--border2); transform: translateX(4px); }
+  .call-stock { font-family: 'Space Mono', monospace; font-size: 1rem; font-weight: 700; color: var(--white); }
+  .call-name { font-size: 12px; color: var(--grey); margin-top: 2px; }
+  .call-details { display: flex; gap: 20px; margin-top: 10px; }
+  .call-detail { font-size: 12px; color: var(--grey); }
+  .call-detail span { color: var(--white); font-weight: 600; }
+  .call-return { text-align: right; }
+  .call-return .r { font-family: 'Space Mono', monospace; font-size: 1.4rem; font-weight: 700; }
+  .call-return small { display: block; font-size: 11px; color: var(--grey); margin-top: 2px; }
+
+  /* ====== CALLS ACCORDION ====== */
+  .calls-accordion {
+    display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px;
+  }
+  .acc-group {
+    border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+    transition: border-color 0.3s ease;
+  }
+  .acc-group.open { border-color: var(--border2); }
+  .acc-header {
+    width: 100%; background: var(--card-bg); border: none; cursor: pointer;
+    padding: 18px 22px; display: flex; align-items: center;
+    justify-content: space-between; gap: 14px; font-family: 'DM Sans', sans-serif;
+    transition: background 0.25s ease;
+  }
+  .acc-group.open .acc-header { background: rgba(201,168,76,0.07); }
+  .acc-header:hover { background: rgba(201,168,76,0.07); }
+  .acc-header-left { display: flex; align-items: center; gap: 14px; }
+  .acc-icon { font-size: 1.5rem; flex-shrink: 0; }
+  .acc-title {
+    display: block; font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem; font-weight: 700; color: var(--white); line-height: 1.2;
+  }
+  .acc-group.open .acc-title { color: var(--gold); }
+  .acc-desc { display: block; font-size: 11.5px; color: var(--grey); margin-top: 2px; }
+  .acc-chevron {
+    font-size: 14px; color: var(--grey); transition: transform 0.3s ease, color 0.3s ease;
+    flex-shrink: 0;
+  }
+  .acc-group.open .acc-chevron { transform: rotate(180deg); color: var(--gold); }
+
+  /* Animated body */
+  .acc-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .acc-group.open .acc-body { max-height: 900px; }
+  .acc-children {
+    padding: 6px 14px 14px; display: flex; flex-direction: column; gap: 6px;
+    border-top: 1px solid var(--border);
+  }
+  .acc-child {
+    width: 100%; background: transparent; border: 1px solid transparent;
+    border-radius: 10px; padding: 12px 16px; cursor: pointer;
+    display: flex; align-items: center; gap: 14px; text-align: left;
+    font-family: 'DM Sans', sans-serif; transition: all 0.22s ease;
+  }
+  .acc-child:hover { background: rgba(201,168,76,0.06); border-color: var(--border); }
+  .acc-child.active {
+    background: rgba(201,168,76,0.1); border-color: var(--border2);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  }
+  .acc-child-icon { font-size: 1.3rem; flex-shrink: 0; }
+  .acc-child-title {
+    display: block; font-size: 13.5px; font-weight: 600; color: var(--white); line-height: 1.2;
+  }
+  .acc-child.active .acc-child-title { color: var(--gold); }
+  .acc-child-desc { display: block; font-size: 11.5px; color: var(--grey); margin-top: 2px; }
+  @media (max-width: 480px) {
+    .acc-header { padding: 14px 16px; }
+    .acc-child { padding: 10px 12px; }
+  }
+
+  /* ====== CAROUSEL ====== */
+  .carousel-wrap { position: relative; overflow: hidden; }
+  .carousel-track { display: flex; transition: transform 0.5s cubic-bezier(0.4,0,0.2,1); }
+  .carousel-slide { min-width: 100%; padding: 0 4px; box-sizing: border-box; }
+  .carousel-card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 20px; padding: 36px; position: relative; backdrop-filter: blur(12px);
+  }
+  .carousel-card .quote-mark {
+    font-family: 'Cormorant Garamond', serif; font-size: 5rem;
+    color: var(--gold); opacity: 0.3; line-height: 0.6;
+    position: absolute; top: 24px; left: 24px;
+  }
+  .carousel-card .quote-text {
+    font-size: 16px; color: var(--white); line-height: 1.75;
+    font-style: italic; margin-bottom: 24px; padding-top: 20px;
+  }
+  .carousel-card .quote-author { display: flex; align-items: center; gap: 14px; }
+  .quote-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700; color: var(--navy); flex-shrink: 0;
+  }
+  .quote-info strong { display: block; font-size: 14px; color: var(--white); }
+  .quote-info span { font-size: 12px; color: var(--grey); }
+  .quote-stars { color: var(--gold); font-size: 14px; margin-top: 2px; letter-spacing: 2px; }
+  .carousel-controls { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 24px; }
+  .car-btn {
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1px solid var(--border2); background: transparent;
+    color: var(--gold); cursor: pointer; font-size: 16px;
+    display: flex; align-items: center; justify-content: center; transition: var(--transition);
+  }
+  .car-btn:hover { background: rgba(201,168,76,0.15); }
+  .car-dots { display: flex; gap: 6px; }
+  .car-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); transition: var(--transition); cursor: pointer; }
+  .car-dot.active { background: var(--gold); width: 22px; border-radius: 4px; }
+
+  /* ====== MINI LEAD FORM ====== */
+  .mini-form-section {
+    background: linear-gradient(135deg, rgba(201,168,76,0.06) 0%, rgba(15,39,68,0.4) 100%);
+    border: 1px solid var(--border); border-radius: 24px; padding: 44px 40px;
+    position: relative; overflow: hidden;
+  }
+  .mini-form-section::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 220px; height: 220px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,168,76,0.1), transparent 70%);
+  }
+  .mini-form-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 48px; align-items: center; }
+  .mini-form-left h3 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; margin-bottom: 10px; }
+  .mini-form-left h3 em { color: var(--gold); }
+  .mini-form-left p { font-size: 13.5px; color: var(--grey2); line-height: 1.7; margin-bottom: 20px; }
+  .mini-benefit { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 13px; color: var(--grey2); }
+  .mini-benefit::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+  .mini-form-right { display: flex; flex-direction: column; gap: 12px; }
+  .mini-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mini-form-right input, .mini-form-right select {
+    width: 100%; padding: 11px 14px;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--white); font-size: 13.5px;
+    font-family: 'DM Sans', sans-serif; outline: none; transition: var(--transition);
+  }
+  .mini-form-right input:focus, .mini-form-right select:focus { border-color: var(--gold); background: rgba(201,168,76,0.06); }
+  .mini-form-right select option { background: var(--navy2); }
+  .mini-form-success {
+    display: none; text-align: center; padding: 20px;
+    background: rgba(46,204,113,0.08); border: 1px solid rgba(46,204,113,0.25);
+    border-radius: 12px; font-size: 14px; color: var(--green);
+  }
+  .mini-form-success.show { display: block; }
+  @media (max-width: 768px) {
+    .calls-l1 { grid-template-columns: 1fr 1fr; }
+    .mini-form-grid { grid-template-columns: 1fr; gap: 28px; }
+    .mini-form-row { grid-template-columns: 1fr; }
+    .mini-form-section { padding: 28px 22px; }
+  }
+  @media (max-width: 480px) {
+    .calls-l1 { grid-template-columns: 1fr; }
+    .calls-l1-btn { flex-direction: row; align-items: center; gap: 12px; }
+    .l1-icon { margin-bottom: 0; }
+  }
+
+  /* ====== SIDEBAR NAV LAYOUT (Calls + Tools) ====== */
+  .page-split {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: calc(100vh - 64px);
+    gap: 0;
+  }
+  .snav-wrap {
+    background: #07131F;
+    border-right: 1px solid var(--border);
+    padding: 32px 0;
+    position: sticky;
+    top: 64px;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+  }
+  .snav-wrap::-webkit-scrollbar { width: 4px; }
+  .snav-wrap::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+  /* Section header — now a clickable row with + button */
+  .snav-section { margin-bottom: 4px; }
+  .snav-section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 20px 13px 20px; cursor: pointer;
+    user-select: none; transition: background 0.2s ease;
+    border-left: 2px solid transparent;
+  }
+  .snav-section-header:hover { background: rgba(201,168,76,0.05); }
+  .snav-section-header.open {
+    background: rgba(201,168,76,0.07);
+    border-left-color: var(--gold);
+  }
+  .snav-section-header-left {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .snav-section-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: rgba(201,168,76,0.12); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
+    flex-shrink: 0;
+  }
+  .snav-section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+    color: var(--grey2); text-transform: uppercase; transition: color 0.2s;
+  }
+  .snav-section-header.open .snav-section-title { color: var(--gold); }
+  .snav-section-plus {
+    width: 22px; height: 22px; border-radius: 6px;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 300; color: var(--grey2); flex-shrink: 0;
+    transition: all 0.2s ease; line-height: 1;
+  }
+  .snav-section-header.open .snav-section-plus {
+    background: rgba(201,168,76,0.15); border-color: var(--border2);
+    color: var(--gold); content: '−';
+  }
+
+  /* Collapsible body wrapping the child items */
+  .snav-section-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .snav-section-body.open { max-height: 600px; }
+  .snav-divider {
+    height: 1px; background: var(--border); margin: 0 20px 4px;
+  }
+
+  /* Each row item */
+  .snav-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 20px 10px 28px; cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: all 0.2s ease; user-select: none;
+  }
+  .snav-item:hover { background: rgba(201,168,76,0.06); }
+  .snav-item.active {
+    background: rgba(201,168,76,0.1);
+    border-left-color: var(--gold);
+  }
+  .snav-item-label {
+    font-size: 13.5px; color: var(--grey2); transition: color 0.2s;
+  }
+  .snav-item.active .snav-item-label,
+  .snav-item:hover .snav-item-label { color: var(--white); }
+  .snav-item.active .snav-item-label { color: var(--gold); font-weight: 600; }
+
+  /* The + / – toggle button */
+  .snav-plus {
+    width: 22px; height: 22px; border-radius: 6px;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 300; color: var(--grey2); flex-shrink: 0;
+    transition: all 0.2s ease; line-height: 1;
+  }
+  .snav-item.expanded .snav-plus {
+    background: rgba(201,168,76,0.15); border-color: var(--border2);
+    color: var(--gold);
+  }
+
+  /* Expandable sub-description */
+  .snav-sub {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.32s cubic-bezier(0.4,0,0.2,1);
+    background: rgba(201,168,76,0.03);
+  }
+  .snav-sub.open { max-height: 160px; }
+  .snav-sub-inner {
+    padding: 10px 24px 14px 28px;
+    border-left: 2px solid var(--border2);
+    margin: 0 24px 4px;
+    border-radius: 0 0 6px 6px;
+  }
+  .snav-sub-inner p { font-size: 12px; color: var(--grey); line-height: 1.65; }
+  .snav-sub-inner .snav-sub-btn {
+    display: inline-block; margin-top: 8px;
+    font-size: 11.5px; color: var(--gold); cursor: pointer;
+    font-weight: 600; letter-spacing: 0.3px;
+  }
+  .snav-sub-inner .snav-sub-btn:hover { text-decoration: underline; }
+
+  /* Section separator between Short/Long */
+  .snav-sep {
+    height: 1px; background: rgba(255,255,255,0.05);
+    margin: 12px 0;
+  }
+
+  /* Right content area */
+  .snav-content {
+    padding: 40px 36px;
+    background: var(--navy);
+  }
+  .snav-content-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
+    padding-bottom: 20px; border-bottom: 1px solid var(--border);
+  }
+  .snav-content-header h2 {
+    font-size: 1.6rem; margin: 0; text-align: left;
+  }
+  .snav-content-header p {
+    font-size: 13px; color: var(--grey); margin: 4px 0 0;
+  }
+  .snav-breadcrumb {
+    font-family: 'Space Mono', monospace; font-size: 10.5px;
+    color: var(--grey); letter-spacing: 1px; margin-bottom: 6px;
+  }
+  .snav-breadcrumb span { color: var(--gold); }
+
+  @media (max-width: 900px) {
+    .page-split { grid-template-columns: 1fr; }
+    .snav-wrap {
+      position: static; height: auto;
+      display: flex; flex-wrap: wrap; padding: 16px;
+      gap: 4px; border-right: none; border-bottom: 1px solid var(--border);
+    }
+    .snav-section { margin-bottom: 4px; }
+    .snav-section-header { padding: 8px 12px 6px; }
+    .snav-divider { display: none; }
+    .snav-item { padding: 9px 12px; border-radius: 8px; border-left: none; }
+    .snav-item.active { border-left: none; border: 1px solid var(--border2); }
+    .snav-sub { display: none; }
+    .snav-content { padding: 24px 20px; }
+  }
+
+  /* ====== FII / DII TALLY WIDGET ====== */
+  .fiidii-header {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px; margin-bottom: 16px;
+  }
+  .fiidii-title-row { display: flex; align-items: center; gap: 10px; }
+  .fiidii-icon { font-size: 16px; }
+  .fiidii-heading {
+    font-family: 'Space Mono', monospace; font-size: 12px;
+    font-weight: 700; color: var(--white); text-transform: uppercase; letter-spacing: 1.5px;
+  }
+  .fiidii-live-badge {
+    display: flex; align-items: center; gap: 5px;
+    background: rgba(46,204,113,0.1); border: 1px solid rgba(46,204,113,0.25);
+    border-radius: 20px; padding: 2px 10px;
+    font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+    color: var(--green); letter-spacing: 1px;
+  }
+  .fiidii-date { font-size: 11px; color: var(--grey); font-family: 'Space Mono', monospace; }
+  .fiidii-hist-btn {
+    font-size: 11px; font-family: 'Space Mono', monospace; font-weight: 700;
+    color: var(--gold); background: rgba(201,168,76,0.08);
+    border: 1px solid var(--border2); border-radius: 6px; padding: 4px 12px;
+    cursor: pointer; transition: var(--transition); letter-spacing: 0.3px;
+    display: none; /* hidden — table is always visible */
+  }
+
+  /* Master two-column grid */
+  .fiidii-master-grid {
+    display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start;
+  }
+
+  /* Left: today's cards */
+  .fiidii-left {}
+  .fiidii-cards {
+    display: grid; grid-template-columns: 1fr auto 1fr auto; gap: 0; align-items: stretch;
+  }
+  .fiidii-card {
+    background: rgba(11,28,52,0.7); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px 18px; transition: border-color 0.3s;
+  }
+  .fiidii-card:hover { border-color: var(--border2); }
+  .fiidii-card-top {
+    display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px;
+  }
+  .fiidii-cat {
+    font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
+    color: var(--white); letter-spacing: 1px;
+  }
+  .fiidii-subcat { font-size: 10px; color: var(--grey); margin-top: 2px; }
+  .fiidii-net-badge {
+    font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+    font-family: 'Space Mono', monospace; white-space: nowrap;
+  }
+  .fiidii-net-badge.buy-badge  { background: rgba(46,204,113,0.15); color: var(--green); border: 1px solid rgba(46,204,113,0.3); }
+  .fiidii-net-badge.sell-badge { background: rgba(231,76,60,0.15);  color: var(--red);   border: 1px solid rgba(231,76,60,0.3);  }
+  .fiidii-net {
+    font-family: 'Space Mono', monospace; font-size: 1.3rem; font-weight: 700;
+    line-height: 1; margin-bottom: 2px;
+  }
+  .fiidii-net.pos { color: var(--green); }
+  .fiidii-net.neg { color: var(--red); }
+  .fiidii-net-label { font-size: 10px; color: var(--grey); margin-bottom: 10px; }
+  .fiidii-bar-wrap {
+    height: 5px; background: rgba(231,76,60,0.25); border-radius: 3px;
+    overflow: hidden; margin-bottom: 10px;
+  }
+  .fiidii-bar-buy {
+    height: 100%; background: linear-gradient(90deg, var(--green), #27ae60);
+    border-radius: 3px; transition: width 1s ease;
+  }
+  .fiidii-bsrow { display: flex; gap: 14px; }
+  .fiidii-bs { display: flex; align-items: center; gap: 7px; }
+  .fiidii-bs-icon {
+    width: 20px; height: 20px; border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; flex-shrink: 0;
+  }
+  .fiidii-bs-icon.buy  { background: rgba(46,204,113,0.15); color: var(--green); }
+  .fiidii-bs-icon.sell { background: rgba(231,76,60,0.15);  color: var(--red);   }
+  .fiidii-bs-val   { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: var(--white); }
+  .fiidii-bs-label { font-size: 9.5px; color: var(--grey); }
+  .fiidii-vsep {
+    display: flex; align-items: center; justify-content: center; padding: 0 12px;
+    font-family: 'Space Mono', monospace; font-size: 10px; color: var(--grey); font-weight: 700;
+  }
+  .fiidii-sentiment {
+    background: rgba(11,28,52,0.7); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px 18px; min-width: 150px;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .sentiment-label {
+    font-family: 'Space Mono', monospace; font-size: 9.5px;
+    color: var(--grey); text-transform: uppercase; letter-spacing: 1px;
+  }
+  .sentiment-val { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 700; }
+  .sentiment-val.bullish { color: var(--green); }
+  .sentiment-val.bearish { color: var(--red); }
+  .sentiment-val.neutral { color: var(--gold); }
+  .sentiment-desc { font-size: 10.5px; color: var(--grey2); line-height: 1.5; }
+  .sentiment-meter {
+    height: 5px;
+    background: linear-gradient(90deg, var(--red) 0%, var(--gold) 50%, var(--green) 100%);
+    border-radius: 3px; position: relative; margin-top: 4px;
+  }
+  .sentiment-fill {
+    position: absolute; top: -3px; height: 11px; width: 3px;
+    background: white; border-radius: 2px; transform: translateX(-50%);
+    box-shadow: 0 0 5px rgba(255,255,255,0.9); transition: left 1s ease;
+  }
+  .sentiment-scale {
+    display: flex; justify-content: space-between;
+    font-size: 8.5px; color: var(--grey); font-family: 'Space Mono', monospace; margin-top: 2px;
+  }
+  .fiidii-note { font-size: 9px; color: var(--grey); margin-top: auto; font-family: 'Space Mono', monospace; opacity: 0.7; }
+
+  /* RIGHT: 30-day table */
+  .fiidii-right {}
+  .hist-table-wrap {
+    background: rgba(7,19,31,0.85); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+  }
+  .hist-table-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    background: rgba(201,168,76,0.06);
+  }
+  .hist-table-title {
+    font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
+    color: var(--white); text-transform: uppercase; letter-spacing: 1px;
+  }
+  .hist-table-sub { font-size: 10px; color: var(--grey); font-family: 'Space Mono', monospace; }
+  .hist-scroll {
+    max-height: 280px; overflow-y: auto;
+  }
+  .hist-scroll::-webkit-scrollbar { width: 3px; }
+  .hist-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  .hist-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+  .hist-table thead tr { background: rgba(201,168,76,0.05); position: sticky; top: 0; z-index: 1; }
+  .hist-table th {
+    padding: 8px 10px; text-align: left; font-family: 'Space Mono', monospace;
+    font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.8px;
+    white-space: nowrap; border-bottom: 1px solid var(--border);
+  }
+  .hist-table td {
+    padding: 7px 10px; border-top: 1px solid rgba(255,255,255,0.04);
+    font-size: 11px; white-space: nowrap;
+  }
+  .hist-table tr:hover td { background: rgba(201,168,76,0.04); }
+  .hist-table .td-date { color: var(--grey2); font-family: 'Space Mono', monospace; font-size: 10px; }
+  .hist-table .td-pos { color: var(--green); font-weight: 700; font-family: 'Space Mono', monospace; }
+  .hist-table .td-neg { color: var(--red);   font-weight: 700; font-family: 'Space Mono', monospace; }
+  .hist-flow-bar {
+    display: flex; gap: 2px; align-items: center; height: 14px;
+  }
+  .hist-fii-bar, .hist-dii-bar {
+    height: 8px; border-radius: 2px; min-width: 2px; transition: width 0.5s;
+  }
+  .hist-fii-bar { background: #3498db; }
+  .hist-dii-bar { background: var(--gold); }
+
+  @media (max-width: 1024px) {
+    .fiidii-master-grid { grid-template-columns: 1fr; }
+    .fiidii-right { margin-top: 0; }
+    .hist-scroll { max-height: 220px; }
+  }
+  @media (max-width: 860px) {
+    .fiidii-cards { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 10px; }
+    .fiidii-vsep { display: none; }
+    .fiidii-sentiment { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .sentiment-meter, .sentiment-scale { width: 100%; }
+  }
+  @media (max-width: 540px) {
+    .fiidii-cards { grid-template-columns: 1fr; }
+  }
+
+  /* ====== DISCLAIMER ====== */
+  .disclaimer {
+    background: rgba(231,76,60,0.05); border: 1px solid rgba(231,76,60,0.2);
+    border-radius: 12px; padding: 20px 24px; margin: 40px 0 0;
+  }
+  .disclaimer h4 { font-size: 12px; color: var(--red); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-family: 'Space Mono', monospace; }
+  .disclaimer p { font-size: 12px; color: var(--grey); line-height: 1.65; }
+
+  /* ====== FOOTER ====== */
+  footer {
+    background: var(--navy2); border-top: 1px solid var(--border); padding: 60px 0 30px;
+  }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+  .footer-brand p { font-size: 13px; color: var(--grey); line-height: 1.7; margin-top: 14px; max-width: 280px; }
+  footer h5 { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--grey); margin-bottom: 16px; font-family: 'Space Mono', monospace; }
+  footer ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  footer ul li a { font-size: 13.5px; color: var(--grey2); text-decoration: none; transition: var(--transition); cursor: pointer; }
+  footer ul li a:hover { color: var(--gold); }
+  .footer-bottom { padding-top: 28px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .footer-bottom p { font-size: 12px; color: var(--grey); }
+  .sebi-badge { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--gold); background: rgba(201,168,76,0.1); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); }
+  .social-links { display: flex; gap: 10px; margin-top: 16px; }
+  .social-link { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; text-decoration: none; transition: var(--transition); color: var(--grey2); }
+  .social-link:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* ====== DIVIDER ====== */
+  .gold-line { width: 60px; height: 3px; background: linear-gradient(90deg, var(--gold), transparent); border-radius: 2px; margin: 16px auto 0; }
+  .gold-line.left { margin: 16px 0 0; }
+
+  /* ====== SCROLL ANIMATIONS ====== */
+  .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ====== RESPONSIVE ====== */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .about-grid { grid-template-columns: 1fr; }
+    .tools-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    h1 { font-size: 2.8rem; }
+  }
+  @media (max-width: 480px) {
+    .footer-grid { grid-template-columns: 1fr; }
+    .hero-stats { flex-direction: column; gap: 20px; }
+    .result-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ====== NAVBAR ====== -->
+<nav id="mainNav">
+  <a class="nav-logo" onclick="showPage('home');closeMegas()">
+    <div class="logo-mark">R</div>
+    <div class="logo-text">Root<span>Nivesh</span></div>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a onclick="showPage('home');closeMegas()" class="active">Home</a></li>
+    <li><a onclick="showPage('reports');closeMegas()">Research Reports</a></li>
+    <li><a onclick="showPage('learner');closeMegas()">Learner Club</a></li>
+
+    <!-- CALLS mega trigger -->
+    <li>
+      <div class="nav-dd-trigger" id="triggerCalls" onclick="toggleMega('megaCalls','triggerCalls')">
+        Calls <span class="dd-arrow">▾</span>
+      </div>
+      <div class="mega-menu" id="megaCalls">
+        <div class="mega-inner cols-2">
+
+          <!-- LEFT: SHORT TERM -->
+          <div class="mega-col">
+            <div class="mega-col-header">
+              <div class="mega-col-icon">⚡</div>
+              <span class="mega-col-title">Short Term</span>
+            </div>
+            <div class="mega-row" onclick="megaGoCall('intraday')">
+              <span class="mega-row-label">Intraday</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-intraday','snav-intraday')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-intraday">
+              <div class="mega-sub-inner">
+                <p>Same-day buy/sell trades with tight stop-loss. Ideal for active traders.</p>
+                <span class="mega-sub-go" onclick="megaGoCall('intraday')">View Calls →</span>
+              </div>
+            </div>
+            <div class="mega-row" onclick="megaGoCall('swing')">
+              <span class="mega-row-label">Swing</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-swing','snav-swing')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-swing">
+              <div class="mega-sub-inner">
+                <p>7–14 day momentum trades capturing short-term price swings.</p>
+                <span class="mega-sub-go" onclick="megaGoCall('swing')">View Calls →</span>
+              </div>
+            </div>
+            <div class="mega-row" onclick="megaGoCall('positional')">
+              <span class="mega-row-label">Positional</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-positional','snav-positional')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-positional">
+              <div class="mega-sub-inner">
+                <p>1–3 month trend-following calls. Hold for larger price moves.</p>
+                <span class="mega-sub-go" onclick="megaGoCall('positional')">View Calls →</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: LONG TERM -->
+          <div class="mega-col">
+            <div class="mega-col-header">
+              <div class="mega-col-icon">🏦</div>
+              <span class="mega-col-title">Long Term</span>
+            </div>
+            <div class="mega-row" onclick="megaGoCall('value')">
+              <span class="mega-row-label">Value Based Investing</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-value','snav-value')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-value">
+              <div class="mega-sub-inner">
+                <p>Stocks picked below intrinsic value. 18–30 month wealth creation horizon.</p>
+                <span class="mega-sub-go" onclick="megaGoCall('value')">View Picks →</span>
+              </div>
+            </div>
+            <div class="mega-row" onclick="megaGoCall('monthly')">
+              <span class="mega-row-label">Monthly Based Investing</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-monthly','snav-monthly')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-monthly">
+              <div class="mega-sub-inner">
+                <p>SIP, ETF & index fund ideas for systematic long-term compounding.</p>
+                <span class="mega-sub-go" onclick="megaGoCall('monthly')">View Ideas →</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </li>
+
+    <li><a onclick="showPage('performance');closeMegas()">Performance</a></li>
+
+    <!-- TOOLS mega trigger -->
+    <li>
+      <div class="nav-dd-trigger" id="triggerTools" onclick="toggleMega('megaTools','triggerTools')">
+        Tools <span class="dd-arrow">▾</span>
+      </div>
+      <div class="mega-menu" id="megaTools">
+        <div class="mega-inner cols-1">
+          <div class="mega-col">
+            <div class="mega-col-header">
+              <div class="mega-col-icon">🔧</div>
+              <span class="mega-col-title">Financial Tools</span>
+            </div>
+            <div class="mega-row" onclick="megaGoTool('emi')">
+              <span class="mega-row-label">EMI Calculator</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-emi')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-emi">
+              <div class="mega-sub-inner">
+                <p>Calculate monthly EMI, total interest payable and principal breakdown for any loan type.</p>
+                <span class="mega-sub-go" onclick="megaGoTool('emi')">Open Calculator →</span>
+              </div>
+            </div>
+            <div class="mega-row" onclick="megaGoTool('pos')">
+              <span class="mega-row-label">Position Sizing Calculator</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-pos')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-pos">
+              <div class="mega-sub-inner">
+                <p>Find the exact number of shares to buy so your loss never exceeds a set % of capital.</p>
+                <span class="mega-sub-go" onclick="megaGoTool('pos')">Open Calculator →</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+
+    <li><a onclick="showPage('about');closeMegas()">About</a></li>
+    <li><a onclick="showPage('contact');closeMegas()" class="nav-cta">Contact</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a onclick="showPage('home');toggleMenu()">🏠 Home</a>
+  <a onclick="showPage('reports');toggleMenu()">📊 Research Reports</a>
+  <a onclick="showPage('learner');toggleMenu()">🎓 Learner Club</a>
+  <div class="mob-section">⚡ Short Term Calls</div>
+  <a class="mob-indent" onclick="megaGoCall('intraday');toggleMenu()">📈 Intraday</a>
+  <a class="mob-indent" onclick="megaGoCall('swing');toggleMenu()">🔄 Swing</a>
+  <a class="mob-indent" onclick="megaGoCall('positional');toggleMenu()">📊 Positional</a>
+  <div class="mob-section">🏦 Long Term Calls</div>
+  <a class="mob-indent" onclick="megaGoCall('value');toggleMenu()">💎 Value Based</a>
+  <a class="mob-indent" onclick="megaGoCall('monthly');toggleMenu()">📅 Monthly Based</a>
+  <a onclick="showPage('performance');toggleMenu()">📈 Performance</a>
+  <div class="mob-section">🔧 Tools</div>
+  <a class="mob-indent" onclick="megaGoTool('emi');toggleMenu()">🏦 EMI Calculator</a>
+  <a class="mob-indent" onclick="megaGoTool('pos');toggleMenu()">📐 Position Sizing</a>
+  <a onclick="showPage('about');toggleMenu()">👤 About</a>
+  <a onclick="showPage('contact');toggleMenu()">✉️ Contact</a>
+</div>
+
+<!-- ===================== HOME PAGE ===================== -->
+<div class="page active" id="page-home">
+
+  <!-- Hero -->
+  <section class="hero">
+    <!--
+    <div class="ticker-tape">
+      <div class="ticker-live-bar">
+        <span class="ticker-live-dot">
+          <span class="tlive-pulse"></span>LIVE
+        </span>
+        <span class="ticker-market-status" id="marketStatus">NSE</span>
+      </div>
+      <div class="ticker-scroll-wrap">
+        <div class="ticker-inner" id="tickerInner">
+          <span class="ticker-loading">⟳ Fetching live market data…</span>
+        </div>
+      </div>
+    </div>
+    -->
+    <div class="hero-content">
+      <div class="hero-badge">Hello, SEBI REGISTERED RESEARCH ANALYST</div>
+      <h1>Smart Research Hello 123.<br><span class="accent">Smarter</span> Returns.</h1>
+      <p class="hero-sub">SEBI Registered Research Analyst providing deep fundamental & technical analysis, actionable trading calls, and financial education for retail investors.</p>
+      <div class="btn-group">
+        <button class="btn btn-gold" onclick="showPage('reports')">📊 View Research Reports</button>
+        <button class="btn btn-outline" onclick="showPage('calls')">📞 Latest Calls</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num">87%</div>
+          <div class="stat-label">Accuracy Rate</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">500+</div>
+          <div class="stat-label">Reports Published</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">12K+</div>
+          <div class="stat-label">Active Subscribers</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">7+</div>
+          <div class="stat-label">Years Experience</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===== FII / DII TALLY WIDGET ===== -->
+  <section style="padding: 28px 0; background: rgba(7,19,31,0.6); border-bottom: 1px solid var(--border);">
+    <div class="container">
+
+      <!-- Global header row -->
+      <div class="fiidii-header">
+        <div class="fiidii-title-row">
+          <span class="fiidii-icon">📊</span>
+          <span class="fiidii-heading">FII / DII Tally</span>
+          <span class="fiidii-live-badge"><span class="tlive-pulse"></span>LIVE</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <div class="fiidii-date" id="fiidiiDate">Loading…</div>
+          <button class="fiidii-hist-btn" id="histToggleBtn" onclick="toggleHistTable()">📅 Last 30 Days ▾</button>
+        </div>
+      </div>
+
+      <!-- Two-column master layout -->
+      <div class="fiidii-master-grid">
+
+        <!-- LEFT: Today's FII / DII cards -->
+        <div class="fiidii-left">
+          <div class="fiidii-cards">
+
+            <!-- FII Card -->
+            <div class="fiidii-card" id="fiiCard">
+              <div class="fiidii-card-top">
+                <div>
+                  <div class="fiidii-cat">FII / FPI</div>
+                  <div class="fiidii-subcat">Foreign Institutional Investors</div>
+                </div>
+                <div class="fiidii-net-badge" id="fiiBadge">—</div>
+              </div>
+              <div class="fiidii-net" id="fiiNet">—</div>
+              <div class="fiidii-net-label" id="fiiNetLabel">Net Activity</div>
+              <div class="fiidii-bar-wrap">
+                <div class="fiidii-bar-buy" id="fiiBarBuy" style="width:50%"></div>
+              </div>
+              <div class="fiidii-bsrow">
+                <div class="fiidii-bs">
+                  <span class="fiidii-bs-icon buy">B</span>
+                  <div>
+                    <div class="fiidii-bs-val" id="fiiBuy">—</div>
+                    <div class="fiidii-bs-label">Buy (&#8377;Cr)</div>
+                  </div>
+                </div>
+                <div class="fiidii-bs">
+                  <span class="fiidii-bs-icon sell">S</span>
+                  <div>
+                    <div class="fiidii-bs-val" id="fiiSell">—</div>
+                    <div class="fiidii-bs-label">Sell (&#8377;Cr)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- VS -->
+            <div class="fiidii-vsep">VS</div>
+
+            <!-- DII Card -->
+            <div class="fiidii-card" id="diiCard">
+              <div class="fiidii-card-top">
+                <div>
+                  <div class="fiidii-cat">DII</div>
+                  <div class="fiidii-subcat">Domestic Institutional Investors</div>
+                </div>
+                <div class="fiidii-net-badge" id="diiBadge">—</div>
+              </div>
+              <div class="fiidii-net" id="diiNet">—</div>
+              <div class="fiidii-net-label" id="diiNetLabel">Net Activity</div>
+              <div class="fiidii-bar-wrap">
+                <div class="fiidii-bar-buy" id="diiBarBuy" style="width:50%"></div>
+              </div>
+              <div class="fiidii-bsrow">
+                <div class="fiidii-bs">
+                  <span class="fiidii-bs-icon buy">B</span>
+                  <div>
+                    <div class="fiidii-bs-val" id="diiBuy">—</div>
+                    <div class="fiidii-bs-label">Buy (&#8377;Cr)</div>
+                  </div>
+                </div>
+                <div class="fiidii-bs">
+                  <span class="fiidii-bs-icon sell">S</span>
+                  <div>
+                    <div class="fiidii-bs-val" id="diiSell">—</div>
+                    <div class="fiidii-bs-label">Sell (&#8377;Cr)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sentiment -->
+            <div class="fiidii-sentiment" id="fiidiiSentiment">
+              <div class="sentiment-label">Market Sentiment</div>
+              <div class="sentiment-val" id="sentimentVal">—</div>
+              <div class="sentiment-desc" id="sentimentDesc">Calculating…</div>
+              <div class="sentiment-meter">
+                <div class="sentiment-fill" id="sentimentFill" style="left:50%"></div>
+              </div>
+              <div class="sentiment-scale">
+                <span>Bearish</span><span>Neutral</span><span>Bullish</span>
+              </div>
+              <div class="fiidii-note">Source: NSE India &#183; 15-min delayed</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- RIGHT: Last 30 days table (always visible) -->
+        <div class="fiidii-right">
+          <div class="hist-table-wrap">
+            <div class="hist-table-header">
+              <span class="hist-table-title">Last 30 Days</span>
+              <span class="hist-table-sub" id="histLoadStatus">Loading&#8230;</span>
+            </div>
+            <div class="hist-scroll">
+              <table class="hist-table" id="histTable">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>FII Net (&#8377;Cr)</th>
+                    <th>DII Net (&#8377;Cr)</th>
+                    <th>Flow</th>
+                  </tr>
+                </thead>
+                <tbody id="histTableBody">
+                  <tr><td colspan="4" style="text-align:center; color:var(--grey); padding:20px; font-size:12px;">Fetching data&#8230;</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /fiidii-master-grid -->
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section>
+    <div class="container">
+      <div class="section-header fade-in">
+        <div class="section-tag">What We Offer</div>
+        <h2>Comprehensive <em>Research Services</em></h2>
+        <div class="gold-line"></div>
+        <p class="section-desc" style="margin-top:16px">From deep-dive fundamental analysis to intraday trading calls — everything you need to invest with confidence.</p>
+      </div>
+      <div class="services-grid">
+        <div class="service-card fade-in">
+          <div class="service-icon">📑</div>
+          <h3>Research Reports</h3>
+          <p>Detailed fundamental analysis with buy/sell targets, financial ratios, and risk assessment for NSE/BSE listed companies.</p>
+        </div>
+        <div class="service-card fade-in">
+          <div class="service-icon">📞</div>
+          <h3>Trading Calls</h3>
+          <p>Intraday and positional calls with precise entry, exit, and stop-loss levels — backed by technical analysis.</p>
+        </div>
+        <div class="service-card fade-in">
+          <div class="service-icon">💼</div>
+          <h3>Investment Ideas</h3>
+          <p>Long-term investment picks for wealth creation with 1–3 year horizon based on business quality and valuation.</p>
+        </div>
+        <div class="service-card fade-in">
+          <div class="service-icon">🎓</div>
+          <h3>Learner Club</h3>
+          <p>Structured financial education — from stock market basics to advanced options strategies — for all skill levels.</p>
+        </div>
+        <div class="service-card fade-in">
+          <div class="service-icon">📈</div>
+          <h3>Portfolio Review</h3>
+          <p>One-on-one portfolio health check, asset allocation advice, and rebalancing recommendations.</p>
+        </div>
+        <div class="service-card fade-in">
+          <div class="service-icon">🔧</div>
+          <h3>Financial Tools</h3>
+          <p>Free EMI calculator, position sizing calculator, and other interactive tools for smarter financial decisions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Reports -->
+  <section style="background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(201,168,76,0.04), transparent);">
+    <div class="container">
+      <div class="section-header fade-in">
+        <div class="section-tag">Latest Research</div>
+        <h2>Featured <em>Reports</em></h2>
+        <div class="gold-line"></div>
+      </div>
+      <div class="cards-grid">
+        <div class="card fade-in">
+          <div class="card-tag tag-buy">BUY</div>
+          <h3>Reliance Industries Ltd</h3>
+          <p>Jio Financial Services demerger value unlocking, O2C margin recovery, and new energy business ramp-up make RIL a compelling bet.</p>
+          <div class="card-meta">
+            <div class="meta-item"><span>₹3,250</span>Target Price</div>
+            <div class="meta-item"><span>+18%</span>Upside</div>
+            <div class="meta-item"><span>12M</span>Horizon</div>
+          </div>
+        </div>
+        <div class="card fade-in">
+          <div class="card-tag tag-buy">BUY</div>
+          <h3>HDFC Bank Limited</h3>
+          <p>Post-merger integration on track, NIM expansion expected in H2, strong CASA ratio and retail loan book growth drive outperformance.</p>
+          <div class="card-meta">
+            <div class="meta-item"><span>₹1,950</span>Target Price</div>
+            <div class="meta-item"><span>+22%</span>Upside</div>
+            <div class="meta-item"><span>12M</span>Horizon</div>
+          </div>
+        </div>
+        <div class="card fade-in">
+          <div class="card-tag tag-hold">HOLD</div>
+          <h3>Infosys Limited</h3>
+          <p>Deal ramp-downs and global macro headwinds weigh on near-term growth. Await better entry after guidance upgrade in Q2 FY26.</p>
+          <div class="card-meta">
+            <div class="meta-item"><span>₹1,760</span>Target Price</div>
+            <div class="meta-item"><span>+8%</span>Upside</div>
+            <div class="meta-item"><span>6M</span>Horizon</div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center; margin-top:36px">
+        <button class="btn btn-outline" onclick="showPage('reports')">View All Reports →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose Us -->
+  <section>
+    <div class="container">
+      <div class="section-header fade-in">
+        <div class="section-tag">Why RootNivesh</div>
+        <h2>Research You Can <em>Trust</em></h2>
+        <div class="gold-line"></div>
+      </div>
+      <div class="cards-grid">
+        <div class="card fade-in">
+          <h3>🏛️ SEBI Registered</h3>
+          <p>Fully compliant with SEBI regulations. All research reports and recommendations adhere to SEBI (Research Analysts) Regulations 2014.</p>
+        </div>
+        <div class="card fade-in">
+          <h3>🔬 Deep Analysis</h3>
+          <p>Every report backed by thorough analysis of financial statements, management quality, competitive moat, and sector tailwinds.</p>
+        </div>
+        <div class="card fade-in">
+          <h3>⚡ Timely Calls</h3>
+          <p>Real-time alerts via WhatsApp & Telegram. Never miss a trading opportunity with our instant notification system.</p>
+        </div>
+        <div class="card fade-in">
+          <h3>📊 Transparent Performance</h3>
+          <p>Full track record publicly available. We report wins and losses equally — because honest performance data builds real trust.</p>
+        </div>
+        <div class="card fade-in">
+          <h3>🎓 Education First</h3>
+          <p>We don't just give fish — we teach fishing. Our Learner Club ensures subscribers understand the 'why' behind every call.</p>
+        </div>
+        <div class="card fade-in">
+          <h3>🤝 Dedicated Support</h3>
+          <p>Responsive support team for all queries. Monthly webinars and Q&A sessions with our research team.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TESTIMONIALS CAROUSEL ===== -->
+  <section>
+    <div class="container">
+      <div class="section-header fade-in">
+        <div class="section-tag">What Our Subscribers Say</div>
+        <h2>Trusted by <em>12,000+</em> Investors</h2>
+        <div class="gold-line"></div>
+      </div>
+      <div class="carousel-wrap fade-in">
+        <div class="carousel-track" id="carouselTrack">
+
+          <div class="carousel-slide">
+            <div class="carousel-card">
+              <div class="quote-mark">"</div>
+              <p class="quote-text">RootNivesh's research completely changed how I invest. Their HDFC Bank call gave me a 22% return in 8 months. The reports are detailed, easy to understand, and the analyst actually responds to your questions. Best ₹2,999 I ever spent.</p>
+              <div class="quote-author">
+                <div class="quote-avatar">R</div>
+                <div class="quote-info">
+                  <strong>Rahul Sharma</strong>
+                  <span>Software Engineer, Pune</span>
+                  <div class="quote-stars">★★★★★</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="carousel-slide">
+            <div class="carousel-card">
+              <div class="quote-mark">"</div>
+              <p class="quote-text">I've been trading for 5 years but always struggled with consistency. After joining the Learner Club and following their positional calls, my strike rate improved from 45% to over 78%. The position sizing calculator alone is worth the subscription.</p>
+              <div class="quote-author">
+                <div class="quote-avatar">P</div>
+                <div class="quote-info">
+                  <strong>Priya Menon</strong>
+                  <span>Business Owner, Bangalore</span>
+                  <div class="quote-stars">★★★★★</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="carousel-slide">
+            <div class="carousel-card">
+              <div class="quote-mark">"</div>
+              <p class="quote-text">The transparency is what sets RootNivesh apart — they publish both their winning and losing calls. No other analyst I've followed has that level of honesty. Their Nifty Bank options call gave 89% returns in 3 days.</p>
+              <div class="quote-author">
+                <div class="quote-avatar">A</div>
+                <div class="quote-info">
+                  <strong>Amit Joshi</strong>
+                  <span>Retired Professional, Delhi</span>
+                  <div class="quote-stars">★★★★★</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="carousel-slide">
+            <div class="carousel-card">
+              <div class="quote-mark">"</div>
+              <p class="quote-text">As a first-time investor, I was overwhelmed. The Learner Club modules — especially 'Stock Market Basics' and 'How to Read Annual Reports' — gave me the confidence to start investing on my own. Highly recommend to every beginner.</p>
+              <div class="quote-author">
+                <div class="quote-avatar">S</div>
+                <div class="quote-info">
+                  <strong>Sneha Patil</strong>
+                  <span>CA Student, Mumbai</span>
+                  <div class="quote-stars">★★★★★</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="carousel-slide">
+            <div class="carousel-card">
+              <div class="quote-mark">"</div>
+              <p class="quote-text">Dixon Technologies call at ₹12,850 is now at ₹15,800+ — that's 23% in under 6 months. The research note was thorough — PLI scheme analysis, order book data, management commentary. This isn't a tip service, it's real research.</p>
+              <div class="quote-author">
+                <div class="quote-avatar">V</div>
+                <div class="quote-info">
+                  <strong>Vijay Kulkarni</strong>
+                  <span>IT Manager, Hyderabad</span>
+                  <div class="quote-stars">★★★★★</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="carousel-controls">
+          <button class="car-btn" onclick="carPrev()">←</button>
+          <div class="car-dots" id="carDots"></div>
+          <button class="car-btn" onclick="carNext()">→</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MINI LEAD FORM ===== -->
+  <section style="padding: 0 0 60px">
+    <div class="container">
+      <div class="mini-form-section fade-in">
+        <div class="mini-form-grid">
+          <div class="mini-form-left">
+            <div class="section-tag">Free Research Report</div>
+            <h3>Get Your First Report <em>Free</em></h3>
+            <p>Drop your details and we'll send you a complimentary research report on the stock of your choice — with full fundamental analysis, target price, and risk assessment.</p>
+            <div class="mini-benefit">SEBI Registered Research Analyst</div>
+            <div class="mini-benefit">No spam. Unsubscribe anytime.</div>
+            <div class="mini-benefit">Report delivered within 24 hours</div>
+            <div class="mini-benefit">Instant access to our free Learner Club</div>
+          </div>
+          <div class="mini-form-right" id="miniFormFields">
+            <div class="mini-form-row">
+              <input type="text" id="mfName" placeholder="Your Name *">
+              <input type="tel" id="mfPhone" placeholder="Phone Number *">
+            </div>
+            <input type="email" id="mfEmail" placeholder="Email Address *">
+            <select id="mfInterest">
+              <option value="">I'm interested in… *</option>
+              <option>Free Research Report</option>
+              <option>Short Term Trading Calls</option>
+              <option>Long Term Investment Ideas</option>
+              <option>Learner Club Membership</option>
+              <option>Premium Subscription</option>
+              <option>Portfolio Review</option>
+            </select>
+            <select id="mfCapital">
+              <option value="">Investment Capital Range</option>
+              <option>Below ₹1 Lakh</option>
+              <option>₹1 – 5 Lakhs</option>
+              <option>₹5 – 20 Lakhs</option>
+              <option>₹20 – 50 Lakhs</option>
+              <option>Above ₹50 Lakhs</option>
+            </select>
+            <button class="calc-btn" onclick="submitMiniForm()" style="margin-top:4px">
+              🚀 Get Free Report Now
+            </button>
+            <p style="font-size:11px; color:var(--grey); text-align:center">
+              By submitting, you agree to our privacy policy. SEBI Reg. INH000XXXXX.
+            </p>
+          </div>
+          <div class="mini-form-success" id="miniFormSuccess" style="display:none; grid-column:2">
+            <div style="font-size:3rem; margin-bottom:10px">🎉</div>
+            <h4 style="font-family:'Cormorant Garamond',serif; font-size:1.4rem; margin-bottom:8px; color:var(--white)">You're In!</h4>
+            <p style="color:var(--grey2); font-size:14px">We'll send your free research report within 24 hours. Check your email and WhatsApp.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Disclaimer -->
+  <section style="padding: 0 0 60px">
+    <div class="container">
+      <div class="disclaimer">
+        <h4>⚠️ Risk Disclaimer</h4>
+        <p>Investment in securities market are subject to market risk. Read all related documents carefully before investing. Registration granted by SEBI and certification from NISM in no way guarantee performance of the intermediary or provide any assurance of returns to investors. Past performance is not indicative of future results. RootNivesh Research is registered with SEBI as a Research Analyst.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+
+<!-- ===================== RESEARCH REPORTS PAGE ===================== -->
+<div class="page" id="page-reports">
+  <div class="page-hero">
+    <div class="container">
+      <div class="section-tag">Deep Analysis</div>
+      <h1>Research <em>Reports</em></h1>
+      <div class="gold-line"></div>
+      <p style="margin-top:14px">Fundamental & technical research on NSE/BSE listed stocks, sectors, and indices.</p>
+    </div>
+  </div>
+  <section>
+    <div class="container">
+      <div class="tabs" id="reportTabs">
+        <button class="tab active" onclick="filterReports('all', this)">All Reports</button>
+        <button class="tab" onclick="filterReports('largecap', this)">Large Cap</button>
+        <button class="tab" onclick="filterReports('midcap', this)">Mid Cap</button>
+        <button class="tab" onclick="filterReports('smallcap', this)">Small Cap</button>
+        <button class="tab" onclick="filterReports('sectoral', this)">Sectoral</button>
+      </div>
+      <div class="cards-grid" id="reportsGrid">
+        <!-- Reports injected by JS -->
+      </div>
+      <div class="disclaimer" style="margin-top:40px">
+        <h4>⚠️ Disclaimer</h4>
+        <p>These reports are for educational and informational purposes only. RootNivesh Research is a SEBI Registered Research Analyst. Please read the full disclaimer before acting on any recommendation. Investment in securities is subject to market risk.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ===================== LEARNER CLUB PAGE ===================== -->
+<div class="page" id="page-learner">
+  <div class="page-hero">
+    <div class="container">
+      <div class="section-tag">Financial Education</div>
+      <h1>Learner <em>Club</em></h1>
+      <div class="gold-line"></div>
+      <p style="margin-top:14px">Build your knowledge from basics to advanced strategies. Learn, practice, and grow.</p>
+    </div>
+  </div>
+  <section>
+    <div class="container">
+      <div class="tabs">
+        <button class="tab active" onclick="filterCourses('all', this)">All Courses</button>
+        <button class="tab" onclick="filterCourses('beginner', this)">Beginner</button>
+        <button class="tab" onclick="filterCourses('intermediate', this)">Intermediate</button>
+        <button class="tab" onclick="filterCourses('advanced', this)">Advanced</button>
+      </div>
+      <div class="cards-grid" id="coursesGrid"></div>
+
+      <!-- Upcoming Webinars -->
+      <div style="margin-top:60px">
+        <div class="section-header" style="text-align:left">
+          <div class="section-tag">Live Sessions</div>
+          <h2 style="text-align:left">Upcoming <em>Webinars</em></h2>
+        </div>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-tag tag-free">FREE</div>
+            <h3>Options 101: Understanding Basics</h3>
+            <p>Learn what options are, how pricing works, and why retail traders use them. Live Q&A included.</p>
+            <div class="card-meta">
+              <div class="meta-item"><span>Apr 20, 2025</span>Date</div>
+              <div class="meta-item"><span>7:00 PM</span>Time</div>
+              <div class="meta-item"><span>Zoom</span>Platform</div>
+            </div>
+            <div class="card-footer"><button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px" onclick="showPage('contact')">Register Free</button></div>
+          </div>
+          <div class="card">
+            <div class="card-tag tag-premium">PREMIUM</div>
+            <h3>Building a Long-Term Wealth Portfolio</h3>
+            <p>Asset allocation, portfolio rebalancing strategies, and picking quality businesses for the long run.</p>
+            <div class="card-meta">
+              <div class="meta-item"><span>Apr 27, 2025</span>Date</div>
+              <div class="meta-item"><span>6:30 PM</span>Time</div>
+              <div class="meta-item"><span>Zoom</span>Platform</div>
+            </div>
+            <div class="card-footer"><button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px" onclick="showPage('contact')">Subscribe & Join</button></div>
+          </div>
+          <div class="card">
+            <div class="card-tag tag-free">FREE</div>
+            <h3>How to Read Annual Reports</h3>
+            <p>A practical walkthrough of key sections — P&L, balance sheet, cash flow, notes to accounts — with real company examples.</p>
+            <div class="card-meta">
+              <div class="meta-item"><span>May 4, 2025</span>Date</div>
+              <div class="meta-item"><span>7:00 PM</span>Time</div>
+              <div class="meta-item"><span>YouTube</span>Platform</div>
+            </div>
+            <div class="card-footer"><button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px" onclick="showPage('contact')">Set Reminder</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ===================== CALLS PAGE ===================== -->
+<div class="page" id="page-calls">
+  <div style="padding:100px 0 24px; text-align:center; border-bottom:1px solid var(--border); background:radial-gradient(ellipse 60% 40% at 50% 0%, rgba(201,168,76,0.05),transparent)">
+    <div class="container">
+      <div class="section-tag">Actionable Ideas</div>
+      <h1 style="font-size:clamp(2rem,4vw,3rem); margin-bottom:8px">Trading &amp; Investment <em>Calls</em></h1>
+      <p style="color:var(--grey2); font-size:14px">Select a category from the left to view calls</p>
+    </div>
+  </div>
+
+  <div class="page-split">
+    <!-- SIDEBAR NAV -->
+    <div class="snav-wrap">
+
+      <!-- ── SHORT TERM (parent) ── -->
+      <div class="snav-section">
+        <div class="snav-section-header open" id="sec-short" onclick="snavToggleSection('sec-short','secbody-short')">
+          <div class="snav-section-header-left">
+            <div class="snav-section-icon">&#x26A1;</div>
+            <span class="snav-section-title">Short Term</span>
+          </div>
+          <div class="snav-section-plus" id="secplus-short">+</div>
+        </div>
+        <div class="snav-section-body open" id="secbody-short">
+          <div class="snav-divider"></div>
+          <div class="snav-item active" id="snav-intraday" onclick="snavSelectCall('intraday',this)">
+            <span class="snav-item-label">Intraday</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-intraday','snav-intraday')">+</div>
+          </div>
+          <div class="snav-sub" id="sub-intraday">
+            <div class="snav-sub-inner">
+              <p>Same-day buy/sell trades with tight stop-loss. Ideal for active traders who monitor markets closely.</p>
+              <span class="snav-sub-btn" onclick="snavSelectCall('intraday',document.getElementById('snav-intraday'))">View Intraday Calls &#8594;</span>
+            </div>
+          </div>
+          <div class="snav-item" id="snav-swing" onclick="snavSelectCall('swing',this)">
+            <span class="snav-item-label">Swing</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-swing','snav-swing')">+</div>
+          </div>
+          <div class="snav-sub" id="sub-swing">
+            <div class="snav-sub-inner">
+              <p>7&#8211;14 day momentum-based trades capturing short-term price swings via technical analysis.</p>
+              <span class="snav-sub-btn" onclick="snavSelectCall('swing',document.getElementById('snav-swing'))">View Swing Calls &#8594;</span>
+            </div>
+          </div>
+          <div class="snav-item" id="snav-positional" onclick="snavSelectCall('positional',this)">
+            <span class="snav-item-label">Positional</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-positional','snav-positional')">+</div>
+          </div>
+          <div class="snav-sub" id="sub-positional">
+            <div class="snav-sub-inner">
+              <p>1&#8211;3 month trend-following calls. Hold through minor pullbacks for larger price moves.</p>
+              <span class="snav-sub-btn" onclick="snavSelectCall('positional',document.getElementById('snav-positional'))">View Positional Calls &#8594;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="snav-sep"></div>
+
+      <!-- ── LONG TERM (parent) ── -->
+      <div class="snav-section">
+        <div class="snav-section-header" id="sec-long" onclick="snavToggleSection('sec-long','secbody-long')">
+          <div class="snav-section-header-left">
+            <div class="snav-section-icon">&#x1F3E6;</div>
+            <span class="snav-section-title">Long Term</span>
+          </div>
+          <div class="snav-section-plus" id="secplus-long">+</div>
+        </div>
+        <div class="snav-section-body" id="secbody-long">
+          <div class="snav-divider"></div>
+          <div class="snav-item" id="snav-value" onclick="snavSelectCall('value',this)">
+            <span class="snav-item-label">Value Based Investing</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-value','snav-value')">+</div>
+          </div>
+          <div class="snav-sub" id="sub-value">
+            <div class="snav-sub-inner">
+              <p>Stocks picked below intrinsic value. 18&#8211;30 month horizon for long-term wealth creation.</p>
+              <span class="snav-sub-btn" onclick="snavSelectCall('value',document.getElementById('snav-value'))">View Value Picks &#8594;</span>
+            </div>
+          </div>
+          <div class="snav-item" id="snav-monthly" onclick="snavSelectCall('monthly',this)">
+            <span class="snav-item-label">Monthly Based Investing</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-monthly','snav-monthly')">+</div>
+          </div>
+          <div class="snav-sub" id="sub-monthly">
+            <div class="snav-sub-inner">
+              <p>Systematic monthly ideas &#8212; ETFs, index funds &amp; SIPs for long-term compounding.</p>
+              <span class="snav-sub-btn" onclick="snavSelectCall('monthly',document.getElementById('snav-monthly'))">View Monthly Ideas &#8594;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /snav-wrap -->
+
+    <!-- CONTENT AREA -->
+    <div class="snav-content">
+      <div class="snav-content-header">
+        <div>
+          <div class="snav-breadcrumb">CALLS &nbsp;/&nbsp; <span id="callsBreadcrumb">INTRADAY</span></div>
+          <h2 id="callsTitle">&#x1F4C8; Intraday Calls</h2>
+          <p id="callsDesc">Same-day trades with precise entry, target &amp; stop-loss levels.</p>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px;" id="callsGrid"></div>
+      <div class="card" style="margin-top:40px; text-align:center; background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03))">
+        <h3 style="font-size:1.5rem; margin-bottom:10px">Get Calls on WhatsApp</h3>
+        <p style="max-width:420px; margin:0 auto 20px; font-size:13.5px; color:var(--grey2)">Real-time alerts with entry, target &amp; stop-loss sent directly to your WhatsApp &amp; Telegram.</p>
+        <button class="btn btn-gold" onclick="showPage('contact')" style="margin:0 auto">&#x1F4F2; Subscribe Now</button>
+      </div>
+      <div class="disclaimer">
+        <h4>&#9888;&#65039; Important Disclaimer</h4>
+        <p>All calls are for informational purposes only. Past performance does not guarantee future results. RootNivesh Research (SEBI Reg. No. INH000XXXXX) &#8212; SEBI (Research Analysts) Regulations, 2014.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===================== PERFORMANCE PAGE ===================== -->
+<div class="page" id="page-performance">
+  <div class="page-hero">
+    <div class="container">
+      <div class="section-tag">Track Record</div>
+      <h1>Performance <em>Dashboard</em></h1>
+      <div class="gold-line"></div>
+      <p style="margin-top:14px">Complete transparency on all calls — wins, losses, and overall accuracy metrics.</p>
+    </div>
+  </div>
+  <section>
+    <div class="container">
+      <!-- KPI Cards -->
+      <div class="perf-grid">
+        <div class="perf-card"><div class="perf-num perf-pos">87%</div><div class="perf-label">Overall Accuracy</div></div>
+        <div class="perf-card"><div class="perf-num perf-pos">+34.2%</div><div class="perf-label">Avg Return / Call</div></div>
+        <div class="perf-card"><div class="perf-num">248</div><div class="perf-label">Total Calls (FY25)</div></div>
+        <div class="perf-card"><div class="perf-num perf-pos">216</div><div class="perf-label">Profitable Calls</div></div>
+        <div class="perf-card"><div class="perf-num perf-neg">32</div><div class="perf-label">Loss Calls</div></div>
+        <div class="perf-card"><div class="perf-num perf-pos">3.4x</div><div class="perf-label">Avg Risk-Reward</div></div>
+      </div>
+
+      <!-- Performance Table -->
+      <div class="tabs">
+        <button class="tab active" onclick="filterPerf('all', this)">All</button>
+        <button class="tab" onclick="filterPerf('equity', this)">Equity</button>
+        <button class="tab" onclick="filterPerf('intraday', this)">Intraday</button>
+        <button class="tab" onclick="filterPerf('options', this)">Options</button>
+      </div>
+      <div class="table-wrap">
+        <table id="perfTable">
+          <thead>
+            <tr>
+              <th>Stock</th>
+              <th>Call Type</th>
+              <th>Entry</th>
+              <th>Target</th>
+              <th>SL</th>
+              <th>Exit</th>
+              <th>P&L %</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="perfBody"></tbody>
+        </table>
+      </div>
+      <div class="disclaimer" style="margin-top:32px">
+        <h4>⚠️ Performance Disclaimer</h4>
+        <p>Performance data shown is based on entry and exit prices as recommended. Actual returns may vary due to slippage, brokerage, and execution timing. Past performance is not indicative of future results. SEBI Registration No. INH000XXXXX.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ===================== TOOLS PAGE ===================== -->
+<div class="page" id="page-tools">
+  <div style="padding:100px 0 24px; text-align:center; border-bottom:1px solid var(--border); background:radial-gradient(ellipse 60% 40% at 50% 0%, rgba(201,168,76,0.05),transparent)">
+    <div class="container">
+      <div class="section-tag">Free Financial Tools</div>
+      <h1 style="font-size:clamp(2rem,4vw,3rem); margin-bottom:8px">Smart <em>Calculators</em></h1>
+      <p style="color:var(--grey2); font-size:14px">Select a tool from the left panel</p>
+    </div>
+  </div>
+
+  <div class="page-split">
+    <!-- SIDEBAR NAV -->
+    <div class="snav-wrap">
+      <div class="snav-section">
+        <div class="snav-section-header open" id="sec-tools" onclick="snavToggleSection('sec-tools','secbody-tools')">
+          <div class="snav-section-header-left">
+            <div class="snav-section-icon">&#x1F527;</div>
+            <span class="snav-section-title">Tools</span>
+          </div>
+          <div class="snav-section-plus" id="secplus-tools">&#8722;</div>
+        </div>
+        <div class="snav-section-body open" id="secbody-tools">
+          <div class="snav-divider"></div>
+          <div class="snav-item active" id="snav-emi" onclick="snavSelectTool('emi',this)">
+            <span class="snav-item-label">EMI Calculator</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-emi','snav-emi')">+</div>
+          </div>
+          <div class="snav-sub" id="sub-emi">
+            <div class="snav-sub-inner">
+              <p>Calculate monthly EMI, total interest payable and principal breakdown for any loan type.</p>
+              <span class="snav-sub-btn" onclick="snavSelectTool('emi',document.getElementById('snav-emi'))">Open EMI Calculator &#8594;</span>
+            </div>
+          </div>
+          <div class="snav-item" id="snav-pos" onclick="snavSelectTool('pos',this)">
+            <span class="snav-item-label">Position Sizing</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-pos','snav-pos')">+</div>
+          </div>
+          <div class="snav-sub" id="sub-pos">
+            <div class="snav-sub-inner">
+              <p>Find the exact number of shares to buy so your loss never exceeds a set % of capital.</p>
+              <span class="snav-sub-btn" onclick="snavSelectTool('pos',document.getElementById('snav-pos'))">Open Position Sizer &#8594;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT AREA -->
+    <div class="snav-content">
+
+      <!-- EMI TOOL -->
+      <div id="toolContent-emi">
+        <div class="snav-content-header">
+          <div>
+            <div class="snav-breadcrumb">TOOLS &nbsp;/&nbsp; <span style="color:var(--gold)">EMI CALCULATOR</span></div>
+            <h2>&#x1F3E6; EMI Calculator</h2>
+            <p>Calculate monthly instalment, total interest &amp; principal breakdown for any loan.</p>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px;">
+          <div class="form-group">
+            <label>Loan Amount (&#8377;)</label>
+            <input type="number" id="loanAmount" placeholder="e.g. 5000000" value="5000000">
+          </div>
+          <div class="form-group">
+            <label>Annual Interest Rate (%)</label>
+            <input type="number" id="interestRate" step="0.1" placeholder="e.g. 8.5" value="8.5">
+          </div>
+          <div class="form-group">
+            <label>Loan Tenure</label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+              <input type="number" id="tenureValue" placeholder="e.g. 20" value="20">
+              <select id="tenureType">
+                <option value="years">Years</option>
+                <option value="months">Months</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Loan Type</label>
+            <select id="loanType">
+              <option>Home Loan</option><option>Car Loan</option>
+              <option>Personal Loan</option><option>Education Loan</option>
+              <option>Business Loan</option>
+            </select>
+          </div>
+        </div>
+        <button class="calc-btn" style="max-width:280px; margin-top:8px" onclick="calcEMI()">Calculate EMI &#8594;</button>
+        <div class="calc-result" id="emiResult" style="margin-top:24px">
+          <div class="result-grid">
+            <div class="result-item"><div class="r-val" id="emiVal">-</div><div class="r-label">Monthly EMI</div></div>
+            <div class="result-item"><div class="r-val" id="totalInterestVal">-</div><div class="r-label">Total Interest</div></div>
+            <div class="result-item"><div class="r-val" id="totalAmountVal">-</div><div class="r-label">Total Payment</div></div>
+            <div class="result-item"><div class="r-val" id="interestPctVal">-</div><div class="r-label">Interest %</div></div>
+          </div>
+          <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border)">
+            <div style="font-size:12px; color:var(--grey); margin-bottom:6px">Principal vs Interest Breakdown</div>
+            <div style="background:rgba(255,255,255,0.05); border-radius:8px; height:12px; overflow:hidden">
+              <div id="emiBar" style="height:100%; background:linear-gradient(90deg,var(--gold),var(--gold2)); width:50%; transition:width 0.8s ease;"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:6px; font-size:11px; color:var(--grey)">
+              <span>Principal: <span id="principalPct" style="color:var(--gold)">-</span></span>
+              <span>Interest: <span id="interestPctDisp" style="color:var(--grey2)">-</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- POSITION SIZING TOOL -->
+      <div id="toolContent-pos" style="display:none">
+        <div class="snav-content-header">
+          <div>
+            <div class="snav-breadcrumb">TOOLS &nbsp;/&nbsp; <span style="color:var(--gold)">POSITION SIZING</span></div>
+            <h2>&#x1F4D0; Position Sizing Calculator</h2>
+            <p>Find the exact share quantity to keep your trade risk within a safe % of capital.</p>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px;">
+          <div class="form-group">
+            <label>Total Capital (&#8377;)</label>
+            <input type="number" id="capital" placeholder="e.g. 500000" value="500000">
+          </div>
+          <div class="form-group">
+            <label>Risk Per Trade (%)</label>
+            <input type="number" id="riskPct" step="0.1" placeholder="e.g. 1" value="1">
+          </div>
+          <div class="form-group">
+            <label>Entry Price (&#8377;)</label>
+            <input type="number" id="entryPrice" placeholder="e.g. 2500" value="2500">
+          </div>
+          <div class="form-group">
+            <label>Stop Loss Price (&#8377;)</label>
+            <input type="number" id="slPrice" placeholder="e.g. 2450" value="2450">
+          </div>
+          <div class="form-group">
+            <label>Target Price (&#8377;) <span style="color:var(--grey);font-weight:400">&#8212; optional</span></label>
+            <input type="number" id="targetPrice" placeholder="e.g. 2650">
+          </div>
+        </div>
+        <button class="calc-btn" style="max-width:280px; margin-top:8px" onclick="calcPosition()">Calculate Position &#8594;</button>
+        <div class="calc-result" id="posResult" style="margin-top:24px">
+          <div class="result-grid">
+            <div class="result-item"><div class="r-val" id="posQty">-</div><div class="r-label">Shares to Buy</div></div>
+            <div class="result-item"><div class="r-val" id="posInvest">-</div><div class="r-label">Capital Invested</div></div>
+            <div class="result-item"><div class="r-val" id="posRisk">-</div><div class="r-label">Max Risk (&#8377;)</div></div>
+            <div class="result-item"><div class="r-val" id="posRR">-</div><div class="r-label">Risk:Reward</div></div>
+          </div>
+          <div id="posAdvice" style="margin-top:16px; padding:12px; border-radius:8px; font-size:12.5px; line-height:1.6; display:none;"></div>
+        </div>
+      </div>
+
+    </div><!-- /snav-content -->
+  </div>
+</div>
+
+
+<!-- ===================== CONTACT PAGE ===================== -->
+<div class="page" id="page-contact">
+  <div class="page-hero">
+    <div class="container">
+      <div class="section-tag">Get In Touch</div>
+      <h1>Contact <em>Us</em></h1>
+      <div class="gold-line"></div>
+      <p style="margin-top:14px">Have questions about our research? Want to subscribe? We'd love to hear from you.</p>
+    </div>
+  </div>
+  <section>
+    <div class="container">
+      <div class="contact-grid">
+        <div class="contact-info">
+          <h3>Let's Talk <em>Markets</em></h3>
+          <div class="gold-line left"></div>
+          <p style="margin-top:16px">Whether you're a first-time investor or a seasoned trader, our team is here to help you navigate the markets with clarity and confidence.</p>
+          <div class="contact-item">
+            <div class="contact-icon">📧</div>
+            <div class="contact-item-text">
+              <strong>Email</strong>
+              <span>research@rootnivesh.in</span>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">📞</div>
+            <div class="contact-item-text">
+              <strong>Phone</strong>
+              <span>+91 98765 43210</span>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">📍</div>
+            <div class="contact-item-text">
+              <strong>Office</strong>
+              <span>Mumbai, Maharashtra, India</span>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">🕒</div>
+            <div class="contact-item-text">
+              <strong>Business Hours</strong>
+              <span>Mon–Sat: 9:00 AM – 6:00 PM IST</span>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">📱</div>
+            <div class="contact-item-text">
+              <strong>WhatsApp</strong>
+              <span>+91 98765 43210</span>
+            </div>
+          </div>
+          <div style="margin-top:28px">
+            <div class="reg-box">
+              <strong>SEBI REGISTRATION</strong>
+              SEBI Registered Research Analyst — Reg. No. INH000XXXXX<br>
+              NISM Series XV Certified
+            </div>
+          </div>
+          <div class="social-links">
+            <a class="social-link" href="#" title="Twitter">𝕏</a>
+            <a class="social-link" href="#" title="Telegram">✈</a>
+            <a class="social-link" href="#" title="YouTube">▶</a>
+            <a class="social-link" href="#" title="LinkedIn">in</a>
+            <a class="social-link" href="#" title="Instagram">◈</a>
+          </div>
+        </div>
+        <div class="contact-form">
+          <h3>Send a <em>Message</em></h3>
+          <div id="contactFormWrap">
+            <div class="form-row">
+              <div class="form-group">
+                <label>First Name *</label>
+                <input type="text" id="cfName" placeholder="Rahul">
+              </div>
+              <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" id="cfLast" placeholder="Sharma">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Email Address *</label>
+              <input type="email" id="cfEmail" placeholder="rahul@example.com">
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" id="cfPhone" placeholder="+91 98765 43210">
+            </div>
+            <div class="form-group">
+              <label>Subject</label>
+              <select id="cfSubject">
+                <option>Subscription Enquiry</option>
+                <option>Research Report Query</option>
+                <option>Trading Call Query</option>
+                <option>Learner Club</option>
+                <option>Portfolio Review</option>
+                <option>General Enquiry</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Message *</label>
+              <textarea id="cfMessage" placeholder="Tell us how we can help you..."></textarea>
+            </div>
+            <button class="calc-btn" onclick="submitContact()">Send Message ✉</button>
+          </div>
+          <div class="form-success" id="formSuccess">
+            <div class="check">✅</div>
+            <h3 style="font-family:'Cormorant Garamond',serif; margin-bottom:8px">Message Sent!</h3>
+            <p>Thank you for reaching out. Our team will get back to you within 24 hours.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ===================== ABOUT PAGE ===================== -->
+<div class="page" id="page-about">
+  <div class="page-hero">
+    <div class="container">
+      <div class="section-tag">Our Story</div>
+      <h1>About <em>RootNivesh</em></h1>
+      <div class="gold-line"></div>
+    </div>
+  </div>
+  <section>
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-image-wrap">
+          <div class="about-img-placeholder">
+            <div class="avatar">👨‍💼</div>
+            <p>Replace with your photo</p>
+          </div>
+          <div class="about-badge">
+            <div class="badge-num">7+</div>
+            <div class="badge-lbl">Years of<br>Research</div>
+          </div>
+        </div>
+        <div class="about-content">
+          <div class="section-tag">Founder & Lead Analyst</div>
+          <h2>Driven by <em>Data,</em><br>Guided by Experience</h2>
+          <div class="gold-line left"></div>
+          <p style="margin-top:20px">RootNivesh Research was founded with a singular mission: to democratize quality financial research for every Indian investor — from the first-time SIP investor to the seasoned F&O trader.</p>
+          <p>With over 7 years of experience across equity research, derivatives trading, and portfolio management, our founder has worked with some of India's leading broking firms before starting RootNivesh to serve retail investors directly.</p>
+          <p>We believe every investor deserves the same quality of research that institutional desks receive — and we're here to close that gap.</p>
+          <div class="reg-box">
+            <strong>SEBI REGISTRATION DETAILS</strong>
+            Research Analyst Registration No: INH000XXXXX<br>
+            Registered Since: January 2018<br>
+            NISM Series XV Certified | CFA Level II
+          </div>
+          <div class="btn-group" style="justify-content:flex-start; margin-top:20px">
+            <button class="btn btn-gold" onclick="showPage('contact')">Get In Touch</button>
+            <button class="btn btn-outline" onclick="showPage('performance')">View Track Record</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mission & Values -->
+      <div style="margin-top:80px">
+        <div class="section-header">
+          <div class="section-tag">Our Values</div>
+          <h2>What We Stand <em>For</em></h2>
+          <div class="gold-line"></div>
+        </div>
+        <div class="services-grid">
+          <div class="service-card"><div class="service-icon">🎯</div><h3>Accuracy</h3><p>We obsess over data quality. Every number is verified before it reaches you.</p></div>
+          <div class="service-card"><div class="service-icon">🔍</div><h3>Transparency</h3><p>Full performance track record — published every month without cherry-picking.</p></div>
+          <div class="service-card"><div class="service-icon">⚖️</div><h3>Integrity</h3><p>SEBI compliant, conflict-of-interest free research. We eat our own cooking.</p></div>
+          <div class="service-card"><div class="service-icon">📚</div><h3>Education</h3><p>We believe an informed investor is a better investor. Knowledge is our core product.</p></div>
+        </div>
+      </div>
+
+      <!-- Team -->
+      <div style="margin-top:60px">
+        <div class="section-header">
+          <div class="section-tag">The Team</div>
+          <h2>Meet Our <em>Analysts</em></h2>
+          <div class="gold-line"></div>
+        </div>
+        <div class="team-grid">
+          <div class="team-card"><div class="team-avatar">👨‍💼</div><h4>Arjun Mehta</h4><p>Founder & Lead Analyst</p></div>
+          <div class="team-card"><div class="team-avatar">👩‍💼</div><h4>Priya Nair</h4><p>Fundamental Analyst</p></div>
+          <div class="team-card"><div class="team-avatar">👨‍💻</div><h4>Vikram Singh</h4><p>Technical Analyst</p></div>
+          <div class="team-card"><div class="team-avatar">👩‍🏫</div><h4>Sneha Patel</h4><p>Derivatives Strategist</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ====== FOOTER ====== -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo" onclick="showPage('home')" style="cursor:pointer; display:inline-flex">
+          <div class="logo-mark">R</div>
+          <div class="logo-text" style="font-size:18px">Root<span>Nivesh</span></div>
+        </div>
+        <p>SEBI Registered Research Analyst providing deep equity research, actionable trading calls, and financial education for Indian investors.</p>
+        <div class="social-links">
+          <a class="social-link" href="#" title="Twitter">𝕏</a>
+          <a class="social-link" href="#" title="Telegram">✈</a>
+          <a class="social-link" href="#" title="YouTube">▶</a>
+          <a class="social-link" href="#" title="LinkedIn">in</a>
+        </div>
+      </div>
+      <div>
+        <h5>Navigation</h5>
+        <ul>
+          <li><a onclick="showPage('home')">Home</a></li>
+          <li><a onclick="showPage('reports')">Research Reports</a></li>
+          <li><a onclick="showPage('calls')">Trading Calls</a></li>
+          <li><a onclick="showPage('performance')">Performance</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Learn & Tools</h5>
+        <ul>
+          <li><a onclick="showPage('learner')">Learner Club</a></li>
+          <li><a onclick="showPage('tools');setTool('emi')">EMI Calculator</a></li>
+          <li><a onclick="showPage('tools');setTool('position')">Position Sizing</a></li>
+          <li><a onclick="showPage('about')">About Us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="#">Disclaimer</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Use</a></li>
+          <li><a onclick="showPage('contact')">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 RootNivesh Research. All rights reserved.</p>
+      <div class="sebi-badge">SEBI Reg. INH000XXXXX</div>
+      <p>Not investment advice. Read full disclaimer.</p>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ====== JAVASCRIPT ====== -->
+<script>
+/* ===== PAGE NAVIGATION ===== */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  window.scrollTo(0, 0);
+  initPage(id);
+}
+
+/* ===== MEGA MENU ===== */
+function toggleMega(menuId, triggerId) {
+  console.log('toggleMega called with', menuId, triggerId);
+  const menu = document.getElementById(menuId);
+  const trigger = document.getElementById(triggerId);
+  console.log('menu element:', menu);
+  console.log('trigger element:', trigger);
+  const isOpen = menu.classList.contains('open');
+  console.log('isOpen:', isOpen);
+  closeMegas();
+  if (!isOpen) {
+    menu.classList.add('open');
+    trigger.classList.add('open');
+    console.log('Added open class');
+  }
+}
+function closeMegas() {
+  document.querySelectorAll('.mega-menu').forEach(m => m.classList.remove('open'));
+  document.querySelectorAll('.nav-dd-trigger').forEach(t => t.classList.remove('open'));
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('nav') && !e.target.closest('.mega-menu')) closeMegas();
+});
+function megaToggleSub(e, subId) {
+  e.stopPropagation();
+  const sub = document.getElementById(subId);
+  const btn = e.currentTarget;
+  const isOpen = sub.classList.contains('open');
+  // close all subs in this mega
+  sub.closest('.mega-inner').querySelectorAll('.mega-sub').forEach(s => s.classList.remove('open'));
+  sub.closest('.mega-inner').querySelectorAll('.mega-plus').forEach(p => p.textContent = '+');
+  if (!isOpen) { sub.classList.add('open'); btn.textContent = '−'; }
+}
+function megaGoCall(type) {
+  closeMegas();
+  showPage('calls');
+  const el = document.getElementById('snav-' + type);
+  if (el) snavSelectCall(type, el);
+}
+function megaGoTool(type) {
+  closeMegas();
+  showPage('tools');
+  const el = document.getElementById('snav-' + type);
+  if (el) snavSelectTool(type, el);
+}
+
+function initPage(id) {
+  if (id === 'reports') renderReports('all');
+  if (id === 'learner') renderCourses('all');
+  if (id === 'calls') { renderCalls('intraday'); }
+  if (id === 'performance') { renderPerfTable('all'); }
+}
+
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+/* ===== SIDEBAR NAV — CALLS ===== */
+const callsMeta = {
+  intraday:   { title:'📈 Intraday Calls',          crumb:'INTRADAY',   desc:'Same-day trades with precise entry, target & stop-loss levels.' },
+  swing:      { title:'🔄 Swing Calls',              crumb:'SWING',      desc:'7–14 day momentum trades capturing short-term price swings.' },
+  positional: { title:'📊 Positional Calls',         crumb:'POSITIONAL', desc:'1–3 month trend-following calls with larger profit targets.' },
+  value:      { title:'💎 Value Based Investing',    crumb:'VALUE',      desc:'Fundamentally strong stocks picked below intrinsic value.' },
+  monthly:    { title:'📅 Monthly Based Investing',  crumb:'MONTHLY',    desc:'SIP, ETF & index fund ideas for systematic long-term compounding.' },
+};
+
+function snavSelectCall(type, el) {
+  document.querySelectorAll('#page-calls .snav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  const m = callsMeta[type];
+  document.getElementById('callsTitle').textContent = m.title;
+  document.getElementById('callsBreadcrumb').textContent = m.crumb;
+  document.getElementById('callsDesc').textContent = m.desc;
+  renderCalls(type);
+}
+
+/* ===== SIDEBAR NAV — TOOLS ===== */
+function snavSelectTool(type, el) {
+  document.querySelectorAll('#page-tools .snav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('toolContent-emi').style.display = type === 'emi' ? 'block' : 'none';
+  document.getElementById('toolContent-pos').style.display = type === 'pos' ? 'block' : 'none';
+}
+
+/* called from navbar dropdown */
+function setTool(which) {
+  showPage('tools');
+  const type = which === 'emi' ? 'emi' : 'pos';
+  const el = document.getElementById('snav-' + type);
+  if (el) snavSelectTool(type, el);
+}
+
+/* ===== + / – EXPAND INLINE (child items) ===== */
+function snavToggle(event, subId, itemId) {
+  event.stopPropagation();
+  const sub  = document.getElementById(subId);
+  const item = document.getElementById(itemId);
+  const plus = item.querySelector('.snav-plus');
+  const isOpen = sub.classList.contains('open');
+  const page = item.closest('.page');
+  page.querySelectorAll('.snav-sub').forEach(s => s.classList.remove('open'));
+  page.querySelectorAll('.snav-item').forEach(i => {
+    const p = i.querySelector('.snav-plus'); if (p) p.textContent = '+';
+    i.classList.remove('expanded');
+  });
+  if (!isOpen) {
+    sub.classList.add('open');
+    item.classList.add('expanded');
+    plus.textContent = '−';
+  }
+}
+
+/* ===== + / – PARENT SECTION TOGGLE ===== */
+function snavToggleSection(headerId, bodyId) {
+  const header = document.getElementById(headerId);
+  const body   = document.getElementById(bodyId);
+  const plus   = header.querySelector('.snav-section-plus');
+  const isOpen = body.classList.contains('open');
+  if (isOpen) {
+    body.classList.remove('open');
+    header.classList.remove('open');
+    plus.textContent = '+';
+  } else {
+    body.classList.add('open');
+    header.classList.add('open');
+    plus.textContent = '−';
+  }
+}
+
+/* ===== CAROUSEL JS ===== */
+let carIdx = 0;
+const carTotal = 5;
+let carTimer;
+function carBuildDots() {
+  const d = document.getElementById('carDots');
+  if (!d) return;
+  d.innerHTML = '';
+  for (let i = 0; i < carTotal; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'car-dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => carGoTo(i);
+    d.appendChild(dot);
+  }
+}
+function carGoTo(i) {
+  carIdx = i;
+  const track = document.getElementById('carouselTrack');
+  if (track) track.style.transform = `translateX(-${carIdx * 100}%)`;
+  document.querySelectorAll('.car-dot').forEach((d, idx) => d.classList.toggle('active', idx === carIdx));
+}
+function carNext() { carGoTo((carIdx + 1) % carTotal); }
+function carPrev() { carGoTo((carIdx - 1 + carTotal) % carTotal); }
+function startCarousel() {
+  carBuildDots();
+  clearInterval(carTimer);
+  carTimer = setInterval(carNext, 5000);
+}
+
+/* ===== MINI LEAD FORM ===== */
+function submitMiniForm() {
+  const name = document.getElementById('mfName').value.trim();
+  const phone = document.getElementById('mfPhone').value.trim();
+  const email = document.getElementById('mfEmail').value.trim();
+  const interest = document.getElementById('mfInterest').value;
+  if (!name || !phone || !email || !interest) {
+    alert('Please fill Name, Phone, Email and select your interest.'); return;
+  }
+  document.getElementById('miniFormFields').style.display = 'none';
+  const s = document.getElementById('miniFormSuccess');
+  s.style.display = 'block'; s.classList.add('show');
+}
+
+// default hide position tool
+/* ================================================================
+   LIVE MARKET TICKER  — Yahoo Finance (15-min delayed, NSE data)
+   ================================================================ */
+/*
+// Live market ticker data from NSE
+const TICKER_STOCKS = [
+  { type: 'index', symbol: 'NIFTY 50', label: 'NIFTY 50' },
+  { type: 'index', symbol: 'SENSEX', label: 'SENSEX' },
+  { type: 'index', symbol: 'NIFTY BANK', label: 'BANKNIFTY' },
+  { type: 'stock', symbol: 'RELIANCE', label: 'RELIANCE' },
+  { type: 'stock', symbol: 'TCS', label: 'TCS' },
+  { type: 'stock', symbol: 'INFY', label: 'INFOSYS' },
+  { type: 'stock', symbol: 'HDFCBANK', label: 'HDFCBANK' },
+  { type: 'stock', symbol: 'ICICIBANK', label: 'ICICIBANK' },
+  { type: 'stock', symbol: 'WIPRO', label: 'WIPRO' },
+  { type: 'stock', symbol: 'BAJFINANCE', label: 'BAJFINANCE' },
+  { type: 'stock', symbol: 'TATAMOTORS', label: 'TATAMOTORS' },
+  { type: 'stock', symbol: 'SBIN', label: 'SBIN' },
+  { type: 'stock', symbol: 'AXISBANK', label: 'AXISBANK' },
+  { type: 'stock', symbol: 'LT', label: 'L&T' },
+  { type: 'stock', symbol: 'MARUTI', label: 'MARUTI' },
+];
+*/
+
+/*
+function isMarketOpen() {
+  const now = new Date();
+  const ist  = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+  const day  = ist.getDay();           // 0=Sun, 6=Sat
+  const h    = ist.getHours();
+  const m    = ist.getMinutes();
+  const mins = h * 60 + m;
+  return day >= 1 && day <= 5 && mins >= 555 && mins <= 930; // 9:15–15:30 IST
+}
+*/
+
+/*
+function buildTickerHTML(quotes) {
+  const items = quotes.map(q => {
+    const info  = TICKER_STOCKS.find(s => s.symbol === q.symbol) || { label: q.symbol };
+    const price = q.regularMarketPrice != null ? (q.regularMarketPrice).toLocaleString('en-IN', { maximumFractionDigits: 2 }) : '—';
+    const chg   = q.regularMarketChangePercent;
+    const isUp  = chg != null ? chg >= 0 : true;
+    const arrow = isUp ? '▲' : '▼';
+    const pct   = chg != null ? Math.abs(chg).toFixed(2) + '%' : '';
+    const dir   = isUp ? 'up' : 'down';
+    return `<span class="ticker-item">` +
+      `<span class="t-symbol">${info.label}</span>` +
+      `<span class="t-price">₹${price}</span>` +
+      `<span class="t-${dir}">${arrow} ${pct}</span>` +
+    `</span>`;
+  }).join('');
+  return items + items; // duplicate for seamless loop
+}
+*/
+
+/*
+async function fetchLiveTicker() {
+  const indices = TICKER_STOCKS.filter(s => s.type === 'index');
+  const stocks = TICKER_STOCKS.filter(s => s.type === 'stock');
+  const headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Accept': 'application/json, text/plain, */*',
+    'Referer': 'https://www.nseindia.com/'
+  };
+
+  let quotes = [];
+
+  // Fetch indices
+  if (indices.length > 0) {
+    try {
+      const res = await fetch('https://www.nseindia.com/api/allIndices', { headers, signal: AbortSignal.timeout(8000) });
+      if (res.ok) {
+        const data = await res.json();
+        for (const idx of indices) {
+          const item = data.data.find(d => d.index === idx.symbol);
+          if (item) {
+            quotes.push({
+              symbol: idx.symbol,
+              regularMarketPrice: item.last,
+              regularMarketChangePercent: item.percentChange
+            });
+          }
+        }
+      }
+    } catch (e) {}
+  }
+
+  // Fetch stocks
+  if (stocks.length > 0) {
+    const stockPromises = stocks.map(s => 
+      fetch(`https://www.nseindia.com/api/quote-equity?symbol=${s.symbol}`, { headers, signal: AbortSignal.timeout(8000) })
+        .then(r => r.ok ? r.json() : null)
+        .then(d => d ? {
+          symbol: s.symbol,
+          regularMarketPrice: d.metadata.lastPrice,
+          regularMarketChangePercent: d.metadata.pChange
+        } : null)
+        .catch(() => null)
+    );
+    const stockResults = await Promise.all(stockPromises);
+    quotes.push(...stockResults.filter(q => q));
+  }
+
+  if (quotes.length > 0) {
+    const inner = document.getElementById('tickerInner');
+    if (inner) inner.innerHTML = buildTickerHTML(quotes);
+
+    const status = document.getElementById('marketStatus');
+    if (status) {
+      const open = isMarketOpen();
+      status.textContent = open ? 'MARKET OPEN' : 'MARKET CLOSED';
+      status.style.color = open ? 'var(--green)' : 'var(--grey)';
+    }
+  } else {
+    showStaticTicker();
+  }
+}
+*/
+
+/*
+function showStaticTicker() {
+  const fallback = [
+    { symbol:'NIFTY 50',        regularMarketPrice:24380.25, regularMarketChangePercent:0.87  },
+    { symbol:'SENSEX',       regularMarketPrice:80218.37, regularMarketChangePercent:0.79  },
+    { symbol:'NIFTY BANK',     regularMarketPrice:52414.60, regularMarketChangePercent:1.12  },
+    { symbol:'RELIANCE',  regularMarketPrice:2913.50,  regularMarketChangePercent:1.34  },
+    { symbol:'TCS',       regularMarketPrice:4021.80,  regularMarketChangePercent:0.62  },
+    { symbol:'INFY',     regularMarketPrice:1752.40,  regularMarketChangePercent:-0.38 },
+    { symbol:'HDFCBANK',  regularMarketPrice:1648.90,  regularMarketChangePercent:1.08  },
+    { symbol:'ICICIBANK', regularMarketPrice:1378.25,  regularMarketChangePercent:0.93  },
+    { symbol:'WIPRO',    regularMarketPrice:487.60,   regularMarketChangePercent:0.44  },
+    { symbol:'BAJFINANCE',regularMarketPrice:7182.35,  regularMarketChangePercent:2.17  },
+    { symbol:'TATAMOTORS',regularMarketPrice:854.30,   regularMarketChangePercent:1.56  },
+    { symbol:'SBIN',      regularMarketPrice:792.45,   regularMarketChangePercent:0.71  },
+    { symbol:'AXISBANK',  regularMarketPrice:1218.60,  regularMarketChangePercent:0.85  },
+    { symbol:'LT',        regularMarketPrice:3640.70,  regularMarketChangePercent:0.49  },
+    { symbol:'MARUTI',    regularMarketPrice:12140.50, regularMarketChangePercent:1.22  },
+  ];
+  const inner = document.getElementById('tickerInner');
+  if (inner) inner.innerHTML = buildTickerHTML(fallback);
+}
+*/
+
+/*
+// Fetch now, then refresh every 10 minutes
+function initLiveTicker() {
+  fetchLiveTicker();
+  setInterval(fetchLiveTicker, 600000);
+}
+*/
+
+/* ================================================================
+   FII / DII LIVE TALLY  — NSE India API via CORS proxy
+   ================================================================ */
+function fmtCr(val) {
+  const n = parseFloat(val);
+  if (isNaN(n)) return '—';
+  const abs = Math.abs(n);
+  const str = abs >= 10000
+    ? (abs / 100).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    : abs.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+  return (n < 0 ? '−' : '+') + '₹' + str + ' Cr';
+}
+function fmtCrAbs(val) {
+  const n = Math.abs(parseFloat(val));
+  return '₹' + n.toLocaleString('en-IN', { maximumFractionDigits: 2 }) + ' Cr';
+}
+
+function applyFiiDii(fii, dii) {
+  // FII
+  const fiiNet = parseFloat(fii.netValue || fii.NET_VALUE || 0);
+  const fiiBuy = parseFloat(fii.buyValue  || fii.BUY_VALUE  || 0);
+  const fiiSell= parseFloat(fii.sellValue || fii.SELL_VALUE || 0);
+  const fiiPos = fiiNet >= 0;
+  document.getElementById('fiiNet').textContent   = fmtCr(fiiNet);
+  document.getElementById('fiiNet').className     = 'fiidii-net ' + (fiiPos ? 'pos' : 'neg');
+  document.getElementById('fiiNetLabel').textContent = fiiPos ? 'Net Buy' : 'Net Sell';
+  document.getElementById('fiiBuy').textContent  = fmtCrAbs(fiiBuy);
+  document.getElementById('fiiSell').textContent = fmtCrAbs(fiiSell);
+  const fiiBadge = document.getElementById('fiiBadge');
+  fiiBadge.textContent = fiiPos ? 'NET BUY' : 'NET SELL';
+  fiiBadge.className   = 'fiidii-net-badge ' + (fiiPos ? 'buy-badge' : 'sell-badge');
+  const fiiBuyPct = fiiBuy + fiiSell > 0 ? (fiiBuy / (fiiBuy + fiiSell) * 100) : 50;
+  document.getElementById('fiiBarBuy').style.width = fiiBuyPct + '%';
+
+  // DII
+  const diiNet = parseFloat(dii.netValue || dii.NET_VALUE || 0);
+  const diiBuy = parseFloat(dii.buyValue  || dii.BUY_VALUE  || 0);
+  const diiSell= parseFloat(dii.sellValue || dii.SELL_VALUE || 0);
+  const diiPos = diiNet >= 0;
+  document.getElementById('diiNet').textContent   = fmtCr(diiNet);
+  document.getElementById('diiNet').className     = 'fiidii-net ' + (diiPos ? 'pos' : 'neg');
+  document.getElementById('diiNetLabel').textContent = diiPos ? 'Net Buy' : 'Net Sell';
+  document.getElementById('diiBuy').textContent  = fmtCrAbs(diiBuy);
+  document.getElementById('diiSell').textContent = fmtCrAbs(diiSell);
+  const diiBadge = document.getElementById('diiBadge');
+  diiBadge.textContent = diiPos ? 'NET BUY' : 'NET SELL';
+  diiBadge.className   = 'fiidii-net-badge ' + (diiPos ? 'buy-badge' : 'sell-badge');
+  const diiBuyPct = diiBuy + diiSell > 0 ? (diiBuy / (diiBuy + diiSell) * 100) : 50;
+  document.getElementById('diiBarBuy').style.width = diiBuyPct + '%';
+
+  // Sentiment
+  const totalNet = fiiNet + diiNet;
+  const maxSwing = 8000; // ₹8000Cr considered extreme
+  let score = 50 + (totalNet / maxSwing) * 50;
+  score = Math.min(98, Math.max(2, score));
+  const sv = document.getElementById('sentimentVal');
+  const sd = document.getElementById('sentimentDesc');
+  const sf = document.getElementById('sentimentFill');
+  sf.style.left = score + '%';
+  if (score >= 62) {
+    sv.textContent = 'Bullish'; sv.className = 'sentiment-val bullish';
+    sd.textContent = 'Institutions net buying. Positive flow supports market upside.';
+  } else if (score <= 38) {
+    sv.textContent = 'Bearish'; sv.className = 'sentiment-val bearish';
+    sd.textContent = 'Institutions net selling. Caution advised in near term.';
+  } else {
+    sv.textContent = 'Neutral'; sv.className = 'sentiment-val neutral';
+    sd.textContent = 'Mixed institutional flow. Watch for direction clarity.';
+  }
+}
+
+async function fetchFiiDii() {
+  const nseURL = 'https://www.nseindia.com/api/fiidiiTradeReact';
+  const headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Accept': 'application/json, text/plain, */*',
+    'Referer': 'https://www.nseindia.com/'
+  };
+
+  try {
+    const res = await fetch(nseURL, { headers, signal: AbortSignal.timeout(8000) });
+    if (res.ok) {
+      const data = await res.json();
+      const arr = Array.isArray(data) ? data : (data.data || []);
+      const fii = arr.find(r => (r.category || r.CATEGORY || '').toUpperCase().includes('FII'));
+      const dii = arr.find(r => (r.category || r.CATEGORY || '').toUpperCase().includes('DII'));
+      if (fii && dii) {
+        // Set date
+        const dateStr = fii.date || fii.DATE || new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+        document.getElementById('fiidiiDate').textContent = 'As of ' + dateStr;
+        applyFiiDii(fii, dii);
+        return;
+      }
+    }
+  } catch (e) {}
+  // Fallback
+  applyFiiDii(
+    { buyValue: '14832.45', sellValue: '13120.30', netValue:  '1712.15' },
+    { buyValue: '10234.80', sellValue:  '8940.25', netValue:  '1294.55' }
+  );
+  document.getElementById('fiidiiDate').textContent = 'Static data (live fetch unavailable)';
+}
+
+function initFiiDii() {
+  fetchFiiDii();
+  fetchFiiDiiHistory();
+  setInterval(fetchFiiDii, 300000);
+}
+
+/* ---- 30-day historical table ---- */
+function genFallbackHistory() {
+  const rows = [];
+  const today = new Date();
+  let seed = 1234;
+  function rnd() { seed = (seed * 16807 + 0) % 2147483647; return (seed % 10000) / 100; }
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    if (d.getDay() === 0 || d.getDay() === 6) continue;
+    const fiiNet = (rnd() - 50) * 80;
+    const diiNet = (rnd() - 40) * 60;
+    rows.push({
+      date: d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
+      fii: fiiNet.toFixed(2),
+      dii: diiNet.toFixed(2),
+    });
+  }
+  return rows.slice(-22);
+}
+
+function renderHistTable(rows) {
+  const maxAbs = Math.max(...rows.map(r => Math.max(Math.abs(+r.fii), Math.abs(+r.dii))));
+  const tbody = document.getElementById('histTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = rows.slice().reverse().map(r => {
+    const fv = +r.fii, dv = +r.dii;
+    const fPos = fv >= 0, dPos = dv >= 0;
+    const fW = Math.round(Math.abs(fv) / maxAbs * 40);
+    const dW = Math.round(Math.abs(dv) / maxAbs * 40);
+    const fStr = (fPos ? '+' : '') + (+fv).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+    const dStr = (dPos ? '+' : '') + (+dv).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+    return `<tr>
+      <td class="td-date">${r.date}</td>
+      <td class="${fPos ? 'td-pos' : 'td-neg'}">${fStr}</td>
+      <td class="${dPos ? 'td-pos' : 'td-neg'}">${dStr}</td>
+      <td>
+        <div class="hist-flow-bar">
+          <div class="hist-fii-bar" style="width:${fW}px; opacity:${fPos?1:0.45}"></div>
+          <div class="hist-dii-bar" style="width:${dW}px; opacity:${dPos?1:0.45}"></div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function fetchFiiDiiHistory() {
+  const end   = new Date();
+  const start = new Date(); start.setDate(start.getDate() - 40);
+  const fmt   = d => `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
+  const nseURL = `https://www.nseindia.com/api/historicalOR/fiiDiiData?startDate=${fmt(start)}&endDate=${fmt(end)}`;
+  const headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Accept': 'application/json, text/plain, */*',
+    'Referer': 'https://www.nseindia.com/'
+  };
+
+  try {
+    const res = await fetch(nseURL, { headers, signal: AbortSignal.timeout(9000) });
+    if (res.ok) {
+      const data = await res.json();
+      const arr = data?.data || data?.Data || (Array.isArray(data) ? data : null);
+      if (arr && arr.length > 0) {
+        const rows = arr.slice(-22).map(row => ({
+          date: row.date || row.Date || row.DATE || '',
+          fii:  row.fiiNetDii || row.FII_NET || row.fiiNet || row.netFII || row.NET_FII || 0,
+          dii:  row.diiNetDii || row.DII_NET || row.diiNet || row.netDII || row.NET_DII || 0,
+        }));
+
+        renderHistTable(rows);
+        document.getElementById('histLoadStatus').textContent = 'NSE data';
+        return;
+      }
+    }
+  } catch (e) {}
+
+  // fallback
+  renderHistTable(genFallbackHistory());
+  document.getElementById('histLoadStatus').textContent = 'Sample data';
+}
+
+function toggleHistTable() {
+  /* table is always visible — this was an earlier toggle, no-op now */
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  renderReports('all');
+  renderCourses('all');
+  renderCalls('intraday');
+  renderPerfTable('all');
+  observeFadeIns();
+  startCarousel();
+  // initLiveTicker(); // Commented out to disable live ticker
+  initFiiDii();
+  // set initial + / − state for section headers
+  const shortPlus = document.getElementById('secplus-short');
+  if (shortPlus) shortPlus.textContent = '−';
+  const toolsPlus = document.getElementById('secplus-tools');
+  if (toolsPlus) toolsPlus.textContent = '−';
+});
+
+/* ===== REPORTS DATA ===== */
+const reportsData = [
+  {cat:'largecap', tag:'buy', title:'Reliance Industries Ltd', ticker:'RELIANCE', desc:'Jio Financial value unlock, O2C recovery, and new energy ramp-up. Strong FCF generation supports premium valuation.', target:'₹3,250', upside:'+18%', horizon:'12M', date:'Apr 5, 2025'},
+  {cat:'largecap', tag:'buy', title:'HDFC Bank Limited', ticker:'HDFCBANK', desc:'Post-merger NIM expansion expected, strong CASA ratio and retail loan growth. Valuations still reasonable vs history.', target:'₹1,950', upside:'+22%', horizon:'12M', date:'Apr 3, 2025'},
+  {cat:'largecap', tag:'hold', title:'Infosys Limited', ticker:'INFY', desc:'Near-term headwinds from deal ramp-downs. Await guidance upgrade. Strong balance sheet and dividend yield provide support.', target:'₹1,760', upside:'+8%', horizon:'6M', date:'Apr 1, 2025'},
+  {cat:'midcap', tag:'buy', title:'Dixon Technologies', ticker:'DIXON', desc:'Electronics PLI beneficiary. Strong order book in mobile, LED, and consumer electronics. Scalable business model.', target:'₹16,500', upside:'+28%', horizon:'18M', date:'Mar 28, 2025'},
+  {cat:'midcap', tag:'buy', title:'Chalet Hotels Ltd', ticker:'CHALET', desc:'India hospitality upcycle. Premium hotel RevPAR growth of 15%+ YoY. Debt reduction on track.', target:'₹1,050', upside:'+32%', horizon:'18M', date:'Mar 25, 2025'},
+  {cat:'midcap', tag:'sell', title:'PVR Inox Ltd', ticker:'PVRINOX', desc:'OTT competition intensifying. Footfall recovery slower than expected. Debt levels remain elevated.', target:'₹1,200', upside:'-12%', horizon:'12M', date:'Mar 22, 2025'},
+  {cat:'smallcap', tag:'buy', title:'Bikaji Foods', ticker:'BIKAJI', desc:'Organized snacks category growing rapidly. Pan-India distribution expansion. Margin improvement ahead.', target:'₹820', upside:'+35%', horizon:'24M', date:'Mar 18, 2025'},
+  {cat:'smallcap', tag:'buy', title:'Ami Organics', ticker:'AMIORG', desc:'Specialty chemicals with strong pharma API pipeline. Export diversification into Europe.', target:'₹1,450', upside:'+40%', horizon:'24M', date:'Mar 15, 2025'},
+  {cat:'sectoral', tag:'hold', title:'Nifty IT Sector', ticker:'NIFTYIT', desc:'Mixed signals — US macro uncertainty vs long-term AI spends. Prefer Tier-2 IT over large caps at current valuations.', target:'Index View', upside:'Neutral', horizon:'6M', date:'Apr 2, 2025'},
+  {cat:'sectoral', tag:'buy', title:'Banking Sector Outlook', ticker:'BANKNIFTY', desc:'Rate cut cycle beginning. NIMs to stabilize. Credit growth at 14–16%. PSU banks offer value; HDFC/ICICI for quality.', target:'Overweight', upside:'+15–25%', horizon:'12M', date:'Mar 30, 2025'},
+];
+function renderReports(cat) {
+  const data = cat === 'all' ? reportsData : reportsData.filter(r => r.cat === cat);
+  document.getElementById('reportsGrid').innerHTML = data.map(r => `
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start">
+        <div class="card-tag tag-${r.tag}">${r.tag.toUpperCase()}</div>
+        <div style="font-family:'Space Mono',monospace; font-size:12px; color:var(--grey)">${r.ticker}</div>
+      </div>
+      <h3>${r.title}</h3>
+      <p>${r.desc}</p>
+      <div class="card-meta">
+        <div class="meta-item"><span>${r.target}</span>Target</div>
+        <div class="meta-item"><span style="color:${r.upside.startsWith('+') ? 'var(--green)' : r.upside.startsWith('-') ? 'var(--red)' : 'var(--gold)'}">${r.upside}</span>Upside</div>
+        <div class="meta-item"><span>${r.horizon}</span>Horizon</div>
+      </div>
+      <div class="card-footer" style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center">
+        <span style="font-size:11px; color:var(--grey)">${r.date}</span>
+        <button class="btn btn-outline" style="padding:6px 14px; font-size:12px">Read Full Report →</button>
+      </div>
+    </div>`).join('');
+}
+function filterReports(cat, btn) {
+  document.querySelectorAll('#reportTabs .tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderReports(cat);
+}
+
+/* ===== COURSES DATA ===== */
+const coursesData = [
+  {level:'beginner', icon:'📈', title:'Stock Market Basics', desc:'What is a stock? How does BSE/NSE work? Types of orders, demat accounts, and how to start investing.', lessons:'12 Lessons', duration:'6 Hours', badge:'Free'},
+  {level:'beginner', icon:'💰', title:'Mutual Funds & SIP', desc:'Understanding mutual fund categories, SIP vs lumpsum, NAV, expense ratio, and picking the right fund.', lessons:'8 Lessons', duration:'4 Hours', badge:'Free'},
+  {level:'intermediate', icon:'📊', title:'Fundamental Analysis', desc:'P/E, P/B, ROE, ROCE, DCF valuation, reading annual reports, and building a financial model.', lessons:'20 Lessons', duration:'14 Hours', badge:'Premium'},
+  {level:'intermediate', icon:'📉', title:'Technical Analysis', desc:'Chart patterns, candlesticks, RSI, MACD, moving averages, volume analysis, and support/resistance.', lessons:'18 Lessons', duration:'12 Hours', badge:'Premium'},
+  {level:'advanced', icon:'🎲', title:'Options Strategies', desc:'Greeks, spreads, straddles, iron condor, theta decay, and building income-generating options portfolios.', lessons:'24 Lessons', duration:'18 Hours', badge:'Premium'},
+  {level:'advanced', icon:'🏗️', title:'Portfolio Construction', desc:'Asset allocation, rebalancing, factor investing, risk-adjusted returns, and building a multi-cap portfolio.', lessons:'16 Lessons', duration:'10 Hours', badge:'Premium'},
+];
+function renderCourses(level) {
+  const data = level === 'all' ? coursesData : coursesData.filter(c => c.level === level);
+  document.getElementById('coursesGrid').innerHTML = data.map(c => `
+    <div class="course-card card">
+      <div class="course-icon">${c.icon}</div>
+      <div class="card-tag ${c.badge === 'Free' ? 'tag-free' : 'tag-premium'}">${c.badge}</div>
+      <h3>${c.title}</h3>
+      <p>${c.desc}</p>
+      <div class="course-meta">
+        <span><strong>${c.lessons}</strong></span>
+        <span><strong>${c.duration}</strong></span>
+        <span style="text-transform:capitalize; color:var(--gold); text-transform:capitalize">${c.level}</span>
+      </div>
+      <div class="card-footer" style="margin-top:16px">
+        <button class="btn btn-gold" style="width:100%; justify-content:center" onclick="showPage('contact')">
+          ${c.badge === 'Free' ? 'Start Free →' : 'Enroll Now →'}
+        </button>
+      </div>
+    </div>`).join('');
+}
+function filterCourses(level, btn) {
+  document.querySelectorAll('#page-learner .tabs .tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderCourses(level);
+}
+
+/* ===== CALLS DATA — STRUCTURED ===== */
+const callsData = {
+  intraday: [
+    {stock:'NIFTY 50', name:'Index F&O — Intraday', action:'buy', entry:'24,250', target:'24,480', sl:'24,160', ret:'+9.6%', date:'Apr 9', horizon:'Same Day', rr:'2.6:1'},
+    {stock:'ICICIBANK', name:'ICICI Bank Ltd', action:'buy', entry:'₹1,240', target:'₹1,265', sl:'₹1,228', ret:'+2.0%', date:'Apr 2', horizon:'Same Day', rr:'2.1:1'},
+    {stock:'RELIANCE', name:'Reliance Industries', action:'sell', entry:'₹2,900', target:'₹2,840', sl:'₹2,935', ret:'+2.1%', date:'Mar 27', horizon:'Same Day', rr:'1.7:1'},
+    {stock:'HDFCBANK', name:'HDFC Bank Ltd', action:'buy', entry:'₹1,590', target:'₹1,618', sl:'₹1,578', ret:'+1.8%', date:'Mar 26', horizon:'Same Day', rr:'2.3:1'},
+  ],
+  swing: [
+    {stock:'TATAMOTORS', name:'Tata Motors Ltd', action:'buy', entry:'₹838', target:'₹920', sl:'₹805', ret:'+15.3%', date:'Apr 8', horizon:'7–14 Days', rr:'2.5:1'},
+    {stock:'DIXON', name:'Dixon Technologies', action:'buy', entry:'₹12,850', target:'₹14,200', sl:'₹12,100', ret:'+10.5%', date:'Apr 1', horizon:'10 Days', rr:'1.8:1'},
+    {stock:'WIPRO', name:'Wipro Ltd', action:'buy', entry:'₹490', target:'₹528', sl:'₹472', ret:'+7.8%', date:'Mar 28', horizon:'12 Days', rr:'2.1:1'},
+    {stock:'SBIN', name:'State Bank of India', action:'buy', entry:'₹720', target:'₹780', sl:'₹692', ret:'+8.3%', date:'Mar 25', horizon:'8 Days', rr:'2.1:1'},
+  ],
+  positional: [
+    {stock:'HCLTECH', name:'HCL Technologies', action:'buy', entry:'₹1,650', target:'₹1,920', sl:'₹1,550', ret:'+16.4%', date:'Apr 4', horizon:'1–3 Months', rr:'2.7:1'},
+    {stock:'ASIANPAINT', name:'Asian Paints Ltd', action:'buy', entry:'₹2,850', target:'₹3,200', sl:'₹2,700', ret:'+12.3%', date:'Mar 20', horizon:'2 Months', rr:'2.3:1'},
+    {stock:'MARUTI', name:'Maruti Suzuki India', action:'buy', entry:'₹11,800', target:'₹13,500', sl:'₹11,100', ret:'+14.4%', date:'Mar 15', horizon:'3 Months', rr:'2.4:1'},
+    {stock:'BAJFINANCE', name:'Bajaj Finance Ltd', action:'buy', entry:'₹6,800', target:'₹7,800', sl:'₹6,400', ret:'+14.7%', date:'Mar 10', horizon:'2 Months', rr:'2.5:1'},
+  ],
+  value: [
+    {stock:'HDFCBANK', name:'HDFC Bank Limited', action:'buy', entry:'₹1,595', target:'₹2,100', sl:'₹1,350', ret:'+31.7%', date:'Jan 15', horizon:'18–24 Months', rr:'2.1:1'},
+    {stock:'NESTLEIND', name:'Nestle India Ltd', action:'buy', entry:'₹2,350', target:'₹2,950', sl:'₹2,050', ret:'+25.5%', date:'Feb 10', horizon:'24 Months', rr:'2.0:1'},
+    {stock:'AMIORG', name:'Ami Organics Ltd', action:'buy', entry:'₹1,040', target:'₹1,600', sl:'₹880', ret:'+53.8%', date:'Dec 5', horizon:'24 Months', rr:'3.5:1'},
+    {stock:'BIKAJI', name:'Bikaji Foods Intl', action:'buy', entry:'₹608', target:'₹900', sl:'₹520', ret:'+48.0%', date:'Nov 20', horizon:'30 Months', rr:'3.3:1'},
+  ],
+  monthly: [
+    {stock:'NIFTYBEES', name:'Nifty 50 ETF — SIP', action:'buy', entry:'₹240/unit', target:'₹320', sl:'N/A', ret:'+33.3%', date:'Jan 1', horizon:'12 Months SIP', rr:'Long Term'},
+    {stock:'JUNIORBEES', name:'Nifty Next 50 ETF', action:'buy', entry:'₹65/unit', target:'₹95', sl:'N/A', ret:'+46.2%', date:'Jan 1', horizon:'12 Months SIP', rr:'Long Term'},
+    {stock:'PPFAS', name:'Parag Parikh Flexi Cap', action:'buy', entry:'₹5,000/month', target:'Wealth Creation', sl:'N/A', ret:'+26.8% XIRR', date:'Ongoing', horizon:'3–5 Years', rr:'Long Term'},
+    {stock:'MIRAE', name:'Mirae Asset Large Cap', action:'buy', entry:'₹3,000/month', target:'Wealth Creation', sl:'N/A', ret:'+21.4% XIRR', date:'Ongoing', horizon:'5+ Years', rr:'Long Term'},
+  ],
+};
+
+let currentCallsGroup = 'short';
+
+function toggleAcc(groupId) {
+  const group = document.getElementById(groupId);
+  const isOpen = group.classList.contains('open');
+  // close all
+  document.querySelectorAll('.acc-group').forEach(g => g.classList.remove('open'));
+  // open this one if it wasn't open, else leave closed
+  if (!isOpen) group.classList.add('open');
+}
+
+function selectCall(type, groupId, btn) {
+  // ensure parent group is open
+  const group = document.getElementById(groupId);
+  document.querySelectorAll('.acc-group').forEach(g => g.classList.remove('open'));
+  group.classList.add('open');
+  // clear all active child buttons
+  document.querySelectorAll('.acc-child').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCalls(type);
+}
+
+function filterCalls(type, btn, group) {
+  selectCall(type, 'acc' + (group === 'short' ? 'Short' : 'Long'), btn);
+}
+
+function switchCallsGroup(group) {
+  const id = group === 'short' ? 'accShort' : 'accLong';
+  document.querySelectorAll('.acc-group').forEach(g => g.classList.remove('open'));
+  document.getElementById(id).classList.add('open');
+  const defaultType = group === 'short' ? 'intraday' : 'value';
+  renderCalls(defaultType);
+}
+
+function renderCalls(type) {
+  const data = callsData[type] || [];
+  const isLong = (type === 'value' || type === 'monthly');
+  document.getElementById('callsGrid').innerHTML = data.map(c => `
+    <div class="call-card">
+      <div>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap">
+          <span class="${c.action === 'buy' ? 'badge-buy' : 'badge-sell'}">${c.action.toUpperCase()}</span>
+          <span style="font-size:11px; color:var(--grey); text-transform:capitalize">${type}</span>
+          <span style="font-size:11px; color:var(--grey); background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:10px;">⏱ ${c.horizon}</span>
+        </div>
+        <div class="call-stock">${c.stock}</div>
+        <div class="call-name">${c.name}</div>
+        <div class="call-details">
+          <div class="call-detail">Entry: <span>${c.entry}</span></div>
+          <div class="call-detail">Target: <span style="color:var(--green)">${c.target}</span></div>
+          <div class="call-detail">SL: <span style="color:var(--red)">${c.sl}</span></div>
+          <div class="call-detail">R:R <span>${c.rr}</span></div>
+          <div class="call-detail">Date: <span>${c.date}</span></div>
+        </div>
+      </div>
+      <div class="call-return">
+        <div class="r ${parseFloat(c.ret) >= 0 ? 'badge-pos' : 'badge-neg'}">${c.ret}</div>
+        <small>Return</small>
+      </div>
+    </div>`).join('');
+}
+
+/* ===== PERFORMANCE DATA ===== */
+const perfData = [
+  {stock:'TATAMOTORS', type:'equity', entry:'780', target:'920', sl:'740', exit:'915', pnl:'+17.3%', status:'Target Hit', date:'Apr 8'},
+  {stock:'ICICIBANK', type:'intraday', entry:'1,220', target:'1,260', sl:'1,205', exit:'1,258', pnl:'+3.1%', status:'Target Hit', date:'Apr 7'},
+  {stock:'HCLTECH', type:'equity', entry:'1,650', target:'1,850', sl:'1,580', exit:'1,840', pnl:'+11.5%', status:'Target Hit', date:'Apr 4'},
+  {stock:'NIFTY CE 24000', type:'options', entry:'180', target:'320', sl:'110', exit:'315', pnl:'+75.0%', status:'Target Hit', date:'Apr 2'},
+  {stock:'BAJFINANCE', type:'equity', entry:'6,800', target:'7,500', sl:'6,500', exit:'6,490', pnl:'-4.6%', status:'SL Hit', date:'Mar 31'},
+  {stock:'WIPRO', type:'intraday', entry:'490', target:'502', sl:'484', exit:'501', pnl:'+2.2%', status:'Target Hit', date:'Mar 28'},
+  {stock:'SBIN', type:'equity', entry:'720', target:'820', sl:'685', exit:'815', pnl:'+13.2%', status:'Target Hit', date:'Mar 25'},
+  {stock:'NIFTY PE 23500', type:'options', entry:'150', target:'280', sl:'90', exit:'88', pnl:'-41.3%', status:'SL Hit', date:'Mar 22'},
+  {stock:'ASIAN PAINTS', type:'equity', entry:'2,850', target:'3,200', sl:'2,720', exit:'3,190', pnl:'+12.0%', status:'Target Hit', date:'Mar 20'},
+  {stock:'MARUTI', type:'equity', entry:'11,800', target:'13,200', sl:'11,200', exit:'13,100', pnl:'+11.0%', status:'Target Hit', date:'Mar 15'},
+];
+function renderPerfTable(type) {
+  const data = type === 'all' ? perfData : perfData.filter(p => p.type === type);
+  document.getElementById('perfBody').innerHTML = data.map(p => `
+    <tr>
+      <td style="color:var(--white); font-weight:600">${p.stock}</td>
+      <td><span style="text-transform:capitalize; color:var(--grey2)">${p.type}</span></td>
+      <td>${p.entry}</td>
+      <td style="color:var(--green)">${p.target}</td>
+      <td style="color:var(--red)">${p.sl}</td>
+      <td style="color:var(--white)">${p.exit}</td>
+      <td class="${parseFloat(p.pnl) >= 0 ? 'badge-pos' : 'badge-neg'}">${p.pnl}</td>
+      <td><span class="${p.status === 'Target Hit' ? 'badge-buy' : 'badge-sell'}">${p.status}</span></td>
+      <td>${p.date}</td>
+    </tr>`).join('');
+}
+function filterPerf(type, btn) {
+  document.querySelectorAll('#page-performance .tabs .tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderPerfTable(type);
+}
+
+/* ===== EMI CALCULATOR ===== */
+function calcEMI() {
+  const P = parseFloat(document.getElementById('loanAmount').value);
+  const annualR = parseFloat(document.getElementById('interestRate').value);
+  let n = parseFloat(document.getElementById('tenureValue').value);
+  if (document.getElementById('tenureType').value === 'years') n *= 12;
+  if (!P || !annualR || !n) return;
+  const r = annualR / 12 / 100;
+  const emi = P * r * Math.pow(1+r, n) / (Math.pow(1+r, n) - 1);
+  const total = emi * n;
+  const totalInt = total - P;
+  const intPct = (totalInt / total * 100).toFixed(1);
+  const prinPct = (100 - parseFloat(intPct)).toFixed(1);
+  document.getElementById('emiVal').textContent = '₹' + fmt(emi);
+  document.getElementById('totalInterestVal').textContent = '₹' + fmt(totalInt);
+  document.getElementById('totalAmountVal').textContent = '₹' + fmt(total);
+  document.getElementById('interestPctVal').textContent = intPct + '%';
+  document.getElementById('emiBar').style.width = prinPct + '%';
+  document.getElementById('principalPct').textContent = prinPct + '%';
+  document.getElementById('interestPctDisp').textContent = intPct + '%';
+  document.getElementById('emiResult').classList.add('show');
+}
+function fmt(n) {
+  if (n >= 1e7) return (n/1e7).toFixed(2) + 'Cr';
+  if (n >= 1e5) return (n/1e5).toFixed(2) + 'L';
+  return Math.round(n).toLocaleString('en-IN');
+}
+
+/* ===== POSITION SIZING CALCULATOR ===== */
+function calcPosition() {
+  const capital = parseFloat(document.getElementById('capital').value);
+  const riskPct = parseFloat(document.getElementById('riskPct').value);
+  const entry = parseFloat(document.getElementById('entryPrice').value);
+  const sl = parseFloat(document.getElementById('slPrice').value);
+  const target = parseFloat(document.getElementById('targetPrice').value) || 0;
+  if (!capital || !riskPct || !entry || !sl) return;
+  const riskPerShare = Math.abs(entry - sl);
+  const maxRisk = capital * riskPct / 100;
+  const qty = Math.floor(maxRisk / riskPerShare);
+  const invested = qty * entry;
+  let rr = '-';
+  let advice = '';
+  if (target) {
+    const reward = Math.abs(target - entry);
+    rr = (reward / riskPerShare).toFixed(1) + ':1';
+    const rrNum = reward / riskPerShare;
+    if (rrNum >= 2) { advice = `✅ <strong>Good trade setup!</strong> Risk:Reward of ${rr} is favorable. Position of ${qty} shares risks ₹${Math.round(maxRisk).toLocaleString('en-IN')} for potential gain of ₹${Math.round(qty * reward).toLocaleString('en-IN')}.`; document.getElementById('posAdvice').style.background = 'rgba(46,204,113,0.08)'; document.getElementById('posAdvice').style.border = '1px solid rgba(46,204,113,0.25)'; document.getElementById('posAdvice').style.color = '#aaffcc'; }
+    else { advice = `⚠️ <strong>Weak risk:reward of ${rr}.</strong> Consider a better target or entry price. Most traders require at least 2:1 R:R.`; document.getElementById('posAdvice').style.background = 'rgba(231,76,60,0.08)'; document.getElementById('posAdvice').style.border = '1px solid rgba(231,76,60,0.25)'; document.getElementById('posAdvice').style.color = '#ffaaaa'; }
+  }
+  document.getElementById('posQty').textContent = qty.toLocaleString('en-IN');
+  document.getElementById('posInvest').textContent = '₹' + fmt(invested);
+  document.getElementById('posRisk').textContent = '₹' + Math.round(maxRisk).toLocaleString('en-IN');
+  document.getElementById('posRR').textContent = rr;
+  const r = document.getElementById('posResult');
+  const adv = document.getElementById('posAdvice');
+  r.classList.add('show');
+  if (advice) { adv.style.display = 'block'; adv.innerHTML = advice; } else { adv.style.display = 'none'; }
+}
+
+/* ===== CONTACT FORM ===== */
+function submitContact() {
+  const name = document.getElementById('cfName').value;
+  const email = document.getElementById('cfEmail').value;
+  const msg = document.getElementById('cfMessage').value;
+  if (!name || !email || !msg) { alert('Please fill Name, Email, and Message.'); return; }
+  document.getElementById('contactFormWrap').style.display = 'none';
+  document.getElementById('formSuccess').classList.add('show');
+}
+
+/* ===== SCROLL FADE-IN ===== */
+function observeFadeIns() {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+}
+</script>
+
+
+<section style="padding:40px 20px; max-width:900px; margin:auto; line-height:1.7;">
+
+<h2>Stock Market Research & Investment Guidance</h2>
+
+<p>
+RootNivesh provides professional stock market research, investment ideas and trading strategies based on disciplined methodology.
+We help investors build long term wealth through portfolio management, SIP investment strategy and risk controlled approach.
+Our focus is on fundamentally strong companies, financial education and data driven equity research in India.
+</p>
+
+</section>
+</body>
+</html>

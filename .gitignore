@@ -1,0 +1,8 @@
+# Editor and tool folders — not part of the website
+.claude/
+.vscode/
+
+# OS junk
+Thumbs.db
+.DS_Store
+desktop.ini
