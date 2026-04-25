@@ -1385,3 +1385,113 @@
   /* Prevent any element from forcing the page wider than the viewport */
   html, body { max-width: 100vw; overflow-x: hidden; }
   img, video { max-width: 100%; height: auto; }
+
+  /* ====================================================================
+     iPhone 15 Pro & modern phone polish
+     - Notch / Dynamic Island & home-indicator safe-area
+     - Larger touch targets (iOS HIG minimum 44pt)
+     - Swipe hint on overflow-scroll tables
+     - Smooth tap highlights
+     ==================================================================== */
+
+  /* Honor the notch and home-indicator on iPhone */
+  nav {
+    padding-left: max(1.25rem, env(safe-area-inset-left));
+    padding-right: max(1.25rem, env(safe-area-inset-right));
+    padding-top: env(safe-area-inset-top);
+    height: calc(64px + env(safe-area-inset-top, 0px));
+  }
+  .ticker-tape { top: calc(64px + env(safe-area-inset-top, 0px)); }
+  .mega-menu  { top: calc(64px + env(safe-area-inset-top, 0px)); }
+  .mobile-menu {
+    top: calc(64px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+  footer {
+    padding-bottom: calc(30px + env(safe-area-inset-bottom));
+    padding-left:   max(0px, env(safe-area-inset-left));
+    padding-right:  max(0px, env(safe-area-inset-right));
+  }
+
+  /* iOS removes the default tap-highlight halo that looks bad on dark themes.
+     Replace it with a subtle gold flash. */
+  a, button, .btn, .tab, .acc-header, .acc-child,
+  .snav-item, .snav-section-header, .nav-dd-trigger,
+  .mega-row, .plan-type-btn, .plan-cta,
+  .car-btn, .car-dot {
+    -webkit-tap-highlight-color: rgba(201,168,76,0.18);
+    touch-action: manipulation;
+  }
+
+  /* Touch-target minimums on phones (Apple HIG: 44pt; we use 44px). */
+  @media (max-width: 640px) {
+    .nav-links a, .nav-dd-trigger, .mobile-menu a,
+    .tab, .car-btn, .plan-type-btn,
+    .acc-child, .snav-item {
+      min-height: 44px;
+      display: flex; align-items: center;
+    }
+    .btn { min-height: 44px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea,
+    .plan-duration,
+    .mini-form-right input,
+    .mini-form-right select { min-height: 44px; padding-top: 12px; padding-bottom: 12px; }
+
+    /* Ensure links inside mobile menu fill the row width for easy tapping */
+    .mobile-menu a { width: 100%; }
+
+    /* Swipe hint — fade gradient on the right edge of any overflow table
+       so users see there's more content to scroll to. */
+    .table-wrap {
+      position: relative;
+    }
+    .table-wrap::after {
+      content: ''; position: absolute; top: 0; right: 0; bottom: 0;
+      width: 28px; pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(5,16,31,0.85));
+      border-radius: 0 16px 16px 0;
+    }
+
+    /* Hero video — give it a subtle border-only frame and remove heavy shadow
+       on phones (the shadow looks blown out next to the screen edge). */
+    .hero-media { box-shadow: 0 12px 24px rgba(0,0,0,0.35); }
+  }
+
+  /* The Calls/Tools sidebar collapses to a single-row strip at <=900px.
+     On a 393px iPhone it can wrap into a tall stack — make it scroll
+     horizontally instead so the content area starts higher up. */
+  @media (max-width: 640px) {
+    .snav-wrap {
+      display: flex; flex-wrap: nowrap; overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      gap: 6px; padding: 10px 12px;
+      scroll-snap-type: x proximity;
+    }
+    .snav-wrap > * { flex: 0 0 auto; scroll-snap-align: start; }
+    .snav-wrap::-webkit-scrollbar { display: none; }
+    .snav-section { flex: 0 0 auto; }
+    .snav-item { white-space: nowrap; }
+    .snav-content-header h2 { font-size: 1.3rem; }
+  }
+
+  /* Smaller card-meta text on phones to keep meta row on a single line */
+  @media (max-width: 640px) {
+    .card-meta { gap: 12px; flex-wrap: wrap; }
+    .meta-item { font-size: 11px; }
+    .meta-item span { font-size: 12.5px; }
+  }
+
+  /* Reports / courses card grids — keep full-width cards but reduce inner
+     padding slightly on small screens for a more readable density. */
+  @media (max-width: 480px) {
+    .card-footer .btn { width: 100%; justify-content: center; }
+  }
+
+  /* The contact-form padding can be heavy on small screens */
+  @media (max-width: 640px) {
+    .contact-form { padding: 24px 18px; border-radius: 14px; }
+    .mini-form-section { padding: 24px 18px; border-radius: 16px; }
+    .tool-card { padding: 24px 18px; }
+  }
