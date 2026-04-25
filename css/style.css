@@ -274,8 +274,21 @@
     max-height: 0; overflow: hidden;
     transition: max-height 0.32s cubic-bezier(0.4,0,0.2,1);
   }
-  /* Generous cap so several sections + many items can never be clipped. */
-  .mob-group.open > .mob-group-body { max-height: 1400px; }
+  /* When open, the body becomes its own scrollable list so a section
+     with many items doesn't push the rest of the menu off-screen. */
+  .mob-group.open > .mob-group-body {
+    max-height: 280px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  /* Slim, gold-accent scrollbar inside the section */
+  .mob-group-body::-webkit-scrollbar { width: 4px; }
+  .mob-group-body::-webkit-scrollbar-track { background: transparent; }
+  .mob-group-body::-webkit-scrollbar-thumb {
+    background: var(--border2); border-radius: 4px;
+  }
+  .mob-group-body::-webkit-scrollbar-thumb:hover { background: var(--gold); }
   .mob-group-section {
     font-family: 'Space Mono', monospace; font-size: 10px;
     color: var(--gold); letter-spacing: 1.5px; text-transform: uppercase;
