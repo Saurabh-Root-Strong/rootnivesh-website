@@ -92,6 +92,13 @@ function toggleMobGroup(id) {
     if (g !== el) g.classList.remove('open');
   });
   el.classList.toggle('open', willOpen);
+  // After the expand animation, scroll the open accordion fully into view
+  // so the last item is never hidden below the fold.
+  if (willOpen) {
+    setTimeout(() => {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 360);
+  }
 }
 
 /* ===== SIDEBAR NAV — CALLS ===== */

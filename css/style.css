@@ -209,9 +209,14 @@
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    touch-action: pan-y;
     transform: translateZ(0); /* nudge iOS into using a hardware layer for smooth scroll */
   }
   .mobile-menu.open { display: flex; }
+  /* Each direct child stays its natural size so the column never shrinks
+     items below the items they need to be — flex-shrink: 0 forces overflow
+     and reliably triggers the menu's scroll context. */
+  .mobile-menu > * { flex: 0 0 auto; }
 
   /* Plain top-level link row */
   .mobile-menu .mob-link {
