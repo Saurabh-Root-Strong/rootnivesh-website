@@ -1,0 +1,8 @@
+❌ Polling (inefficient)
+✅ Webhook (instant trigger)
+
+👉 Webhook me:
+
+Jaise hi GitHub push hota hai
+Turant deploy trigger ho jata hai
+No waiting 🔥
