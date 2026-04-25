@@ -182,13 +182,14 @@
     background: var(--white); border-radius: 2px; transition: var(--transition);
   }
   .mobile-menu {
-    display: none; position: fixed; top: 64px; left: 0; right: 0;
+    display: none; position: fixed;
+    top: 64px; left: 0; right: 0; bottom: 0;
     background: #07131F;
     border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 8px 12px 24px;
+    padding: 8px 12px calc(24px + env(safe-area-inset-bottom));
     z-index: 999; flex-direction: column; gap: 2px;
-    max-height: calc(100vh - 64px); overflow-y: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .mobile-menu.open { display: flex; }
 

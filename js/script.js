@@ -476,6 +476,8 @@ function toggleHistTable() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  const yrEl = document.getElementById('footerYear');
+  if (yrEl) yrEl.textContent = new Date().getFullYear();
   renderReports('all');
   renderCourses('all');
   renderPlans();
