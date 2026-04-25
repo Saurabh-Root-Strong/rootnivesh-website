@@ -648,7 +648,7 @@ const IPO_ENDPOINTS = {
   closed:   'https://www.nseindia.com/api/public-past-issues'
 };
 
-const IPO_CLOSED_DAYS = 25;
+const IPO_CLOSED_DAYS = 60;
 
 // Normalize the past-issues feed (different field names) to the shape
 // renderIpoTable expects, and keep only rows whose end date is within
