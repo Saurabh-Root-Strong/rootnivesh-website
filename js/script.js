@@ -1,5 +1,3 @@
-console.log('[RN] script.js loaded OK');
-
 /* ===== PAGE NAVIGATION ===== */
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -183,6 +181,122 @@ function submitMiniForm() {
 
 
 /* ================================================================
+   LIVE MARKET TICKER  — Yahoo Finance via CORS proxy
+   Data is 15-min delayed (Yahoo's standard for free quotes).
+   ================================================================ */
+const CORS_PROXY = 'https://corsproxy.io/?url=';
+
+const TICKER_SYMBOLS = [
+  { yahoo: '^NSEI',         label: 'NIFTY 50' },
+  { yahoo: '^BSESN',        label: 'SENSEX' },
+  { yahoo: '^NSEBANK',      label: 'BANKNIFTY' },
+  { yahoo: 'RELIANCE.NS',   label: 'RELIANCE' },
+  { yahoo: 'TCS.NS',        label: 'TCS' },
+  { yahoo: 'INFY.NS',       label: 'INFOSYS' },
+  { yahoo: 'HDFCBANK.NS',   label: 'HDFCBANK' },
+  { yahoo: 'ICICIBANK.NS',  label: 'ICICIBANK' },
+  { yahoo: 'WIPRO.NS',      label: 'WIPRO' },
+  { yahoo: 'BAJFINANCE.NS', label: 'BAJFINANCE' },
+  { yahoo: 'TATAMOTORS.NS', label: 'TATAMOTORS' },
+  { yahoo: 'SBIN.NS',       label: 'SBIN' },
+  { yahoo: 'AXISBANK.NS',   label: 'AXISBANK' },
+  { yahoo: 'LT.NS',         label: 'L&T' },
+  { yahoo: 'MARUTI.NS',     label: 'MARUTI' }
+];
+
+function isMarketOpen() {
+  const ist = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+  const day = ist.getDay();
+  const mins = ist.getHours() * 60 + ist.getMinutes();
+  return day >= 1 && day <= 5 && mins >= 555 && mins <= 930; // Mon-Fri, 9:15-15:30 IST
+}
+
+function buildTickerHTML(quotes) {
+  const items = quotes.map(q => {
+    const isUp = q.changePct >= 0;
+    const arrow = isUp ? '▲' : '▼';
+    const dirClass = isUp ? 'up' : 'down';
+    const priceFmt = q.price.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+    const pctFmt = Math.abs(q.changePct).toFixed(2) + '%';
+    return '<span class="ticker-item">' +
+      '<span class="t-symbol">' + q.label + '</span>' +
+      '<span class="t-price">₹' + priceFmt + '</span>' +
+      '<span class="t-' + dirClass + '">' + arrow + ' ' + pctFmt + '</span>' +
+    '</span>';
+  }).join('');
+  return items + items; // duplicate for seamless infinite scroll
+}
+
+async function fetchTickerOnce() {
+  const symbols = TICKER_SYMBOLS.map(s => s.yahoo).join(',');
+  const yahooURL = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + encodeURIComponent(symbols);
+  const proxiedURL = CORS_PROXY + encodeURIComponent(yahooURL);
+  const res = await fetch(proxiedURL, { signal: AbortSignal.timeout(10000) });
+  if (!res.ok) throw new Error('proxy returned ' + res.status);
+  const data = await res.json();
+  const result = (data.quoteResponse && data.quoteResponse.result) || [];
+  return result.map(q => {
+    const meta = TICKER_SYMBOLS.find(s => s.yahoo === q.symbol);
+    return {
+      label: meta ? meta.label : q.symbol,
+      price: q.regularMarketPrice != null ? q.regularMarketPrice : 0,
+      changePct: q.regularMarketChangePercent != null ? q.regularMarketChangePercent : 0
+    };
+  }).filter(q => q.price > 0);
+}
+
+async function refreshTicker() {
+  try {
+    const quotes = await fetchTickerOnce();
+    if (quotes.length > 0) {
+      const inner = document.getElementById('tickerInner');
+      if (inner) inner.innerHTML = buildTickerHTML(quotes);
+      const status = document.getElementById('marketStatus');
+      if (status) {
+        const open = isMarketOpen();
+        status.textContent = open ? 'NSE • LIVE (15min delay)' : 'NSE • CLOSED';
+        status.style.color = open ? 'var(--green)' : 'var(--grey)';
+      }
+      return;
+    }
+  } catch (e) { /* fall through */ }
+  showStaticTicker();
+}
+
+function showStaticTicker() {
+  const fallback = [
+    { label: 'NIFTY 50',   price: 24380.25, changePct: 0.87 },
+    { label: 'SENSEX',     price: 80218.37, changePct: 0.79 },
+    { label: 'BANKNIFTY',  price: 52414.60, changePct: 1.12 },
+    { label: 'RELIANCE',   price: 2913.50,  changePct: 1.34 },
+    { label: 'TCS',        price: 4021.80,  changePct: 0.62 },
+    { label: 'INFOSYS',    price: 1752.40,  changePct: -0.38 },
+    { label: 'HDFCBANK',   price: 1648.90,  changePct: 1.08 },
+    { label: 'ICICIBANK',  price: 1378.25,  changePct: 0.93 },
+    { label: 'WIPRO',      price: 487.60,   changePct: 0.44 },
+    { label: 'BAJFINANCE', price: 7182.35,  changePct: 2.17 },
+    { label: 'TATAMOTORS', price: 854.30,   changePct: 1.56 },
+    { label: 'SBIN',       price: 792.45,   changePct: 0.71 },
+    { label: 'AXISBANK',   price: 1218.60,  changePct: 0.85 },
+    { label: 'L&T',        price: 3640.70,  changePct: 0.49 },
+    { label: 'MARUTI',     price: 12140.50, changePct: 1.22 }
+  ];
+  const inner = document.getElementById('tickerInner');
+  if (inner) inner.innerHTML = buildTickerHTML(fallback);
+  const status = document.getElementById('marketStatus');
+  if (status) {
+    status.textContent = 'NSE • SAMPLE DATA';
+    status.style.color = 'var(--grey)';
+  }
+}
+
+function initLiveTicker() {
+  refreshTicker();
+  setInterval(refreshTicker, 60000); // refresh every 60 seconds
+}
+
+
+/* ================================================================
    FII / DII LIVE TALLY  — NSE India API via CORS proxy
    ================================================================ */
 function fmtCr(val) {
@@ -255,34 +369,30 @@ function applyFiiDii(fii, dii) {
 
 async function fetchFiiDii() {
   const nseURL = 'https://www.nseindia.com/api/fiidiiTradeReact';
-  const headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-    'Accept': 'application/json, text/plain, */*',
-    'Referer': 'https://www.nseindia.com/'
-  };
+  const proxiedURL = CORS_PROXY + encodeURIComponent(nseURL);
 
   try {
-    const res = await fetch(nseURL, { headers, signal: AbortSignal.timeout(8000) });
+    const res = await fetch(proxiedURL, { signal: AbortSignal.timeout(10000) });
     if (res.ok) {
       const data = await res.json();
       const arr = Array.isArray(data) ? data : (data.data || []);
       const fii = arr.find(r => (r.category || r.CATEGORY || '').toUpperCase().includes('FII'));
       const dii = arr.find(r => (r.category || r.CATEGORY || '').toUpperCase().includes('DII'));
       if (fii && dii) {
-        // Set date
         const dateStr = fii.date || fii.DATE || new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
-        document.getElementById('fiidiiDate').textContent = 'As of ' + dateStr;
+        document.getElementById('fiidiiDate').textContent = 'As of ' + dateStr + ' (NSE)';
         applyFiiDii(fii, dii);
         return;
       }
     }
   } catch (e) {}
-  // Fallback
+  // Fallback — show sample data with clear "Sample" label
   applyFiiDii(
     { buyValue: '14832.45', sellValue: '13120.30', netValue:  '1712.15' },
     { buyValue: '10234.80', sellValue:  '8940.25', netValue:  '1294.55' }
   );
-  document.getElementById('fiidiiDate').textContent = 'Static data (live fetch unavailable)';
+  const today = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+  document.getElementById('fiidiiDate').textContent = 'Sample data — ' + today;
 }
 
 function initFiiDii() {
@@ -341,14 +451,10 @@ async function fetchFiiDiiHistory() {
   const start = new Date(); start.setDate(start.getDate() - 40);
   const fmt   = d => `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
   const nseURL = `https://www.nseindia.com/api/historicalOR/fiiDiiData?startDate=${fmt(start)}&endDate=${fmt(end)}`;
-  const headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-    'Accept': 'application/json, text/plain, */*',
-    'Referer': 'https://www.nseindia.com/'
-  };
+  const proxiedURL = CORS_PROXY + encodeURIComponent(nseURL);
 
   try {
-    const res = await fetch(nseURL, { headers, signal: AbortSignal.timeout(9000) });
+    const res = await fetch(proxiedURL, { signal: AbortSignal.timeout(10000) });
     if (res.ok) {
       const data = await res.json();
       const arr = data?.data || data?.Data || (Array.isArray(data) ? data : null);
@@ -382,7 +488,7 @@ window.addEventListener('DOMContentLoaded', () => {
   renderPerfTable('all');
   observeFadeIns();
   startCarousel();
-  // initLiveTicker(); // Commented out to disable live ticker
+  initLiveTicker();
   initFiiDii();
   // set initial + / − state for section headers
   const shortPlus = document.getElementById('secplus-short');
