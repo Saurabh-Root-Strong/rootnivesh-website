@@ -86,7 +86,12 @@ function toggleMenu() {
 function toggleMobGroup(id) {
   const el = document.getElementById(id);
   if (!el) return;
-  el.classList.toggle('open');
+  const willOpen = !el.classList.contains('open');
+  // Close every other mobile-menu group first so only one can be open at a time.
+  document.querySelectorAll('.mob-group').forEach(g => {
+    if (g !== el) g.classList.remove('open');
+  });
+  el.classList.toggle('open', willOpen);
 }
 
 /* ===== SIDEBAR NAV — CALLS ===== */
