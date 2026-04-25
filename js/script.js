@@ -109,17 +109,22 @@ function snavSelectCall(type, el) {
 }
 
 /* ===== SIDEBAR NAV — TOOLS ===== */
+const TOOL_TYPES = ['emi', 'pos', 'sip'];
 function snavSelectTool(type, el) {
   document.querySelectorAll('#page-tools .snav-item').forEach(i => i.classList.remove('active'));
   el.classList.add('active');
-  document.getElementById('toolContent-emi').style.display = type === 'emi' ? 'block' : 'none';
-  document.getElementById('toolContent-pos').style.display = type === 'pos' ? 'block' : 'none';
+  TOOL_TYPES.forEach(t => {
+    const panel = document.getElementById('toolContent-' + t);
+    if (panel) panel.style.display = (t === type) ? 'block' : 'none';
+  });
 }
 
 /* called from navbar dropdown */
 function setTool(which) {
   showPage('tools');
-  const type = which === 'emi' ? 'emi' : 'pos';
+  const type = which === 'emi' ? 'emi'
+            : which === 'sip' ? 'sip'
+            : 'pos';
   const el = document.getElementById('snav-' + type);
   if (el) snavSelectTool(type, el);
 }
@@ -1262,6 +1267,39 @@ function calcPosition() {
   const adv = document.getElementById('posAdvice');
   r.classList.add('show');
   if (advice) { adv.style.display = 'block'; adv.innerHTML = advice; } else { adv.style.display = 'none'; }
+}
+
+/* ===== SIP CALCULATOR ===== */
+function calcSIP() {
+  const monthly = parseFloat(document.getElementById('sipAmount').value);
+  const annualR = parseFloat(document.getElementById('sipReturn').value);
+  const years   = parseFloat(document.getElementById('sipYears').value);
+  if (!monthly || !annualR || !years || monthly <= 0 || annualR < 0 || years <= 0) return;
+
+  const n = years * 12;
+  const r = annualR / 12 / 100;
+  // Future value of an annuity (end-of-period contributions, then × (1+r) for start-of-period)
+  const fv = monthly * (Math.pow(1 + r, n) - 1) / r * (1 + r);
+  const invested = monthly * n;
+  const gains    = fv - invested;
+  const multiplier = fv / invested;
+
+  document.getElementById('sipInvested').textContent   = '₹' + fmt(invested);
+  document.getElementById('sipGains').textContent      = '₹' + fmt(gains);
+  document.getElementById('sipMaturity').textContent   = '₹' + fmt(fv);
+  document.getElementById('sipMultiplier').textContent = multiplier.toFixed(2) + 'x';
+
+  const breakdown = document.getElementById('sipBreakdown');
+  const gainsPct = (gains / fv * 100).toFixed(1);
+  breakdown.style.display = 'block';
+  breakdown.innerHTML =
+    '<strong style="color:var(--gold)">Snapshot:</strong> investing ₹' + fmt(monthly) +
+    ' every month for ' + years + ' years at ' + annualR + '% annual return ' +
+    'compounds to <strong style="color:var(--white)">₹' + fmt(fv) + '</strong>. ' +
+    'Of that, <strong style="color:var(--green)">' + gainsPct + '%</strong> is pure return — ' +
+    'your contributions are only ₹' + fmt(invested) + '.';
+
+  document.getElementById('sipResult').classList.add('show');
 }
 
 /* ===== CONTACT FORM ===== */

@@ -158,6 +158,16 @@
                 <span class="mega-sub-go" onclick="megaGoTool('emi')">Open Calculator →</span>
               </div>
             </div>
+            <div class="mega-row" onclick="megaGoTool('sip')">
+              <span class="mega-row-label">SIP Calculator</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-sip','snav-sip')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-sip">
+              <div class="mega-sub-inner">
+                <p>Project the future value of a monthly SIP, with invested amount and gains broken out.</p>
+                <span class="mega-sub-go" onclick="megaGoTool('sip')">Open Calculator →</span>
+              </div>
+            </div>
             <div class="mega-row" onclick="megaGoTool('pos')">
               <span class="mega-row-label">Position Sizing Calculator</span>
               <div class="mega-plus" onclick="megaToggleSub(event,'msub-pos')">+</div>
@@ -215,6 +225,7 @@
     </button>
     <div class="mob-group-body">
       <a class="mob-sub" onclick="megaGoTool('emi')"><span>🏦</span><span>EMI Calculator</span></a>
+      <a class="mob-sub" onclick="megaGoTool('sip')"><span>💰</span><span>SIP Calculator</span></a>
       <a class="mob-sub" onclick="megaGoTool('pos')"><span>📐</span><span>Position Sizing</span></a>
     </div>
   </div>
@@ -1091,6 +1102,16 @@
               <span class="snav-sub-btn" onclick="snavSelectTool('pos',document.getElementById('snav-pos'))">Open Position Sizer &#8594;</span>
             </div>
           </div>
+          <div class="snav-item" id="snav-sip" onclick="snavSelectTool('sip',this)">
+            <span class="snav-item-label">SIP Calculator</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-sip','snav-sip')">+</div>
+          </div>
+          <div class="snav-sub" id="sub-sip">
+            <div class="snav-sub-inner">
+              <p>Project the future value of a monthly SIP at any expected return rate &mdash; with invested amount and gains broken out.</p>
+              <span class="snav-sub-btn" onclick="snavSelectTool('sip',document.getElementById('snav-sip'))">Open SIP Calculator &#8594;</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1196,6 +1217,41 @@
             <div class="result-item"><div class="r-val" id="posRR">-</div><div class="r-label">Risk:Reward</div></div>
           </div>
           <div id="posAdvice" style="margin-top:16px; padding:12px; border-radius:8px; font-size:12.5px; line-height:1.6; display:none;"></div>
+        </div>
+      </div>
+
+      <!-- SIP CALCULATOR -->
+      <div id="toolContent-sip" style="display:none">
+        <div class="snav-content-header">
+          <div>
+            <div class="snav-breadcrumb">TOOLS &nbsp;/&nbsp; <span style="color:var(--gold)">SIP CALCULATOR</span></div>
+            <h2>&#x1F4B0; SIP Calculator</h2>
+            <p>Project the future value of a monthly SIP at any expected return rate &mdash; with invested amount and gains broken out.</p>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px;">
+          <div class="form-group">
+            <label>Monthly Investment (&#8377;)</label>
+            <input type="number" id="sipAmount" placeholder="e.g. 10000" value="10000">
+          </div>
+          <div class="form-group">
+            <label>Expected Annual Return (%)</label>
+            <input type="number" id="sipReturn" step="0.1" placeholder="e.g. 12" value="12">
+          </div>
+          <div class="form-group">
+            <label>Investment Period (Years)</label>
+            <input type="number" id="sipYears" placeholder="e.g. 10" value="10">
+          </div>
+        </div>
+        <button class="calc-btn" style="max-width:280px; margin-top:8px" onclick="calcSIP()">Calculate Maturity &#8594;</button>
+        <div class="calc-result" id="sipResult" style="margin-top:24px">
+          <div class="result-grid">
+            <div class="result-item"><div class="r-val" id="sipInvested">-</div><div class="r-label">Total Invested</div></div>
+            <div class="result-item"><div class="r-val" id="sipGains">-</div><div class="r-label">Estimated Gains</div></div>
+            <div class="result-item"><div class="r-val" id="sipMaturity">-</div><div class="r-label">Maturity Value</div></div>
+            <div class="result-item"><div class="r-val" id="sipMultiplier">-</div><div class="r-label">Wealth Multiplier</div></div>
+          </div>
+          <div id="sipBreakdown" style="margin-top:16px; padding:14px; border-radius:8px; background:rgba(201,168,76,0.05); border:1px solid var(--border2); font-size:12.5px; line-height:1.6; color:var(--grey2); display:none;"></div>
         </div>
       </div>
 
@@ -1415,6 +1471,7 @@
         <ul>
           <li><a onclick="showPage('learner')">Learner Club</a></li>
           <li><a onclick="showPage('tools');setTool('emi')">EMI Calculator</a></li>
+          <li><a onclick="showPage('tools');setTool('sip')">SIP Calculator</a></li>
           <li><a onclick="showPage('tools');setTool('position')">Position Sizing</a></li>
           <li><a onclick="showPage('about')">About Us</a></li>
         </ul>
