@@ -372,17 +372,55 @@ function applyFiiDii(fii, dii) {
   }
 }
 
+/* ---- Sample series shared by the summary card AND the 30-day
+   table, so both panels always agree on the latest figures.
+   When you switch to a real cookie-aware backend, this is the
+   single function to replace. ----------------------------------- */
+const SAMPLE_LATEST = {
+  fii: { buy: 14832.45, sell: 13120.30, net: 1712.15 },
+  dii: { buy: 10234.80, sell:  8940.25, net: 1294.55 }
+};
+
+function buildSampleFiiDiiSeries() {
+  const series = [];
+  const today = new Date();
+  let seed = 1234;
+  const rnd = () => { seed = (seed * 16807 + 0) % 2147483647; return (seed % 10000) / 100; };
+
+  // Walk backwards from today, skipping weekends, until we have 22 rows.
+  const cursor = new Date(today);
+  while (series.length < 22) {
+    if (cursor.getDay() !== 0 && cursor.getDay() !== 6) {
+      series.push({
+        date: cursor.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
+        fii: ((rnd() - 50) * 80).toFixed(2),
+        dii: ((rnd() - 40) * 60).toFixed(2)
+      });
+    }
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  // Pin the most-recent row (index 0) to the headline summary numbers
+  // so the table's latest entry == the summary card.
+  series[0].fii = SAMPLE_LATEST.fii.net.toFixed(2);
+  series[0].dii = SAMPLE_LATEST.dii.net.toFixed(2);
+
+  return series;
+}
+
 function fetchFiiDii() {
-  // NSE FII/DII API requires session cookies that a simple proxy can't supply,
-  // so we render representative sample figures with a clear date stamp.
-  // Update the numbers here when you have fresh NSE data, or wire up a
-  // dedicated cookie-aware backend later.
+  // NSE's live FII/DII API needs session cookies a simple proxy can't
+  // supply, so we render the headline of the same sample series the
+  // 30-day table uses. The two panels will always agree.
   applyFiiDii(
-    { buyValue: '14832.45', sellValue: '13120.30', netValue:  '1712.15' },
-    { buyValue: '10234.80', sellValue:  '8940.25', netValue:  '1294.55' }
+    { buyValue: SAMPLE_LATEST.fii.buy.toFixed(2), sellValue: SAMPLE_LATEST.fii.sell.toFixed(2), netValue: SAMPLE_LATEST.fii.net.toFixed(2) },
+    { buyValue: SAMPLE_LATEST.dii.buy.toFixed(2), sellValue: SAMPLE_LATEST.dii.sell.toFixed(2), netValue: SAMPLE_LATEST.dii.net.toFixed(2) }
   );
-  const today = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
-  document.getElementById('fiidiiDate').textContent = 'Sample data — ' + today;
+  const series = buildSampleFiiDiiSeries();
+  const latestDateLabel = (series[0] && series[0].date) || new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'short' });
+  // Add the year for context
+  const yr = new Date().getFullYear();
+  document.getElementById('fiidiiDate').textContent = 'Sample data — ' + latestDateLabel + ' ' + yr;
 }
 
 function initFiiDii() {
@@ -390,24 +428,10 @@ function initFiiDii() {
   fetchFiiDiiHistory();
 }
 
-/* ---- 30-day historical table ---- */
+/* ---- 30-day historical table — uses the same shared series. ---- */
 function genFallbackHistory() {
-  const rows = [];
-  const today = new Date();
-  let seed = 1234;
-  function rnd() { seed = (seed * 16807 + 0) % 2147483647; return (seed % 10000) / 100; }
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(today); d.setDate(d.getDate() - i);
-    if (d.getDay() === 0 || d.getDay() === 6) continue;
-    const fiiNet = (rnd() - 50) * 80;
-    const diiNet = (rnd() - 40) * 60;
-    rows.push({
-      date: d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
-      fii: fiiNet.toFixed(2),
-      dii: diiNet.toFixed(2),
-    });
-  }
-  return rows.slice(-22);
+  // Returned in oldest -> newest order so renderHistTable's reverse() works correctly.
+  return buildSampleFiiDiiSeries().slice().reverse();
 }
 
 function renderHistTable(rows) {
