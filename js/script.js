@@ -530,10 +530,44 @@ function renderHistTable(rows) {
   }).join('');
 }
 
-function fetchFiiDiiHistory() {
-  // NSE historical endpoint requires session cookies — render sample series.
+async function fetchFiiDiiHistory() {
+  // 1. Try the cookie-aware server-side endpoint.
+  try {
+    const res = await fetch('/fii-dii-history.php?cb=' + Date.now(), { signal: AbortSignal.timeout(20000) });
+    if (res.ok) {
+      const payload = await res.json();
+      const rows = payload && Array.isArray(payload.rows) ? payload.rows : null;
+      if (rows && rows.length > 0) {
+        // Convert NSE date format ("24-Apr-2026") to short label ("24 Apr") for the table.
+        const formatted = rows.map(r => {
+          let label = r.date;
+          if (typeof label === 'string') {
+            const parts = label.split(/[-\s]/);
+            if (parts.length >= 2) label = parts[0] + ' ' + parts[1];
+          }
+          return {
+            date: label,
+            fii:  (r.fii != null ? Number(r.fii) : 0).toFixed(2),
+            dii:  (r.dii != null ? Number(r.dii) : 0).toFixed(2)
+          };
+        });
+        // renderHistTable expects oldest-first (it does its own reverse).
+        formatted.reverse();
+        renderHistTable(formatted);
+        const statusEl = document.getElementById('histLoadStatus');
+        if (statusEl) {
+          const stale = !!payload.stale;
+          statusEl.textContent = stale ? 'NSE data (stale cache)' : 'NSE data';
+        }
+        return;
+      }
+    }
+  } catch (e) { /* fall through to sample */ }
+
+  // 2. Fallback — use the deterministic sample series so the table never goes blank.
   renderHistTable(genFallbackHistory());
-  document.getElementById('histLoadStatus').textContent = 'Sample data';
+  const statusEl = document.getElementById('histLoadStatus');
+  if (statusEl) statusEl.textContent = 'Sample data';
 }
 
 function toggleHistTable() {
