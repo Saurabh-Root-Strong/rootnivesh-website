@@ -1,3 +1,5 @@
+console.log('[RN] script.js loaded OK');
+
 /* ===== PAGE NAVIGATION ===== */
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
