@@ -703,25 +703,13 @@ function ipoSubscriptionLabel(item) {
   return '—';
 }
 
-/* Manual profile overrides — used ONLY for IPOs that aren't yet listed
-   on NSE (open / upcoming tabs). Once a company starts trading, NSE's
-   quote-equity endpoint provides the authoritative sector + industry
-   classification, which the auto-fetch below will pull in.
-
-   Add an entry here only when:
-     (a) the IPO is currently open or upcoming, AND
-     (b) you want a curated description until NSE has its data.
-   Keys are the exact NSE `symbol` (uppercase). */
-const IPO_DESCRIPTIONS = {
-  ADISOFT: {
-    sector: 'Software & IT Services',
-    about:  'Builds enterprise applications, mobile apps, and digital platforms for SME and corporate clients across India.'
-  },
-  AMBAAUTO: {
-    sector: 'Automotive Retail',
-    about:  'Multi-brand dealership engaged in retail sales, after-sales servicing, and spare-parts distribution for passenger and commercial vehicles.'
-  }
-};
+/* Manual profile overrides — only needed when both auto-sources
+   return nothing AND you want a curated string. Normal auto-flow:
+     1. NSE quote-equity (gives sector + industry for listed companies)
+     2. Chittorgarh search & extract (covers virtually all Indian IPOs)
+     3. "View on NSE" fallback link
+   Add a row here only to override what the auto-flow returns. */
+const IPO_DESCRIPTIONS = {};
 
 function renderIpoCellFromInfo(sector, about) {
   return (
@@ -744,7 +732,8 @@ function ipoBusinessCell(item) {
     return '<div data-ipo-business="' + sym + '">' + renderIpoCellFromInfo(info.sector, info.about) + '</div>';
   }
   // No manual entry — render an empty placeholder. Async lookup will populate it.
-  return '<div data-ipo-business="' + sym + '" data-needs-lookup="1">' +
+  const companyAttr = (item.companyName || item.company || '').replace(/"/g, '&quot;');
+  return '<div data-ipo-business="' + sym + '" data-needs-lookup="1" data-ipo-company="' + companyAttr + '">' +
          '<span style="font-size:12px; color:var(--grey)">Loading…</span>' +
          '</div>';
 }
@@ -771,7 +760,7 @@ function writeLookupCache(sym, value) {
 }
 
 async function fetchNseIndustry(sym) {
-  const inflight = IPO_LOOKUP_INFLIGHT.get(sym);
+  const inflight = IPO_LOOKUP_INFLIGHT.get('nse:' + sym);
   if (inflight) return inflight;
   const promise = (async () => {
     const url = '/proxy.php?url=' + encodeURIComponent('https://www.nseindia.com/api/quote-equity?symbol=' + encodeURIComponent(sym));
@@ -786,28 +775,91 @@ async function fetchNseIndustry(sym) {
     const company    = info.companyName || sym;
     const about = company + ' — ' + (subSector ? 'operates in ' + subSector + '.' : 'sector classification not available.');
     return { sector: sectorTag, about: about };
-  })().catch(() => null).finally(() => IPO_LOOKUP_INFLIGHT.delete(sym));
-  IPO_LOOKUP_INFLIGHT.set(sym, promise);
+  })().catch(() => null).finally(() => IPO_LOOKUP_INFLIGHT.delete('nse:' + sym));
+  IPO_LOOKUP_INFLIGHT.set('nse:' + sym, promise);
+  return promise;
+}
+
+/* ----- Chittorgarh fallback for unlisted IPOs ----------------------
+   Chittorgarh.com aggregates every Indian IPO with a written
+   business overview. We search by company name to find the IPO
+   page (URL has a numeric ID), then extract the "About <Company>"
+   section. Aggressive 24h caching to be polite to their server.    */
+async function fetchChittorgarhAbout(companyName, sym) {
+  if (!companyName) return null;
+  const inflight = IPO_LOOKUP_INFLIGHT.get('cg:' + sym);
+  if (inflight) return inflight;
+  const promise = (async () => {
+    // 1. Search Chittorgarh for the company name.
+    const searchUrl = 'https://www.chittorgarh.com/?s=' + encodeURIComponent(companyName.replace(/\s*Limited\s*$/i, ''));
+    const searchProxied = '/proxy.php?url=' + encodeURIComponent(searchUrl);
+    const sRes = await fetch(searchProxied, { signal: AbortSignal.timeout(12000) });
+    if (!sRes.ok) return null;
+    const sHtml = await sRes.text();
+    // 2. Find the first IPO link with a numeric ID — pattern: /ipo/<slug>-ipo/<id>/
+    const linkMatch = sHtml.match(/href="(\/ipo\/[a-z0-9-]+ipo\/\d+\/?)"/i);
+    if (!linkMatch) return null;
+    // 3. Fetch that IPO page.
+    const ipoUrl = 'https://www.chittorgarh.com' + linkMatch[1];
+    const pageProxied = '/proxy.php?url=' + encodeURIComponent(ipoUrl);
+    const pRes = await fetch(pageProxied, { signal: AbortSignal.timeout(12000) });
+    if (!pRes.ok) return null;
+    const pHtml = await pRes.text();
+    // 4. Extract the "About <Company>" section.
+    const m = pHtml.match(/<h2[^>]*>\s*About\s+[^<]+<\/h2>([\s\S]{0,3000}?)(?=<h2|<div\s+class=)/i);
+    if (!m) return null;
+    let text = m[1]
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').replace(/&#39;/g, '\'')
+      .replace(/&quot;/g, '"').replace(/&#x27;/g, '\'')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!text || text.length < 40) return null;
+    if (text.length > 320) text = text.slice(0, 317).replace(/\s\S*$/, '') + '…';
+    return text;
+  })().catch(() => null).finally(() => IPO_LOOKUP_INFLIGHT.delete('cg:' + sym));
+  IPO_LOOKUP_INFLIGHT.set('cg:' + sym, promise);
   return promise;
 }
 
 async function autoFillIpoBusinessCells() {
   const placeholders = document.querySelectorAll('[data-needs-lookup="1"]');
-  // Concurrency limit so we don't hammer the proxy.
+  // Concurrency limit so we don't hammer either upstream.
   const queue = Array.from(placeholders);
-  const workers = 4;
+  const workers = 3;
   async function worker() {
     while (queue.length) {
       const el = queue.shift();
       if (!el) continue;
       const sym = el.getAttribute('data-ipo-business');
+      const company = el.getAttribute('data-ipo-company') || '';
       if (!sym) continue;
       el.removeAttribute('data-needs-lookup');
+
+      // Tier 1 — NSE quote-equity (works for already-listed companies).
       let info = readLookupCache(sym);
       if (!info) {
-        info = await fetchNseIndustry(sym);
-        if (info) writeLookupCache(sym, info);
+        const nse = await fetchNseIndustry(sym);
+        if (nse && nse.sector) {
+          info = nse;
+          writeLookupCache(sym, info);
+        }
       }
+
+      // Tier 2 — Chittorgarh (covers unlisted / SME IPOs that NSE doesn't).
+      if (!info || !info.sector) {
+        const cgKey = 'cg:' + sym;
+        const cgCached = readLookupCache(cgKey);
+        let about = (cgCached && cgCached.about) || null;
+        if (!about) {
+          about = await fetchChittorgarhAbout(company, sym);
+          if (about) writeLookupCache(cgKey, { about: about });
+        }
+        if (about) {
+          info = { sector: 'Company Overview', about: about };
+        }
+      }
+
       if (info && info.sector) {
         el.innerHTML = renderIpoCellFromInfo(info.sector, info.about);
       } else {
