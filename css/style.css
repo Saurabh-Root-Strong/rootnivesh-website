@@ -199,13 +199,17 @@
   }
   .mobile-menu {
     display: none; position: fixed;
-    top: 64px; left: 0; right: 0; bottom: 0;
+    top: 64px; left: 0; right: 0;
+    height: calc(100vh - 64px);
+    height: calc(100dvh - 64px); /* dvh handles iOS dynamic toolbar */
     background: #07131F;
     border-top: 1px solid var(--border);
     padding: 8px 12px calc(24px + env(safe-area-inset-bottom));
     z-index: 999; flex-direction: column; gap: 2px;
-    overflow-y: auto;
+    overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    transform: translateZ(0); /* nudge iOS into using a hardware layer for smooth scroll */
   }
   .mobile-menu.open { display: flex; }
 
@@ -270,7 +274,8 @@
     max-height: 0; overflow: hidden;
     transition: max-height 0.32s cubic-bezier(0.4,0,0.2,1);
   }
-  .mob-group.open > .mob-group-body { max-height: 700px; }
+  /* Generous cap so several sections + many items can never be clipped. */
+  .mob-group.open > .mob-group-body { max-height: 1400px; }
   .mob-group-section {
     font-family: 'Space Mono', monospace; font-size: 10px;
     color: var(--gold); letter-spacing: 1.5px; text-transform: uppercase;
