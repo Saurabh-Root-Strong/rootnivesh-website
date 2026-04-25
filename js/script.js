@@ -703,12 +703,15 @@ function ipoSubscriptionLabel(item) {
   return '—';
 }
 
-/* Plain-language profiles of each IPO company.
-   Each entry has:
-     sector  — short tag (Healthcare, Renewable Energy, etc.)
-     about   — 1–2 sentences on what the company actually does.
-   Keys are the exact NSE `symbol` (uppercase). Extend the map as new
-   IPOs launch; entries with no map row fall back to a "View on NSE" link. */
+/* Manual profile overrides — used ONLY for IPOs that aren't yet listed
+   on NSE (open / upcoming tabs). Once a company starts trading, NSE's
+   quote-equity endpoint provides the authoritative sector + industry
+   classification, which the auto-fetch below will pull in.
+
+   Add an entry here only when:
+     (a) the IPO is currently open or upcoming, AND
+     (b) you want a curated description until NSE has its data.
+   Keys are the exact NSE `symbol` (uppercase). */
 const IPO_DESCRIPTIONS = {
   ADISOFT: {
     sector: 'Software & IT Services',
@@ -717,118 +720,106 @@ const IPO_DESCRIPTIONS = {
   AMBAAUTO: {
     sector: 'Automotive Retail',
     about:  'Multi-brand dealership engaged in retail sales, after-sales servicing, and spare-parts distribution for passenger and commercial vehicles.'
-  },
-  CITIUSINVT: {
-    sector: 'Infrastructure Investment Trust (InvIT)',
-    about:  'Pooled investment vehicle holding revenue-generating transmission and connectivity infrastructure assets.'
-  },
-  OMPOWER: {
-    sector: 'Power Transmission',
-    about:  'Manufactures power transmission equipment — transformers, line components, and substation gear used by utilities and industrial buyers.'
-  },
-  VIVIDEL: {
-    sector: 'Electrical & Electromechanical Products',
-    about:  'Designs and supplies electromechanical components and assemblies for industrial and consumer applications.'
-  },
-  AMIRCHAND: {
-    sector: 'Exports / Trading',
-    about:  'Engaged in international trading and export of consumer and industrial goods from India.'
-  },
-  SAIPARENT: {
-    sector: 'Pharmaceuticals (Injectables)',
-    about:  'Specialises in sterile parenteral (injectable) drug formulations for hospitals and the pharma supply chain.'
-  },
-  POWERICA: {
-    sector: 'Power Generation Equipment',
-    about:  'Provides diesel generator sets, renewable power solutions, and turnkey power-backup systems for industrial and commercial sites.'
-  },
-  CMPDI: {
-    sector: 'Mining Consultancy',
-    about:  'Government-linked mine planning and design institute — provides geological surveys, mine design, and consultancy for the mining sector.'
-  },
-  GSPCROP: {
-    sector: 'Agrochemicals',
-    about:  'Manufactures crop-protection chemicals — pesticides, herbicides, and fungicides — for Indian and export agricultural markets.'
-  },
-  RSL: {
-    sector: 'Stainless Steel',
-    about:  'Produces stainless steel long products and bars used in construction, automotive, and industrial fabrication.'
-  },
-  RIIT: {
-    sector: 'Infrastructure Investment Trust (InvIT)',
-    about:  'Holds road/highway infrastructure assets, distributing toll-collection cash flows to unit holders.'
-  },
-  APSISAERO: {
-    sector: 'Aerospace & Defence',
-    about:  'Aerocom-segment supplier of components, sub-assemblies, and engineering services to aerospace OEMs.'
-  },
-  SPCON: {
-    sector: 'Construction & Civil Engineering',
-    about:  'Civil construction company executing buildings, roads, and infrastructure projects on contract.'
-  },
-  SEDEMAC: {
-    sector: 'Mechatronics',
-    about:  'Designs electronic control systems and mechatronic sub-systems for engines, generators, and industrial machines.'
-  },
-  ACETEC: {
-    sector: 'E-Commerce',
-    about:  'Operates online retail and B2B commerce platforms in the Indian e-commerce market.'
-  },
-  STRIDERS: {
-    sector: 'Import / Export Trading',
-    about:  'Cross-border trading house dealing in industrial commodities, raw materials, and consumer goods.'
-  },
-  OMNI: {
-    sector: 'Engineering Services',
-    about:  'Provides engineering, fabrication, and contract manufacturing services for industrial customers.'
-  },
-  YAAP: {
-    sector: 'Digital Services / Marketing',
-    about:  'Digital agency offering creative, content, and online-marketing services to brands.'
-  },
-  PNGSREVA: {
-    sector: 'Diamond & Gold Jewellery',
-    about:  'Retailer of branded diamond and gold jewellery operating under the PNG (P. N. Gadgil) Reva line.'
-  },
-  SRTL: {
-    sector: 'Textiles',
-    about:  'Manufactures twisted yarns and textile products for the apparel and home-furnishing supply chain.'
-  },
-  CLEANMAX: {
-    sector: 'Renewable Energy',
-    about:  'Develops and operates rooftop solar and open-access renewable-power projects for corporate clients across India.'
-  },
-  MOBILISE: {
-    sector: 'Mobile Applications',
-    about:  'App development and mobile-tech studio building consumer and enterprise applications.'
-  },
-  GAUDIUMIVF: {
-    sector: 'Healthcare (IVF / Women’s Health)',
-    about:  'Chain of fertility and women’s-health clinics offering IVF, gynaecology, and reproductive-medicine services.'
   }
 };
+
+function renderIpoCellFromInfo(sector, about) {
+  return (
+    '<div style="max-width:360px; line-height:1.5">' +
+      '<div style="font-size:11px; font-family:\'Space Mono\',monospace; color:var(--gold); ' +
+                  'text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">' +
+        (sector || '—') +
+      '</div>' +
+      '<div style="font-size:12.5px; color:var(--grey2)">' +
+        (about || '') +
+      '</div>' +
+    '</div>'
+  );
+}
 
 function ipoBusinessCell(item) {
   const sym = (item.symbol || '').toUpperCase();
   const info = IPO_DESCRIPTIONS[sym];
   if (info) {
-    return (
-      '<div style="max-width:360px; line-height:1.5">' +
-        '<div style="font-size:11px; font-family:\'Space Mono\',monospace; color:var(--gold); ' +
-                    'text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">' +
-          info.sector +
-        '</div>' +
-        '<div style="font-size:12.5px; color:var(--grey2)">' +
-          info.about +
-        '</div>' +
-      '</div>'
-    );
+    return '<div data-ipo-business="' + sym + '">' + renderIpoCellFromInfo(info.sector, info.about) + '</div>';
   }
-  // Fallback for IPOs we haven't profiled yet — point to NSE's own page.
-  return '<a href="https://www.nseindia.com/market-data/all-upcoming-issues-ipo" ' +
-         'target="_blank" rel="noopener" ' +
-         'style="font-size:12px; color:var(--gold); text-decoration:none; white-space:nowrap">' +
-         'View on NSE →</a>';
+  // No manual entry — render an empty placeholder. Async lookup will populate it.
+  return '<div data-ipo-business="' + sym + '" data-needs-lookup="1">' +
+         '<span style="font-size:12px; color:var(--grey)">Loading…</span>' +
+         '</div>';
+}
+
+/* ----- Auto-fill About Company from NSE for symbols that are
+        already listed. Cached in localStorage for 24h. -------------- */
+const IPO_LOOKUP_CACHE_TTL = 24 * 60 * 60 * 1000;
+const IPO_LOOKUP_INFLIGHT = new Map();
+
+function readLookupCache(sym) {
+  try {
+    const raw = localStorage.getItem('ipo-info:' + sym);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (Date.now() - obj.t > IPO_LOOKUP_CACHE_TTL) return null;
+    return obj.v;
+  } catch (e) { return null; }
+}
+
+function writeLookupCache(sym, value) {
+  try {
+    localStorage.setItem('ipo-info:' + sym, JSON.stringify({ t: Date.now(), v: value }));
+  } catch (e) { /* storage quota — ignore */ }
+}
+
+async function fetchNseIndustry(sym) {
+  const inflight = IPO_LOOKUP_INFLIGHT.get(sym);
+  if (inflight) return inflight;
+  const promise = (async () => {
+    const url = '/proxy.php?url=' + encodeURIComponent('https://www.nseindia.com/api/quote-equity?symbol=' + encodeURIComponent(sym));
+    const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
+    if (!res.ok) throw new Error('http ' + res.status);
+    const data = await res.json();
+    const ii = data && data.industryInfo;
+    const info = data && data.info;
+    if (!ii || !info) return null;
+    const sectorTag  = (ii.sector || ii.macro || '').toUpperCase();
+    const subSector  = ii.basicIndustry || ii.industry || '';
+    const company    = info.companyName || sym;
+    const about = company + ' — ' + (subSector ? 'operates in ' + subSector + '.' : 'sector classification not available.');
+    return { sector: sectorTag, about: about };
+  })().catch(() => null).finally(() => IPO_LOOKUP_INFLIGHT.delete(sym));
+  IPO_LOOKUP_INFLIGHT.set(sym, promise);
+  return promise;
+}
+
+async function autoFillIpoBusinessCells() {
+  const placeholders = document.querySelectorAll('[data-needs-lookup="1"]');
+  // Concurrency limit so we don't hammer the proxy.
+  const queue = Array.from(placeholders);
+  const workers = 4;
+  async function worker() {
+    while (queue.length) {
+      const el = queue.shift();
+      if (!el) continue;
+      const sym = el.getAttribute('data-ipo-business');
+      if (!sym) continue;
+      el.removeAttribute('data-needs-lookup');
+      let info = readLookupCache(sym);
+      if (!info) {
+        info = await fetchNseIndustry(sym);
+        if (info) writeLookupCache(sym, info);
+      }
+      if (info && info.sector) {
+        el.innerHTML = renderIpoCellFromInfo(info.sector, info.about);
+      } else {
+        el.innerHTML =
+          '<a href="https://www.nseindia.com/get-quotes/equity?symbol=' + encodeURIComponent(sym) + '" ' +
+          'target="_blank" rel="noopener" ' +
+          'style="font-size:12px; color:var(--gold); text-decoration:none; white-space:nowrap">' +
+          'View on NSE →</a>';
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: workers }, worker));
 }
 
 function renderIpoTable(rows, tab) {
@@ -866,6 +857,7 @@ async function fetchIpo(tab) {
     let arr = Array.isArray(data) ? data : (data.data || []);
     if (tab === 'closed') arr = normalizeClosedIpos(arr);
     renderIpoTable(arr, tab);
+    autoFillIpoBusinessCells(); // async; updates cells in place when lookups land
     if (status) {
       const now = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
       const suffix = tab === 'closed' ? ' • Last ' + IPO_CLOSED_DAYS + ' days' : '';
