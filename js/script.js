@@ -703,20 +703,126 @@ function ipoSubscriptionLabel(item) {
   return '—';
 }
 
-/* Brief, plain-language descriptions of what each IPO company does.
-   NSE's API doesn't provide this — extend the map as new IPOs launch.
-   Keys must be the exact NSE `symbol` (uppercase). Keep each line under
-   ~140 chars so the table stays compact. */
+/* Plain-language profiles of each IPO company.
+   Each entry has:
+     sector  — short tag (Healthcare, Renewable Energy, etc.)
+     about   — 1–2 sentences on what the company actually does.
+   Keys are the exact NSE `symbol` (uppercase). Extend the map as new
+   IPOs launch; entries with no map row fall back to a "View on NSE" link. */
 const IPO_DESCRIPTIONS = {
-  ADISOFT:  'Software & IT services — develops enterprise applications and digital platforms for SME clients.',
-  AMBAAUTO: 'Automotive dealership — sales, servicing, and spare parts for passenger and commercial vehicles in India.'
+  ADISOFT: {
+    sector: 'Software & IT Services',
+    about:  'Builds enterprise applications, mobile apps, and digital platforms for SME and corporate clients across India.'
+  },
+  AMBAAUTO: {
+    sector: 'Automotive Retail',
+    about:  'Multi-brand dealership engaged in retail sales, after-sales servicing, and spare-parts distribution for passenger and commercial vehicles.'
+  },
+  CITIUSINVT: {
+    sector: 'Infrastructure Investment Trust (InvIT)',
+    about:  'Pooled investment vehicle holding revenue-generating transmission and connectivity infrastructure assets.'
+  },
+  OMPOWER: {
+    sector: 'Power Transmission',
+    about:  'Manufactures power transmission equipment — transformers, line components, and substation gear used by utilities and industrial buyers.'
+  },
+  VIVIDEL: {
+    sector: 'Electrical & Electromechanical Products',
+    about:  'Designs and supplies electromechanical components and assemblies for industrial and consumer applications.'
+  },
+  AMIRCHAND: {
+    sector: 'Exports / Trading',
+    about:  'Engaged in international trading and export of consumer and industrial goods from India.'
+  },
+  SAIPARENT: {
+    sector: 'Pharmaceuticals (Injectables)',
+    about:  'Specialises in sterile parenteral (injectable) drug formulations for hospitals and the pharma supply chain.'
+  },
+  POWERICA: {
+    sector: 'Power Generation Equipment',
+    about:  'Provides diesel generator sets, renewable power solutions, and turnkey power-backup systems for industrial and commercial sites.'
+  },
+  CMPDI: {
+    sector: 'Mining Consultancy',
+    about:  'Government-linked mine planning and design institute — provides geological surveys, mine design, and consultancy for the mining sector.'
+  },
+  GSPCROP: {
+    sector: 'Agrochemicals',
+    about:  'Manufactures crop-protection chemicals — pesticides, herbicides, and fungicides — for Indian and export agricultural markets.'
+  },
+  RSL: {
+    sector: 'Stainless Steel',
+    about:  'Produces stainless steel long products and bars used in construction, automotive, and industrial fabrication.'
+  },
+  RIIT: {
+    sector: 'Infrastructure Investment Trust (InvIT)',
+    about:  'Holds road/highway infrastructure assets, distributing toll-collection cash flows to unit holders.'
+  },
+  APSISAERO: {
+    sector: 'Aerospace & Defence',
+    about:  'Aerocom-segment supplier of components, sub-assemblies, and engineering services to aerospace OEMs.'
+  },
+  SPCON: {
+    sector: 'Construction & Civil Engineering',
+    about:  'Civil construction company executing buildings, roads, and infrastructure projects on contract.'
+  },
+  SEDEMAC: {
+    sector: 'Mechatronics',
+    about:  'Designs electronic control systems and mechatronic sub-systems for engines, generators, and industrial machines.'
+  },
+  ACETEC: {
+    sector: 'E-Commerce',
+    about:  'Operates online retail and B2B commerce platforms in the Indian e-commerce market.'
+  },
+  STRIDERS: {
+    sector: 'Import / Export Trading',
+    about:  'Cross-border trading house dealing in industrial commodities, raw materials, and consumer goods.'
+  },
+  OMNI: {
+    sector: 'Engineering Services',
+    about:  'Provides engineering, fabrication, and contract manufacturing services for industrial customers.'
+  },
+  YAAP: {
+    sector: 'Digital Services / Marketing',
+    about:  'Digital agency offering creative, content, and online-marketing services to brands.'
+  },
+  PNGSREVA: {
+    sector: 'Diamond & Gold Jewellery',
+    about:  'Retailer of branded diamond and gold jewellery operating under the PNG (P. N. Gadgil) Reva line.'
+  },
+  SRTL: {
+    sector: 'Textiles',
+    about:  'Manufactures twisted yarns and textile products for the apparel and home-furnishing supply chain.'
+  },
+  CLEANMAX: {
+    sector: 'Renewable Energy',
+    about:  'Develops and operates rooftop solar and open-access renewable-power projects for corporate clients across India.'
+  },
+  MOBILISE: {
+    sector: 'Mobile Applications',
+    about:  'App development and mobile-tech studio building consumer and enterprise applications.'
+  },
+  GAUDIUMIVF: {
+    sector: 'Healthcare (IVF / Women’s Health)',
+    about:  'Chain of fertility and women’s-health clinics offering IVF, gynaecology, and reproductive-medicine services.'
+  }
 };
 
 function ipoBusinessCell(item) {
   const sym = (item.symbol || '').toUpperCase();
-  const desc = IPO_DESCRIPTIONS[sym];
-  if (desc) {
-    return '<span style="font-size:13px; color:var(--grey2); line-height:1.55; display:block; max-width:340px">' + desc + '</span>';
+  const info = IPO_DESCRIPTIONS[sym];
+  if (info) {
+    return (
+      '<div style="max-width:360px; line-height:1.5">' +
+        '<div style="font-size:11px; font-family:\'Space Mono\',monospace; color:var(--gold); ' +
+                    'text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">' +
+          info.sector +
+        '</div>' +
+        '<div style="font-size:12.5px; color:var(--grey2)">' +
+          info.about +
+        '</div>' +
+      '</div>'
+    );
   }
   // Fallback for IPOs we haven't profiled yet — point to NSE's own page.
   return '<a href="https://www.nseindia.com/market-data/all-upcoming-issues-ipo" ' +
