@@ -57,7 +57,7 @@ function initPage(id) {
   if (id === 'reports') renderReports('all');
   if (id === 'learner') renderCourses('all');
   if (id === 'calls') { renderCalls('intraday'); }
-  if (id === 'performance') { renderPerfTable('all'); }
+  if (id === 'ipo') { fetchIpo(currentIpoTab); }
 }
 
 function toggleMenu() {
@@ -449,7 +449,7 @@ window.addEventListener('DOMContentLoaded', () => {
   renderReports('all');
   renderCourses('all');
   renderCalls('intraday');
-  renderPerfTable('all');
+  fetchIpo('open');
   observeFadeIns();
   startCarousel();
   initLiveTicker();
@@ -632,38 +632,100 @@ function renderCalls(type) {
     </div>`).join('');
 }
 
-/* ===== PERFORMANCE DATA ===== */
-const perfData = [
-  {stock:'TATAMOTORS', type:'equity', entry:'780', target:'920', sl:'740', exit:'915', pnl:'+17.3%', status:'Target Hit', date:'Apr 8'},
-  {stock:'ICICIBANK', type:'intraday', entry:'1,220', target:'1,260', sl:'1,205', exit:'1,258', pnl:'+3.1%', status:'Target Hit', date:'Apr 7'},
-  {stock:'HCLTECH', type:'equity', entry:'1,650', target:'1,850', sl:'1,580', exit:'1,840', pnl:'+11.5%', status:'Target Hit', date:'Apr 4'},
-  {stock:'NIFTY CE 24000', type:'options', entry:'180', target:'320', sl:'110', exit:'315', pnl:'+75.0%', status:'Target Hit', date:'Apr 2'},
-  {stock:'BAJFINANCE', type:'equity', entry:'6,800', target:'7,500', sl:'6,500', exit:'6,490', pnl:'-4.6%', status:'SL Hit', date:'Mar 31'},
-  {stock:'WIPRO', type:'intraday', entry:'490', target:'502', sl:'484', exit:'501', pnl:'+2.2%', status:'Target Hit', date:'Mar 28'},
-  {stock:'SBIN', type:'equity', entry:'720', target:'820', sl:'685', exit:'815', pnl:'+13.2%', status:'Target Hit', date:'Mar 25'},
-  {stock:'NIFTY PE 23500', type:'options', entry:'150', target:'280', sl:'90', exit:'88', pnl:'-41.3%', status:'SL Hit', date:'Mar 22'},
-  {stock:'ASIAN PAINTS', type:'equity', entry:'2,850', target:'3,200', sl:'2,720', exit:'3,190', pnl:'+12.0%', status:'Target Hit', date:'Mar 20'},
-  {stock:'MARUTI', type:'equity', entry:'11,800', target:'13,200', sl:'11,200', exit:'13,100', pnl:'+11.0%', status:'Target Hit', date:'Mar 15'},
-];
-function renderPerfTable(type) {
-  const data = type === 'all' ? perfData : perfData.filter(p => p.type === type);
-  document.getElementById('perfBody').innerHTML = data.map(p => `
+/* ================================================================
+   NEW IPO  — NSE India primary-market endpoints via /proxy.php
+   - Open IPOs:     /api/ipo-current-issue
+   - Upcoming IPOs: /api/all-upcoming-issues?category=ipo
+   - Closed:        derived from upcoming once close date passes
+                    (NSE has no separate "closed" public endpoint, so
+                    we cache last-seen and show placeholder for now)
+   ================================================================ */
+let currentIpoTab = 'open';
+
+const IPO_ENDPOINTS = {
+  open:     'https://www.nseindia.com/api/ipo-current-issue',
+  upcoming: 'https://www.nseindia.com/api/all-upcoming-issues?category=ipo'
+};
+
+function fmtIpoDate(s) {
+  // NSE returns "23-Apr-2026" — pass through as-is, that matches the screenshot style
+  return s || '—';
+}
+
+function fmtIssuePrice(s) {
+  if (!s) return '—';
+  // NSE returns "Rs.130 to Rs.135" — convert to "₹130 - ₹135"
+  return s.replace(/Rs\./g, '₹').replace(/\s+to\s+/g, ' - ');
+}
+
+function ipoSubscriptionLabel(item) {
+  // Active IPOs have noOfTime as a string like "3.16"
+  const t = parseFloat(item.noOfTime);
+  if (!isNaN(t) && t > 0) return t.toFixed(2) + 'x';
+  return '—';
+}
+
+function ipoActionButton(tab, item) {
+  if (tab === 'open')     return '<button class="btn btn-gold" style="padding:7px 18px; font-size:12px" onclick="showPage(\'contact\')">Apply</button>';
+  if (tab === 'upcoming') return '<button class="btn btn-outline" style="padding:7px 18px; font-size:12px" onclick="showPage(\'contact\')">Pre-apply</button>';
+  return '<button class="btn btn-outline" style="padding:7px 18px; font-size:12px" disabled>—</button>';
+}
+
+function renderIpoTable(rows, tab) {
+  const tbody = document.getElementById('ipoBody');
+  if (!tbody) return;
+  if (!rows || rows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px; color:var(--grey)">No IPOs to show in this tab right now.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r => `
     <tr>
-      <td style="color:var(--white); font-weight:600">${p.stock}</td>
-      <td><span style="text-transform:capitalize; color:var(--grey2)">${p.type}</span></td>
-      <td>${p.entry}</td>
-      <td style="color:var(--green)">${p.target}</td>
-      <td style="color:var(--red)">${p.sl}</td>
-      <td style="color:var(--white)">${p.exit}</td>
-      <td class="${parseFloat(p.pnl) >= 0 ? 'badge-pos' : 'badge-neg'}">${p.pnl}</td>
-      <td><span class="${p.status === 'Target Hit' ? 'badge-buy' : 'badge-sell'}">${p.status}</span></td>
-      <td>${p.date}</td>
+      <td style="color:var(--white); font-weight:600">${r.companyName || r.symbol || '—'}</td>
+      <td><span style="text-transform:capitalize; color:var(--grey2)">${r.series || 'Mainboard'}</span></td>
+      <td>${fmtIpoDate(r.issueStartDate)}</td>
+      <td>${fmtIpoDate(r.issueEndDate)}</td>
+      <td>${fmtIssuePrice(r.issuePrice || r.priceBand)}</td>
+      <td>${ipoSubscriptionLabel(r)}</td>
+      <td>${ipoActionButton(tab, r)}</td>
     </tr>`).join('');
 }
-function filterPerf(type, btn) {
-  document.querySelectorAll('#page-performance .tabs .tab').forEach(t => t.classList.remove('active'));
+
+async function fetchIpo(tab) {
+  currentIpoTab = tab;
+  const status = document.getElementById('ipoStatus');
+  const tbody  = document.getElementById('ipoBody');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px; color:var(--grey)">Loading IPO data from NSE…</td></tr>';
+
+  if (tab === 'closed') {
+    renderIpoTable([], tab);
+    if (status) status.textContent = 'Closed IPOs view not yet available — coming soon.';
+    return;
+  }
+
+  const upstream = IPO_ENDPOINTS[tab];
+  if (!upstream) { renderIpoTable([], tab); return; }
+
+  try {
+    const url = '/proxy.php?url=' + encodeURIComponent(upstream);
+    const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
+    if (!res.ok) throw new Error('proxy ' + res.status);
+    const data = await res.json();
+    const arr = Array.isArray(data) ? data : (data.data || []);
+    renderIpoTable(arr, tab);
+    if (status) {
+      const now = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+      status.textContent = 'Source: NSE India • Last fetched at ' + now;
+    }
+  } catch (e) {
+    renderIpoTable([], tab);
+    if (status) status.textContent = 'Could not fetch live IPO data. Please refresh in a few seconds.';
+  }
+}
+
+function filterIpo(tab, btn) {
+  document.querySelectorAll('#page-ipo .tabs .tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-  renderPerfTable(type);
+  fetchIpo(tab);
 }
 
 /* ===== EMI CALCULATOR ===== */

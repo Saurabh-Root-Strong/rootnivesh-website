@@ -133,7 +133,7 @@
       </div>
     </li>
 
-    <li><a onclick="showPage('performance');closeMegas()">Performance</a></li>
+    <li><a onclick="showPage('ipo');closeMegas()">New IPO</a></li>
 
     <!-- TOOLS mega trigger -->
     <li>
@@ -191,7 +191,7 @@
   <div class="mob-section">🏦 Long Term Calls</div>
   <a class="mob-indent" onclick="megaGoCall('value');toggleMenu()">💎 Value Based</a>
   <a class="mob-indent" onclick="megaGoCall('monthly');toggleMenu()">📅 Monthly Based</a>
-  <a onclick="showPage('performance');toggleMenu()">📈 Performance</a>
+  <a onclick="showPage('ipo');toggleMenu()">🆕 New IPO</a>
   <div class="mob-section">🔧 Tools</div>
   <a class="mob-indent" onclick="megaGoTool('emi');toggleMenu()">🏦 EMI Calculator</a>
   <a class="mob-indent" onclick="megaGoTool('pos');toggleMenu()">📐 Position Sizing</a>
@@ -894,56 +894,49 @@
 </div>
 
 
-<!-- ===================== PERFORMANCE PAGE ===================== -->
-<div class="page" id="page-performance">
+<!-- ===================== NEW IPO PAGE ===================== -->
+<div class="page" id="page-ipo">
   <div class="page-hero">
     <div class="container">
-      <div class="section-tag">Track Record</div>
-      <h1>Performance <em>Dashboard</em></h1>
+      <div class="section-tag">Primary Market</div>
+      <h1>New <em>IPOs</em></h1>
       <div class="gold-line"></div>
-      <p style="margin-top:14px">Complete transparency on all calls — wins, losses, and overall accuracy metrics.</p>
+      <p style="margin-top:14px">Live IPO data from NSE — open, upcoming, and recently closed issues.</p>
     </div>
   </div>
   <section>
     <div class="container">
-      <!-- KPI Cards -->
-      <div class="perf-grid">
-        <div class="perf-card"><div class="perf-num perf-pos">87%</div><div class="perf-label">Overall Accuracy</div></div>
-        <div class="perf-card"><div class="perf-num perf-pos">+34.2%</div><div class="perf-label">Avg Return / Call</div></div>
-        <div class="perf-card"><div class="perf-num">248</div><div class="perf-label">Total Calls (FY25)</div></div>
-        <div class="perf-card"><div class="perf-num perf-pos">216</div><div class="perf-label">Profitable Calls</div></div>
-        <div class="perf-card"><div class="perf-num perf-neg">32</div><div class="perf-label">Loss Calls</div></div>
-        <div class="perf-card"><div class="perf-num perf-pos">3.4x</div><div class="perf-label">Avg Risk-Reward</div></div>
+      <!-- IPO Tabs -->
+      <div class="tabs">
+        <button class="tab active" id="ipoTab-open"     onclick="filterIpo('open', this)">Open</button>
+        <button class="tab"        id="ipoTab-upcoming" onclick="filterIpo('upcoming', this)">Upcoming</button>
+        <button class="tab"        id="ipoTab-closed"   onclick="filterIpo('closed', this)">Closed</button>
       </div>
 
-      <!-- Performance Table -->
-      <div class="tabs">
-        <button class="tab active" onclick="filterPerf('all', this)">All</button>
-        <button class="tab" onclick="filterPerf('equity', this)">Equity</button>
-        <button class="tab" onclick="filterPerf('intraday', this)">Intraday</button>
-        <button class="tab" onclick="filterPerf('options', this)">Options</button>
-      </div>
+      <!-- IPO Table -->
       <div class="table-wrap">
-        <table id="perfTable">
+        <table id="ipoTable">
           <thead>
             <tr>
-              <th>Stock</th>
-              <th>Call Type</th>
-              <th>Entry</th>
-              <th>Target</th>
-              <th>SL</th>
-              <th>Exit</th>
-              <th>P&L %</th>
-              <th>Status</th>
-              <th>Date</th>
+              <th>Company Name</th>
+              <th>Type</th>
+              <th>Open Date</th>
+              <th>Close Date</th>
+              <th>Issue Price</th>
+              <th>Subscription</th>
+              <th>Action</th>
             </tr>
           </thead>
-          <tbody id="perfBody"></tbody>
+          <tbody id="ipoBody">
+            <tr><td colspan="7" style="text-align:center; padding:40px; color:var(--grey)">Loading IPO data from NSE…</td></tr>
+          </tbody>
         </table>
       </div>
+      <p id="ipoStatus" style="font-size:11px; color:var(--grey); margin-top:14px; font-family:'Space Mono',monospace">&nbsp;</p>
+
       <div class="disclaimer" style="margin-top:32px">
-        <h4>⚠️ Performance Disclaimer</h4>
-        <p>Performance data shown is based on entry and exit prices as recommended. Actual returns may vary due to slippage, brokerage, and execution timing. Past performance is not indicative of future results. SEBI Registration No. INH000XXXXX.</p>
+        <h4>⚠️ IPO Investment Disclaimer</h4>
+        <p>IPO data sourced from NSE India and may be delayed. Investment in IPOs involves market risks. Read the prospectus carefully before investing. Past listing performance is not indicative of future results. SEBI Registration No. INH000XXXXX.</p>
       </div>
     </div>
   </section>
@@ -1260,7 +1253,7 @@
           </div>
           <div class="btn-group" style="justify-content:flex-start; margin-top:20px">
             <button class="btn btn-gold" onclick="showPage('contact')">Get In Touch</button>
-            <button class="btn btn-outline" onclick="showPage('performance')">View Track Record</button>
+            <button class="btn btn-outline" onclick="showPage('ipo')">View New IPOs</button>
           </div>
         </div>
       </div>
@@ -1322,7 +1315,7 @@
           <li><a onclick="showPage('home')">Home</a></li>
           <li><a onclick="showPage('reports')">Research Reports</a></li>
           <li><a onclick="showPage('calls')">Trading Calls</a></li>
-          <li><a onclick="showPage('performance')">Performance</a></li>
+          <li><a onclick="showPage('ipo')">New IPO</a></li>
         </ul>
       </div>
       <div>

@@ -15,7 +15,7 @@ if ($url === '') {
     exit;
 }
 
-$allowed_hosts = ['query1.finance.yahoo.com', 'query2.finance.yahoo.com'];
+$allowed_hosts = ['query1.finance.yahoo.com', 'query2.finance.yahoo.com', 'www.nseindia.com'];
 $parsed = parse_url($url);
 $host = isset($parsed['host']) ? $parsed['host'] : '';
 if (!in_array($host, $allowed_hosts, true)) {
