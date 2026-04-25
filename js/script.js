@@ -644,8 +644,46 @@ let currentIpoTab = 'open';
 
 const IPO_ENDPOINTS = {
   open:     'https://www.nseindia.com/api/ipo-current-issue',
-  upcoming: 'https://www.nseindia.com/api/all-upcoming-issues?category=ipo'
+  upcoming: 'https://www.nseindia.com/api/all-upcoming-issues?category=ipo',
+  closed:   'https://www.nseindia.com/api/public-past-issues'
 };
+
+const IPO_CLOSED_DAYS = 25;
+
+// Normalize the past-issues feed (different field names) to the shape
+// renderIpoTable expects, and keep only rows whose end date is within
+// the last IPO_CLOSED_DAYS days.
+function normalizeClosedIpos(rows) {
+  if (!Array.isArray(rows)) return [];
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - IPO_CLOSED_DAYS);
+  cutoff.setHours(0, 0, 0, 0);
+
+  // "21-APR-2026" -> Date
+  const parseNseDate = s => {
+    if (!s || typeof s !== 'string') return null;
+    const m = s.match(/^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/);
+    if (!m) return null;
+    const months = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+    const mi = months[m[2].toUpperCase()];
+    if (mi == null) return null;
+    return new Date(Number(m[3]), mi, Number(m[1]));
+  };
+
+  return rows
+    .map(r => ({
+      symbol:           r.symbol,
+      companyName:      r.companyName || r.company,
+      issueStartDate:   r.ipoStartDate || r.issueStartDate,
+      issueEndDate:     r.ipoEndDate   || r.issueEndDate,
+      series:           r.series || (r.securityType === 'IV' ? 'InvIT' : (r.securityType === 'BE' ? 'SME' : 'Mainboard')),
+      issuePrice:       r.priceRange || r.issuePrice || r.priceBand,
+      noOfTime:         r.noOfTime,
+      _endDate:         parseNseDate(r.ipoEndDate || r.issueEndDate)
+    }))
+    .filter(r => r._endDate && r._endDate >= cutoff)
+    .sort((a, b) => b._endDate - a._endDate);
+}
 
 function fmtIpoDate(s) {
   // NSE returns "23-Apr-2026" — pass through as-is, that matches the screenshot style
@@ -712,12 +750,6 @@ async function fetchIpo(tab) {
   const tbody  = document.getElementById('ipoBody');
   if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px; color:var(--grey)">Loading IPO data from NSE…</td></tr>';
 
-  if (tab === 'closed') {
-    renderIpoTable([], tab);
-    if (status) status.textContent = 'Closed IPOs view not yet available — coming soon.';
-    return;
-  }
-
   const upstream = IPO_ENDPOINTS[tab];
   if (!upstream) { renderIpoTable([], tab); return; }
 
@@ -726,11 +758,13 @@ async function fetchIpo(tab) {
     const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
     if (!res.ok) throw new Error('proxy ' + res.status);
     const data = await res.json();
-    const arr = Array.isArray(data) ? data : (data.data || []);
+    let arr = Array.isArray(data) ? data : (data.data || []);
+    if (tab === 'closed') arr = normalizeClosedIpos(arr);
     renderIpoTable(arr, tab);
     if (status) {
       const now = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-      status.textContent = 'Source: NSE India • Last fetched at ' + now;
+      const suffix = tab === 'closed' ? ' • Last ' + IPO_CLOSED_DAYS + ' days' : '';
+      status.textContent = 'Source: NSE India • Last fetched at ' + now + suffix;
     }
   } catch (e) {
     renderIpoTable([], tab);
