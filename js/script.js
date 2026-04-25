@@ -729,7 +729,7 @@ function renderIpoTable(rows, tab) {
   const tbody = document.getElementById('ipoBody');
   if (!tbody) return;
   if (!rows || rows.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px; color:var(--grey)">No IPOs to show in this tab right now.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:var(--grey)">No IPOs to show in this tab right now.</td></tr>';
     return;
   }
   tbody.innerHTML = rows.map(r => `
@@ -739,7 +739,6 @@ function renderIpoTable(rows, tab) {
       <td>${fmtIpoDate(r.issueStartDate)}</td>
       <td>${fmtIpoDate(r.issueEndDate)}</td>
       <td>${fmtIssuePrice(r.issuePrice || r.priceBand)}</td>
-      <td>${ipoSubscriptionLabel(r)}</td>
       <td>${ipoBusinessCell(r)}</td>
     </tr>`).join('');
 }
@@ -748,7 +747,7 @@ async function fetchIpo(tab) {
   currentIpoTab = tab;
   const status = document.getElementById('ipoStatus');
   const tbody  = document.getElementById('ipoBody');
-  if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px; color:var(--grey)">Loading IPO data from NSE…</td></tr>';
+  if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:var(--grey)">Loading IPO data from NSE…</td></tr>';
 
   const upstream = IPO_ENDPOINTS[tab];
   if (!upstream) { renderIpoTable([], tab); return; }
