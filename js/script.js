@@ -56,7 +56,7 @@ function megaGoTool(type) {
 function initPage(id) {
   if (id === 'reports') renderReports('all');
   if (id === 'learner') renderCourses('all');
-  if (id === 'calls') { renderCalls('intraday'); }
+  if (id === 'calls') { renderPlans(); renderCalls('intraday'); }
   if (id === 'ipo') { fetchIpo(currentIpoTab); }
 }
 
@@ -448,6 +448,7 @@ function toggleHistTable() {
 window.addEventListener('DOMContentLoaded', () => {
   renderReports('all');
   renderCourses('all');
+  renderPlans();
   renderCalls('intraday');
   fetchIpo('open');
   observeFadeIns();
@@ -969,6 +970,185 @@ function filterIpo(tab, btn) {
   document.querySelectorAll('#page-ipo .tabs .tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
   fetchIpo(tab);
+}
+
+/* ================================================================
+   PREMIUM CALL PLANS
+   Edit prices in the PLANS array below. Each plan can have one or
+   more "types" (cash / fno) and four durations (1, 3, 6, 12 months).
+   GST is computed at 18% on top of the listed price.
+   ================================================================ */
+const GST_RATE = 0.18;
+
+const PLANS = [
+  {
+    id: 'max',
+    name: 'Max',
+    icon: '💎',
+    tagline: 'Stable, low-risk equity',
+    description: 'Research-driven, low-risk equity calls focused on cash-segment delivery. Weekly portfolio fine-tuning balances growth and protection.',
+    pricing: {
+      cash: { 1: 4999, 3: 13499, 6: 24999, 12: 44999 }
+    }
+  },
+  {
+    id: 'smart',
+    name: 'Smart',
+    icon: '⚡',
+    tagline: 'Balanced cash + F&O',
+    description: 'Smart equity and derivatives recommendations for moderate risk tolerance. Mix of intraday, swing, and short-term positional calls.',
+    pricing: {
+      cash: { 1: 7999,  3: 21999, 6: 39999,  12: 69999 },
+      fno:  { 1: 9999,  3: 27999, 6: 49999,  12: 89999 }
+    }
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    icon: '🔥',
+    tagline: 'Active F&O traders',
+    description: 'High-conviction derivatives strategies for active traders. Premium intraday F&O setups with tight execution windows and risk control.',
+    pricing: {
+      fno: { 1: 14999, 3: 39999, 6: 74999, 12: 134999 }
+    }
+  }
+];
+
+const PLAN_DURATIONS = [
+  { months: 1,  label: '1 Month'   },
+  { months: 3,  label: '3 Months'  },
+  { months: 6,  label: '6 Months'  },
+  { months: 12, label: '12 Months' }
+];
+
+const TYPE_LABELS = { cash: 'Cash', fno: 'F&O' };
+
+function fmtINR(n) { return '₹' + Math.round(n).toLocaleString('en-IN'); }
+function fmtINRdec(n) { return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+function renderPlans() {
+  const grid = document.getElementById('plansList');
+  if (!grid) return;
+  grid.innerHTML = PLANS.map(p => renderPlanCard(p)).join('');
+  PLANS.forEach(p => updatePlanPricing(p.id));
+}
+
+function renderPlanCard(p) {
+  const types = Object.keys(p.pricing);
+  const defaultType = types[0];
+  const typeToggle = types.length > 1
+    ? '<div class="plan-type-toggle">' + types.map(t =>
+        '<button class="plan-type-btn ' + (t === defaultType ? 'active' : '') + '" ' +
+              'onclick="selectPlanType(\'' + p.id + '\',\'' + t + '\',this)">' + TYPE_LABELS[t] + '</button>'
+      ).join('') + '</div>'
+    : '<div class="plan-type-single">' + TYPE_LABELS[defaultType] + ' Segment</div>';
+
+  const durationOpts = PLAN_DURATIONS.map(d => {
+    const price = p.pricing[defaultType][d.months];
+    return '<option value="' + d.months + '">' + d.label + ' — ' + fmtINR(price) + '</option>';
+  }).join('');
+
+  return ''
+    + '<div class="plan-card" id="plan-card-' + p.id + '" data-type="' + defaultType + '" data-duration="1">'
+    +   '<div class="plan-body">'
+    +     '<div class="plan-head">'
+    +       '<div>'
+    +         '<h3>' + p.icon + ' ' + p.name + '</h3>'
+    +         '<div class="plan-tagline">' + p.tagline + '</div>'
+    +       '</div>'
+    +       '<a class="plan-features-link" onclick="showPage(\'contact\')">What You Get →</a>'
+    +     '</div>'
+    +     '<p class="plan-desc">' + p.description + '</p>'
+    +     '<div class="plan-controls">'
+    +       '<div class="plan-control-group">'
+    +         '<label>Segment</label>'
+    +         typeToggle
+    +       '</div>'
+    +       '<div class="plan-control-group">'
+    +         '<label>Duration</label>'
+    +         '<select class="plan-duration" onchange="selectPlanDuration(\'' + p.id + '\', this.value)">' + durationOpts + '</select>'
+    +       '</div>'
+    +     '</div>'
+    +   '</div>'
+    +   '<div class="plan-pricing">'
+    +     '<div class="plan-pricing-title">Pricing</div>'
+    +     '<div class="plan-pricing-meta">'
+    +       '<span class="plan-pricing-meta-name">' + p.name + '</span>'
+    +       '<span class="plan-pricing-meta-type" id="plan-pricing-type-' + p.id + '">' + TYPE_LABELS[defaultType] + '</span>'
+    +       '<span class="plan-pricing-meta-dur"  id="plan-pricing-dur-'  + p.id + '">1 Month</span>'
+    +     '</div>'
+    +     '<div class="plan-pricing-rows">'
+    +       '<div class="plan-pricing-row"><span>Total Amount</span><span id="plan-base-' + p.id + '">—</span></div>'
+    +       '<div class="plan-pricing-row"><span>GST (18%)</span><span id="plan-gst-'  + p.id + '">—</span></div>'
+    +     '</div>'
+    +     '<div class="plan-pricing-payable"><span>Payable</span><span id="plan-payable-' + p.id + '">—</span></div>'
+    +     '<button class="btn btn-gold plan-cta" onclick="subscribeToPlan(\'' + p.id + '\')">Start Premium</button>'
+    +   '</div>'
+    + '</div>';
+}
+
+function selectPlanType(planId, type, btnEl) {
+  const card = document.getElementById('plan-card-' + planId);
+  if (!card) return;
+  card.setAttribute('data-type', type);
+  card.querySelectorAll('.plan-type-btn').forEach(b => b.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
+  // Refresh duration options because prices differ per type
+  const plan = PLANS.find(p => p.id === planId);
+  const sel = card.querySelector('.plan-duration');
+  if (plan && sel) {
+    const cur = sel.value;
+    sel.innerHTML = PLAN_DURATIONS.map(d => {
+      const price = plan.pricing[type][d.months];
+      return '<option value="' + d.months + '"' + (String(d.months) === cur ? ' selected' : '') + '>' +
+             d.label + ' — ' + fmtINR(price) + '</option>';
+    }).join('');
+  }
+  document.getElementById('plan-pricing-type-' + planId).textContent = TYPE_LABELS[type];
+  updatePlanPricing(planId);
+}
+
+function selectPlanDuration(planId, months) {
+  const card = document.getElementById('plan-card-' + planId);
+  if (!card) return;
+  card.setAttribute('data-duration', months);
+  const label = (PLAN_DURATIONS.find(d => String(d.months) === String(months)) || {}).label || months + ' Months';
+  document.getElementById('plan-pricing-dur-' + planId).textContent = label;
+  updatePlanPricing(planId);
+}
+
+function updatePlanPricing(planId) {
+  const card = document.getElementById('plan-card-' + planId);
+  if (!card) return;
+  const plan = PLANS.find(p => p.id === planId);
+  if (!plan) return;
+  const type = card.getAttribute('data-type');
+  const dur  = card.getAttribute('data-duration');
+  const base = (plan.pricing[type] || {})[dur];
+  if (base == null) return;
+  const gst = base * GST_RATE;
+  const payable = base + gst;
+  document.getElementById('plan-base-'    + planId).textContent = fmtINR(base);
+  document.getElementById('plan-gst-'     + planId).textContent = fmtINRdec(gst);
+  document.getElementById('plan-payable-' + planId).textContent = fmtINRdec(payable);
+}
+
+function subscribeToPlan(planId) {
+  const card = document.getElementById('plan-card-' + planId);
+  const plan = PLANS.find(p => p.id === planId);
+  if (!card || !plan) return;
+  const type = card.getAttribute('data-type');
+  const dur  = card.getAttribute('data-duration');
+  const label = (PLAN_DURATIONS.find(d => String(d.months) === String(dur)) || {}).label || dur + ' Months';
+  // Stash selection so the contact form can read it (optional integration).
+  try { sessionStorage.setItem('rn-pending-plan', JSON.stringify({ plan: plan.name, type: TYPE_LABELS[type], duration: label })); } catch (e) {}
+  showPage('contact');
+  setTimeout(() => {
+    const msgEl = document.getElementById('cfMessage');
+    if (msgEl && !msgEl.value) {
+      msgEl.value = 'Hi, I\'d like to subscribe to the ' + plan.name + ' plan (' + TYPE_LABELS[type] + ', ' + label + '). Please share next steps.';
+    }
+  }, 100);
 }
 
 /* ===== EMI CALCULATOR ===== */

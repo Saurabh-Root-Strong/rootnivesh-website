@@ -1098,3 +1098,124 @@
     .hero-stats { flex-direction: column; gap: 20px; }
     .result-grid { grid-template-columns: 1fr; }
   }
+
+  /* ====== PREMIUM PLANS (Calls page) ====== */
+  .plans-list {
+    display: flex; flex-direction: column; gap: 20px;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .plan-card {
+    display: grid; grid-template-columns: 1fr 320px; gap: 0;
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 18px; overflow: hidden; transition: var(--transition);
+  }
+  .plan-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 18px 44px rgba(0,0,0,0.35); }
+  .plan-body { padding: 28px 32px; }
+  .plan-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap; margin-bottom: 10px;
+  }
+  .plan-head h3 {
+    font-family: 'Cormorant Garamond', serif; font-size: 1.6rem;
+    font-weight: 700; color: var(--white); margin: 0;
+  }
+  .plan-tagline {
+    font-family: 'Space Mono', monospace; font-size: 10.5px;
+    color: var(--gold); text-transform: uppercase; letter-spacing: 1.5px;
+    margin-top: 4px;
+  }
+  .plan-features-link {
+    font-size: 12.5px; color: var(--gold); cursor: pointer;
+    font-weight: 600; text-decoration: none; flex-shrink: 0;
+  }
+  .plan-features-link:hover { text-decoration: underline; }
+  .plan-desc {
+    font-size: 13.5px; color: var(--grey2); line-height: 1.7;
+    margin: 0 0 18px;
+  }
+  .plan-controls {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    margin-top: 6px;
+  }
+  .plan-control-group label {
+    display: block; font-family: 'Space Mono', monospace;
+    font-size: 10px; color: var(--grey); text-transform: uppercase;
+    letter-spacing: 1.5px; margin-bottom: 6px;
+  }
+  .plan-type-toggle {
+    display: inline-flex; gap: 4px; background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border); border-radius: 10px; padding: 3px;
+  }
+  .plan-type-btn {
+    background: transparent; border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 600;
+    color: var(--grey2); padding: 7px 16px; border-radius: 7px;
+    transition: var(--transition);
+  }
+  .plan-type-btn.active {
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    color: var(--navy);
+  }
+  .plan-type-single {
+    display: inline-block; padding: 8px 14px;
+    background: rgba(201,168,76,0.08); border: 1px solid var(--border);
+    border-radius: 10px; font-size: 12.5px; color: var(--grey2);
+    font-family: 'Space Mono', monospace; letter-spacing: 0.5px;
+  }
+  .plan-duration {
+    width: 100%; padding: 10px 12px; background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border); border-radius: 10px; color: var(--white);
+    font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none;
+    cursor: pointer; transition: var(--transition);
+  }
+  .plan-duration:focus { border-color: var(--gold); background: rgba(201,168,76,0.05); }
+  .plan-duration option { background: var(--navy2); }
+
+  /* Right column — pricing summary */
+  .plan-pricing {
+    background: rgba(7,19,31,0.5); border-left: 1px solid var(--border);
+    padding: 28px 28px 24px; display: flex; flex-direction: column; gap: 14px;
+  }
+  .plan-pricing-title {
+    text-align: center;
+    font-family: 'Cormorant Garamond', serif; font-size: 1.3rem;
+    font-weight: 700; color: var(--white);
+  }
+  .plan-pricing-meta {
+    display: flex; justify-content: space-between; gap: 8px;
+    padding-bottom: 12px; border-bottom: 1px dashed var(--border);
+    font-size: 12px;
+  }
+  .plan-pricing-meta-name { color: var(--white); font-weight: 600; }
+  .plan-pricing-meta-type, .plan-pricing-meta-dur { color: var(--grey); }
+  .plan-pricing-rows {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .plan-pricing-row {
+    display: flex; justify-content: space-between;
+    font-size: 13px; color: var(--grey2);
+  }
+  .plan-pricing-row span:last-child {
+    font-family: 'Space Mono', monospace; color: var(--white);
+  }
+  .plan-pricing-payable {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding-top: 12px; border-top: 1px solid var(--border);
+    margin-top: 2px;
+  }
+  .plan-pricing-payable span:first-child {
+    font-size: 13px; color: var(--white); font-weight: 600;
+  }
+  .plan-pricing-payable span:last-child {
+    font-family: 'Space Mono', monospace; font-size: 1.4rem;
+    color: var(--gold); font-weight: 700;
+  }
+  .plan-cta {
+    width: 100%; justify-content: center; margin-top: 4px;
+  }
+
+  @media (max-width: 768px) {
+    .plan-card { grid-template-columns: 1fr; }
+    .plan-pricing { border-left: none; border-top: 1px solid var(--border); }
+    .plan-controls { grid-template-columns: 1fr; }
+  }
