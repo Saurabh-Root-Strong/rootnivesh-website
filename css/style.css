@@ -277,7 +277,54 @@
   .t-arrow-up   { color: #2ECC71; }
   .t-arrow-down { color: #E74C3C; }
   .ticker-loading { color: var(--grey); font-size: 11px; padding-left: 20px; animation: none; }
-  .hero-content { position: relative; z-index: 1; max-width: 800px; padding: 0 1rem; margin-top: 40px; }
+  .hero-content { position: relative; z-index: 1; max-width: 1200px; padding: 0 1rem; margin-top: 40px; width: 100%; }
+  .hero-grid {
+    display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px;
+    align-items: center; text-align: left; margin-bottom: 56px;
+  }
+  .hero-text h1 { text-align: left; }
+  .hero-text .hero-sub { margin-left: 0; max-width: 520px; }
+  .hero-media {
+    position: relative; border-radius: 18px; overflow: hidden;
+    border: 1px solid var(--border2);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    background: linear-gradient(135deg, var(--navy3), var(--navy2));
+    aspect-ratio: 4/3;
+  }
+  .hero-media-el, .hero-media-el-fallback {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    position: absolute; inset: 0; z-index: 2;
+  }
+  .hero-media-placeholder {
+    position: absolute; inset: 0; z-index: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; padding: 24px; text-align: center;
+    background: linear-gradient(135deg, rgba(201,168,76,0.05), rgba(15,39,68,0.4));
+  }
+  .hero-media-placeholder-icon {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: rgba(201,168,76,0.15); border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: var(--gold); padding-left: 4px;
+  }
+  .hero-media-placeholder p {
+    font-family: 'Cormorant Garamond', serif; font-size: 1.2rem;
+    color: var(--white); margin: 0;
+  }
+  .hero-media-placeholder small {
+    font-size: 11px; color: var(--grey); font-family: 'Space Mono', monospace;
+    line-height: 1.5; max-width: 260px;
+  }
+  .hero-media-placeholder code {
+    color: var(--gold); background: rgba(201,168,76,0.08);
+    padding: 1px 6px; border-radius: 4px; font-family: inherit;
+  }
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 32px; text-align: center; }
+    .hero-text h1, .hero-text .btn-group { text-align: center; justify-content: center; }
+    .hero-text .hero-sub { margin-left: auto; margin-right: auto; }
+    .hero-media { max-width: 480px; margin: 0 auto; aspect-ratio: 16/10; }
+  }
   .hero-badge {
     display: inline-flex; align-items: center; gap: 8px;
     background: rgba(201,168,76,0.1); border: 1px solid var(--border2);

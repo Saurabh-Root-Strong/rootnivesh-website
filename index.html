@@ -220,12 +220,27 @@
     </div>
 
     <div class="hero-content">
-      <div class="hero-badge">SEBI REGISTERED RESEARCH ANALYST</div>
-      <h1>Smart Research.<br><span class="accent">Smarter</span> Returns.</h1>
-      <p class="hero-sub">SEBI Registered Research Analyst providing deep fundamental & technical analysis, actionable trading calls, and financial education for retail investors.</p>
-      <div class="btn-group">
-        <button class="btn btn-gold" onclick="showPage('reports')">📊 View Research Reports</button>
-        <button class="btn btn-outline" onclick="showPage('calls')">📞 Latest Calls</button>
+      <div class="hero-grid">
+        <div class="hero-text">
+          <div class="hero-badge">SEBI REGISTERED RESEARCH ANALYST</div>
+          <h1>Smart Research.<br><span class="accent">Smarter</span> Returns.</h1>
+          <p class="hero-sub">SEBI Registered Research Analyst providing deep fundamental & technical analysis, actionable trading calls, and financial education for retail investors.</p>
+          <div class="btn-group" style="justify-content:flex-start">
+            <button class="btn btn-gold" onclick="showPage('reports')">📊 View Research Reports</button>
+            <button class="btn btn-outline" onclick="showPage('calls')">📞 Latest Calls</button>
+          </div>
+        </div>
+        <div class="hero-media">
+          <div class="hero-media-placeholder">
+            <div class="hero-media-placeholder-icon">▶</div>
+            <p>Your team video will appear here</p>
+            <small>Save it as <code>images/hero-media.mp4</code> or <code>images/hero-media.gif</code></small>
+          </div>
+          <video class="hero-media-el" autoplay loop muted playsinline onerror="this.style.display='none'">
+            <source src="images/hero-media.mp4" type="video/mp4">
+          </video>
+          <img src="images/hero-media.gif" alt="" class="hero-media-el-fallback" onerror="this.style.display='none'">
+        </div>
       </div>
       <div class="hero-stats">
         <div class="stat-item">
@@ -241,7 +256,7 @@
           <div class="stat-label">Active Subscribers</div>
         </div>
         <div class="stat-item">
-          <div class="stat-num">7+</div>
+          <div class="stat-num">12+</div>
           <div class="stat-label">Years Experience</div>
         </div>
       </div>
