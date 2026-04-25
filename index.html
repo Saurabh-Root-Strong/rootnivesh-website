@@ -182,22 +182,45 @@
 </nav>
 <!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobileMenu">
-  <a onclick="showPage('home');toggleMenu()">🏠 Home</a>
-  <a onclick="showPage('ipo');toggleMenu()">🆕 New IPO</a>
-  <a onclick="showPage('learner');toggleMenu()">🎓 Learner Club</a>
-  <div class="mob-section">⚡ Short Term Calls</div>
-  <a class="mob-indent" onclick="megaGoCall('intraday');toggleMenu()">📈 Intraday</a>
-  <a class="mob-indent" onclick="megaGoCall('swing');toggleMenu()">🔄 Swing</a>
-  <a class="mob-indent" onclick="megaGoCall('positional');toggleMenu()">📊 Positional</a>
-  <div class="mob-section">🏦 Long Term Calls</div>
-  <a class="mob-indent" onclick="megaGoCall('value');toggleMenu()">💎 Value Based</a>
-  <a class="mob-indent" onclick="megaGoCall('monthly');toggleMenu()">📅 Monthly Based</a>
-  <a onclick="showPage('reports');toggleMenu()">📊 Research Reports</a>
-  <div class="mob-section">🔧 Tools</div>
-  <a class="mob-indent" onclick="megaGoTool('emi');toggleMenu()">🏦 EMI Calculator</a>
-  <a class="mob-indent" onclick="megaGoTool('pos');toggleMenu()">📐 Position Sizing</a>
-  <a onclick="showPage('about');toggleMenu()">👤 About</a>
-  <a onclick="showPage('contact');toggleMenu()">✉️ Contact</a>
+  <a class="mob-link" onclick="showPage('home');toggleMenu()"><span class="mob-link-icon">🏠</span><span>Home</span></a>
+  <a class="mob-link" onclick="showPage('ipo');toggleMenu()"><span class="mob-link-icon">🆕</span><span>New IPO</span></a>
+  <a class="mob-link" onclick="showPage('learner');toggleMenu()"><span class="mob-link-icon">🎓</span><span>Learner Club</span></a>
+
+  <!-- Calls accordion -->
+  <div class="mob-group" id="mob-group-calls">
+    <button class="mob-group-header" onclick="toggleMobGroup('mob-group-calls')">
+      <span class="mob-link-icon">📞</span>
+      <span class="mob-group-title">Calls</span>
+      <span class="mob-chevron">▾</span>
+    </button>
+    <div class="mob-group-body">
+      <div class="mob-group-section">Short Term</div>
+      <a class="mob-sub" onclick="megaGoCall('intraday');toggleMenu()"><span>📈</span><span>Intraday</span></a>
+      <a class="mob-sub" onclick="megaGoCall('swing');toggleMenu()"><span>🔄</span><span>Swing</span></a>
+      <a class="mob-sub" onclick="megaGoCall('positional');toggleMenu()"><span>📊</span><span>Positional</span></a>
+      <div class="mob-group-section">Long Term</div>
+      <a class="mob-sub" onclick="megaGoCall('value');toggleMenu()"><span>💎</span><span>Value Based</span></a>
+      <a class="mob-sub" onclick="megaGoCall('monthly');toggleMenu()"><span>📅</span><span>Monthly Based</span></a>
+    </div>
+  </div>
+
+  <a class="mob-link" onclick="showPage('reports');toggleMenu()"><span class="mob-link-icon">📊</span><span>Research Reports</span></a>
+
+  <!-- Tools accordion -->
+  <div class="mob-group" id="mob-group-tools">
+    <button class="mob-group-header" onclick="toggleMobGroup('mob-group-tools')">
+      <span class="mob-link-icon">🔧</span>
+      <span class="mob-group-title">Tools</span>
+      <span class="mob-chevron">▾</span>
+    </button>
+    <div class="mob-group-body">
+      <a class="mob-sub" onclick="megaGoTool('emi');toggleMenu()"><span>🏦</span><span>EMI Calculator</span></a>
+      <a class="mob-sub" onclick="megaGoTool('pos');toggleMenu()"><span>📐</span><span>Position Sizing</span></a>
+    </div>
+  </div>
+
+  <a class="mob-link" onclick="showPage('about');toggleMenu()"><span class="mob-link-icon">👤</span><span>About</span></a>
+  <a class="mob-link mob-link-cta" onclick="showPage('contact');toggleMenu()"><span class="mob-link-icon">✉️</span><span>Contact</span></a>
 </div>
 
 <!-- ===================== HOME PAGE ===================== -->

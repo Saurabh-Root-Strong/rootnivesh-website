@@ -64,6 +64,12 @@ function toggleMenu() {
   document.getElementById('mobileMenu').classList.toggle('open');
 }
 
+function toggleMobGroup(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('open');
+}
+
 /* ===== SIDEBAR NAV — CALLS ===== */
 const callsMeta = {
   intraday:   { title:'📈 Intraday Calls',          crumb:'INTRADAY',   desc:'Same-day trades with precise entry, target & stop-loss levels.' },
