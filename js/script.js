@@ -51,12 +51,22 @@ function megaGoCall(type) {
   showPage('calls');
   const el = document.getElementById('snav-' + type);
   if (el) snavSelectCall(type, el);
+  // On phones the hero pushes the call list far below the fold;
+  // bring the active content into view.
+  setTimeout(() => {
+    const target = document.querySelector('#page-calls .snav-content');
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 60);
 }
 function megaGoTool(type) {
   closeMegas();
   showPage('tools');
   const el = document.getElementById('snav-' + type);
   if (el) snavSelectTool(type, el);
+  setTimeout(() => {
+    const target = document.getElementById('toolContent-' + type);
+    if (target && target.style.display !== 'none') target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 60);
 }
 
 function initPage(id) {
