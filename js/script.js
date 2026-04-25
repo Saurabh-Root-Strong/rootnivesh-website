@@ -665,10 +665,26 @@ function ipoSubscriptionLabel(item) {
   return '—';
 }
 
-function ipoActionButton(tab, item) {
-  if (tab === 'open')     return '<button class="btn btn-gold" style="padding:7px 18px; font-size:12px" onclick="showPage(\'contact\')">Apply</button>';
-  if (tab === 'upcoming') return '<button class="btn btn-outline" style="padding:7px 18px; font-size:12px" onclick="showPage(\'contact\')">Pre-apply</button>';
-  return '<button class="btn btn-outline" style="padding:7px 18px; font-size:12px" disabled>—</button>';
+/* Brief, plain-language descriptions of what each IPO company does.
+   NSE's API doesn't provide this — extend the map as new IPOs launch.
+   Keys must be the exact NSE `symbol` (uppercase). Keep each line under
+   ~140 chars so the table stays compact. */
+const IPO_DESCRIPTIONS = {
+  ADISOFT:  'Software & IT services — develops enterprise applications and digital platforms for SME clients.',
+  AMBAAUTO: 'Automotive dealership — sales, servicing, and spare parts for passenger and commercial vehicles in India.'
+};
+
+function ipoBusinessCell(item) {
+  const sym = (item.symbol || '').toUpperCase();
+  const desc = IPO_DESCRIPTIONS[sym];
+  if (desc) {
+    return '<span style="font-size:13px; color:var(--grey2); line-height:1.55; display:block; max-width:340px">' + desc + '</span>';
+  }
+  // Fallback for IPOs we haven't profiled yet — point to NSE's own page.
+  return '<a href="https://www.nseindia.com/market-data/all-upcoming-issues-ipo" ' +
+         'target="_blank" rel="noopener" ' +
+         'style="font-size:12px; color:var(--gold); text-decoration:none; white-space:nowrap">' +
+         'View on NSE →</a>';
 }
 
 function renderIpoTable(rows, tab) {
@@ -686,7 +702,7 @@ function renderIpoTable(rows, tab) {
       <td>${fmtIpoDate(r.issueEndDate)}</td>
       <td>${fmtIssuePrice(r.issuePrice || r.priceBand)}</td>
       <td>${ipoSubscriptionLabel(r)}</td>
-      <td>${ipoActionButton(tab, r)}</td>
+      <td>${ipoBusinessCell(r)}</td>
     </tr>`).join('');
 }
 
