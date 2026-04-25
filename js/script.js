@@ -785,35 +785,79 @@ async function fetchNseIndustry(sym) {
    business overview. We search by company name to find the IPO
    page (URL has a numeric ID), then extract the "About <Company>"
    section. Aggressive 24h caching to be polite to their server.    */
+function _normName(s) {
+  return (s || '')
+    .toLowerCase()
+    .replace(/&amp;/g, '&').replace(/&[a-z#0-9]+;/g, ' ')
+    .replace(/\s*(limited|ltd\.?|pvt\.?|private)\s*$/i, '')
+    .replace(/[^a-z0-9 ]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function _tokens(s) { return _normName(s).split(' ').filter(Boolean); }
+
 async function fetchChittorgarhAbout(companyName, sym) {
   if (!companyName) return null;
   const inflight = IPO_LOOKUP_INFLIGHT.get('cg:' + sym);
   if (inflight) return inflight;
   const promise = (async () => {
     // 1. Search Chittorgarh for the company name.
-    const searchUrl = 'https://www.chittorgarh.com/?s=' + encodeURIComponent(companyName.replace(/\s*Limited\s*$/i, ''));
+    const searchUrl = 'https://www.chittorgarh.com/?s=' + encodeURIComponent(_normName(companyName));
     const searchProxied = '/proxy.php?url=' + encodeURIComponent(searchUrl);
     const sRes = await fetch(searchProxied, { signal: AbortSignal.timeout(12000) });
     if (!sRes.ok) return null;
     const sHtml = await sRes.text();
-    // 2. Find the first IPO link with a numeric ID — pattern: /ipo/<slug>-ipo/<id>/
-    const linkMatch = sHtml.match(/href="(\/ipo\/[a-z0-9-]+ipo\/\d+\/?)"/i);
-    if (!linkMatch) return null;
-    // 3. Fetch that IPO page.
-    const ipoUrl = 'https://www.chittorgarh.com' + linkMatch[1];
+
+    // 2. Walk every IPO link, score by token overlap with the target name.
+    const queryTokens = _tokens(companyName);
+    if (queryTokens.length === 0) return null;
+    const linkRe = /<a[^>]+href="(\/ipo\/[a-z0-9-]+ipo\/\d+\/?)"[^>]*>([^<]{1,120})<\/a>/gi;
+    let bestUrl = null, bestScore = 0;
+    let m;
+    while ((m = linkRe.exec(sHtml)) !== null) {
+      const labelTokens = _tokens(m[2]);
+      if (!labelTokens.length) continue;
+      const overlap = labelTokens.filter(t => queryTokens.includes(t)).length;
+      // Require at least the first word of the query to match.
+      if (overlap > bestScore && labelTokens.includes(queryTokens[0])) {
+        bestScore = overlap;
+        bestUrl   = m[1];
+      }
+    }
+    if (!bestUrl) return null;
+
+    // 3. Fetch the matched IPO page.
+    const ipoUrl = 'https://www.chittorgarh.com' + bestUrl;
     const pageProxied = '/proxy.php?url=' + encodeURIComponent(ipoUrl);
     const pRes = await fetch(pageProxied, { signal: AbortSignal.timeout(12000) });
     if (!pRes.ok) return null;
     const pHtml = await pRes.text();
-    // 4. Extract the "About <Company>" section.
-    const m = pHtml.match(/<h2[^>]*>\s*About\s+[^<]+<\/h2>([\s\S]{0,3000}?)(?=<h2|<div\s+class=)/i);
-    if (!m) return null;
-    let text = m[1]
-      .replace(/<[^>]+>/g, ' ')
+
+    // 4. Try a series of headings before falling back to meta description.
+    const headingPatterns = [
+      /<h2[^>]*>\s*About[^<]+<\/h2>([\s\S]{0,3500}?)(?=<h2|<div\s+class=)/i,
+      /<h2[^>]*>\s*Company\s+Overview[^<]*<\/h2>([\s\S]{0,3500}?)(?=<h2|<div\s+class=)/i,
+      /<h2[^>]*>\s*Issuer[^<]*<\/h2>([\s\S]{0,3500}?)(?=<h2|<div\s+class=)/i,
+      /<h3[^>]*>\s*About[^<]+<\/h3>([\s\S]{0,3500}?)(?=<h[1-6]|<div\s+class=)/i
+    ];
+    let block = null;
+    for (let i = 0; i < headingPatterns.length; i++) {
+      const hm = pHtml.match(headingPatterns[i]);
+      if (hm) { block = hm[0]; break; }
+    }
+    let text = '';
+    if (block) {
+      text = block.replace(/<[^>]+>/g, ' ');
+    } else {
+      // Last resort: meta description.
+      const metaM = pHtml.match(/<meta\s+name="description"\s+content="([^"]{40,})"/i);
+      if (metaM) text = metaM[1];
+    }
+    text = text
       .replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').replace(/&#39;/g, '\'')
       .replace(/&quot;/g, '"').replace(/&#x27;/g, '\'')
-      .replace(/\s+/g, ' ')
-      .trim();
+      .replace(/\s+/g, ' ').trim();
     if (!text || text.length < 40) return null;
     if (text.length > 320) text = text.slice(0, 317).replace(/\s\S*$/, '') + '…';
     return text;
