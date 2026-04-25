@@ -1,5 +1,0 @@
-# Asset folders
-
-images/  - photos, logos, GIFs, screenshots (any visual still or animation)
-videos/  - MP4 / WebM video files (hero video, testimonials, walkthroughs)
-docs/    - PDFs (prospectuses, disclosures, research samples)
