@@ -181,10 +181,11 @@ function submitMiniForm() {
 
 
 /* ================================================================
-   LIVE MARKET TICKER  — Yahoo Finance via CORS proxy
+   LIVE MARKET TICKER  — Yahoo Finance v8/chart via local PHP proxy
    Data is 15-min delayed (Yahoo's standard for free quotes).
+   Server-side proxy at /proxy.php avoids CORS and rate-limit issues.
    ================================================================ */
-const CORS_PROXY = 'https://corsproxy.io/?url=';
+const PROXY = '/proxy.php?url=';
 
 const TICKER_SYMBOLS = [
   { yahoo: '^NSEI',         label: 'NIFTY 50' },
@@ -227,22 +228,26 @@ function buildTickerHTML(quotes) {
   return items + items; // duplicate for seamless infinite scroll
 }
 
-async function fetchTickerOnce() {
-  const symbols = TICKER_SYMBOLS.map(s => s.yahoo).join(',');
-  const yahooURL = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + encodeURIComponent(symbols);
-  const proxiedURL = CORS_PROXY + encodeURIComponent(yahooURL);
-  const res = await fetch(proxiedURL, { signal: AbortSignal.timeout(10000) });
-  if (!res.ok) throw new Error('proxy returned ' + res.status);
+async function fetchOneSymbol(sym) {
+  const yahooURL = 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(sym.yahoo) + '?interval=1d&range=1d';
+  const url = PROXY + encodeURIComponent(yahooURL);
+  const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
+  if (!res.ok) throw new Error('proxy ' + res.status);
   const data = await res.json();
-  const result = (data.quoteResponse && data.quoteResponse.result) || [];
-  return result.map(q => {
-    const meta = TICKER_SYMBOLS.find(s => s.yahoo === q.symbol);
-    return {
-      label: meta ? meta.label : q.symbol,
-      price: q.regularMarketPrice != null ? q.regularMarketPrice : 0,
-      changePct: q.regularMarketChangePercent != null ? q.regularMarketChangePercent : 0
-    };
-  }).filter(q => q.price > 0);
+  const meta = data && data.chart && data.chart.result && data.chart.result[0] && data.chart.result[0].meta;
+  if (!meta) return null;
+  const price = meta.regularMarketPrice;
+  const prev  = meta.chartPreviousClose != null ? meta.chartPreviousClose : meta.previousClose;
+  if (price == null || prev == null || price <= 0) return null;
+  const changePct = ((price - prev) / prev) * 100;
+  return { label: sym.label, price: price, changePct: changePct };
+}
+
+async function fetchTickerOnce() {
+  const results = await Promise.all(
+    TICKER_SYMBOLS.map(s => fetchOneSymbol(s).catch(() => null))
+  );
+  return results.filter(q => q && q.price > 0);
 }
 
 async function refreshTicker() {
@@ -367,26 +372,11 @@ function applyFiiDii(fii, dii) {
   }
 }
 
-async function fetchFiiDii() {
-  const nseURL = 'https://www.nseindia.com/api/fiidiiTradeReact';
-  const proxiedURL = CORS_PROXY + encodeURIComponent(nseURL);
-
-  try {
-    const res = await fetch(proxiedURL, { signal: AbortSignal.timeout(10000) });
-    if (res.ok) {
-      const data = await res.json();
-      const arr = Array.isArray(data) ? data : (data.data || []);
-      const fii = arr.find(r => (r.category || r.CATEGORY || '').toUpperCase().includes('FII'));
-      const dii = arr.find(r => (r.category || r.CATEGORY || '').toUpperCase().includes('DII'));
-      if (fii && dii) {
-        const dateStr = fii.date || fii.DATE || new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
-        document.getElementById('fiidiiDate').textContent = 'As of ' + dateStr + ' (NSE)';
-        applyFiiDii(fii, dii);
-        return;
-      }
-    }
-  } catch (e) {}
-  // Fallback — show sample data with clear "Sample" label
+function fetchFiiDii() {
+  // NSE FII/DII API requires session cookies that a simple proxy can't supply,
+  // so we render representative sample figures with a clear date stamp.
+  // Update the numbers here when you have fresh NSE data, or wire up a
+  // dedicated cookie-aware backend later.
   applyFiiDii(
     { buyValue: '14832.45', sellValue: '13120.30', netValue:  '1712.15' },
     { buyValue: '10234.80', sellValue:  '8940.25', netValue:  '1294.55' }
@@ -398,7 +388,6 @@ async function fetchFiiDii() {
 function initFiiDii() {
   fetchFiiDii();
   fetchFiiDiiHistory();
-  setInterval(fetchFiiDii, 300000);
 }
 
 /* ---- 30-day historical table ---- */
@@ -446,33 +435,8 @@ function renderHistTable(rows) {
   }).join('');
 }
 
-async function fetchFiiDiiHistory() {
-  const end   = new Date();
-  const start = new Date(); start.setDate(start.getDate() - 40);
-  const fmt   = d => `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
-  const nseURL = `https://www.nseindia.com/api/historicalOR/fiiDiiData?startDate=${fmt(start)}&endDate=${fmt(end)}`;
-  const proxiedURL = CORS_PROXY + encodeURIComponent(nseURL);
-
-  try {
-    const res = await fetch(proxiedURL, { signal: AbortSignal.timeout(10000) });
-    if (res.ok) {
-      const data = await res.json();
-      const arr = data?.data || data?.Data || (Array.isArray(data) ? data : null);
-      if (arr && arr.length > 0) {
-        const rows = arr.slice(-22).map(row => ({
-          date: row.date || row.Date || row.DATE || '',
-          fii:  row.fiiNetDii || row.FII_NET || row.fiiNet || row.netFII || row.NET_FII || 0,
-          dii:  row.diiNetDii || row.DII_NET || row.diiNet || row.netDII || row.NET_DII || 0,
-        }));
-
-        renderHistTable(rows);
-        document.getElementById('histLoadStatus').textContent = 'NSE data';
-        return;
-      }
-    }
-  } catch (e) {}
-
-  // fallback
+function fetchFiiDiiHistory() {
+  // NSE historical endpoint requires session cookies — render sample series.
   renderHistTable(genFallbackHistory());
   document.getElementById('histLoadStatus').textContent = 'Sample data';
 }
