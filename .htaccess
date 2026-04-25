@@ -1,0 +1,32 @@
+# RootNivesh — single-page-app routing for Hostinger LiteSpeed.
+# Any request that isn't an actual file or folder gets served index.html
+# so deep links like /calls, /about, /ipo work via the History API.
+
+RewriteEngine On
+
+# Don't rewrite real files or folders (videos, images, css/js, proxy.php, etc.)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Don't rewrite anything inside the static asset folders
+RewriteCond %{REQUEST_URI} !^/(css|js|images|videos|docs)/
+RewriteCond %{REQUEST_URI} !^/proxy\.php$
+RewriteCond %{REQUEST_URI} !^/sitemap\.xml$
+RewriteCond %{REQUEST_URI} !^/google[a-z0-9]+\.html$
+
+# Send every other request to index.html so the SPA can route client-side
+RewriteRule ^.*$ /index.html [L]
+
+# Long-cache static assets so repeat visits are fast
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg "access plus 30 days"
+  ExpiresByType image/png  "access plus 30 days"
+  ExpiresByType image/gif  "access plus 30 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType video/mp4  "access plus 30 days"
+  ExpiresByType text/css   "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+  ExpiresByType text/html  "access plus 0 seconds"
+</IfModule>

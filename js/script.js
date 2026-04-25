@@ -1,16 +1,71 @@
-/* ===== PAGE NAVIGATION ===== */
-function showPage(id) {
+/* ===== PAGE NAVIGATION + URL ROUTING =====
+   Every "page" gets its own URL via the History API so visitors can
+   bookmark, share, and use back/forward. .htaccess rewrites unknown
+   paths to index.html so direct hits to /calls etc. still load. */
+const PAGE_TO_PATH = {
+  home:     '/',
+  ipo:      '/ipo',
+  learner:  '/learner',
+  calls:    '/calls',
+  reports:  '/reports',
+  tools:    '/tools',
+  about:    '/about',
+  contact:  '/contact'
+};
+const PATH_TO_PAGE = Object.fromEntries(
+  Object.entries(PAGE_TO_PATH).map(function (e) { return [e[1], e[0]]; })
+);
+const PAGE_TITLES = {
+  home:    'RootNivesh Research | SEBI Registered Research Analyst',
+  ipo:     'New IPO | RootNivesh Research',
+  learner: 'Learner Club | RootNivesh Research',
+  calls:   'Trading & Investment Calls | RootNivesh Research',
+  reports: 'Research Reports | RootNivesh Research',
+  tools:   'Smart Calculators | RootNivesh Research',
+  about:   'About Us | RootNivesh Research',
+  contact: 'Contact | RootNivesh Research'
+};
+
+function showPage(id, fromPopState) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
+  const target = document.getElementById('page-' + id);
+  if (target) target.classList.add('active');
   document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
   window.scrollTo(0, 0);
   initPage(id);
+
+  // Update the address bar (skip if we got here from a popstate event,
+  // because the browser already changed the URL).
+  if (!fromPopState && PAGE_TO_PATH[id]) {
+    const newPath = PAGE_TO_PATH[id];
+    if (window.location.pathname !== newPath) {
+      history.pushState({ page: id }, '', newPath);
+    }
+  }
+  // Update document.title so browser tab + share previews are accurate.
+  if (PAGE_TITLES[id]) document.title = PAGE_TITLES[id];
+
   // Auto-close the mobile menu on navigation
   const mm = document.getElementById('mobileMenu');
   if (mm && mm.classList.contains('open')) {
     mm.classList.remove('open');
     document.getElementById('mainNav').classList.remove('menu-open');
   }
+}
+
+// Browser back / forward buttons
+window.addEventListener('popstate', function (e) {
+  const path = window.location.pathname;
+  const page = PATH_TO_PAGE[path] || 'home';
+  showPage(page, true);
+});
+
+// Resolve the initial page from the URL once everything is parsed.
+function resolveInitialPage() {
+  const path = window.location.pathname;
+  const page = PATH_TO_PAGE[path];
+  if (page && page !== 'home') showPage(page, true);
+  else if (PAGE_TITLES.home) document.title = PAGE_TITLES.home;
 }
 
 /* ===== MEGA MENU ===== */
@@ -517,6 +572,7 @@ window.addEventListener('DOMContentLoaded', () => {
   if (yrEl) yrEl.textContent = currentYear;
   const yrElMob = document.getElementById('footerYearMob');
   if (yrElMob) yrElMob.textContent = currentYear;
+  resolveInitialPage();
   renderReports('all');
   renderCourses('all');
   renderPlans();
