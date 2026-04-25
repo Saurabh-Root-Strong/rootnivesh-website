@@ -175,11 +175,27 @@
   .mega-sub-go:hover { text-decoration: underline; }
 
   .hamburger {
-    display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px;
+    display: none; flex-direction: column; justify-content: center;
+    gap: 5px; cursor: pointer; padding: 4px;
+    width: 32px; height: 32px; position: relative;
   }
   .hamburger span {
     display: block; width: 22px; height: 2px;
-    background: var(--white); border-radius: 2px; transition: var(--transition);
+    background: var(--white); border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.2s ease;
+    transform-origin: center;
+  }
+  /* Animate the three bars into an X when the menu is open */
+  nav.menu-open .hamburger span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+    background: var(--gold);
+  }
+  nav.menu-open .hamburger span:nth-child(2) {
+    opacity: 0;
+  }
+  nav.menu-open .hamburger span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+    background: var(--gold);
   }
   .mobile-menu {
     display: none; position: fixed;
@@ -274,6 +290,27 @@
   }
   .mob-sub:hover, .mob-sub:active {
     color: var(--white); background: rgba(201,168,76,0.06);
+  }
+
+  /* Footer block pinned to the bottom of the mobile menu */
+  .mob-footer {
+    margin-top: auto; padding: 18px 14px 4px;
+    border-top: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 10px; align-items: center;
+    text-align: center;
+  }
+  .mob-footer p {
+    font-size: 11px; color: var(--grey); margin: 0;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .mob-footer-sebi {
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    color: var(--gold);
+    background: rgba(201,168,76,0.08);
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    letter-spacing: 0.5px;
   }
   @media (max-width: 900px) {
     .nav-links { display: none; }

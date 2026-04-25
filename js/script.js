@@ -5,6 +5,12 @@ function showPage(id) {
   document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
   window.scrollTo(0, 0);
   initPage(id);
+  // Auto-close the mobile menu on navigation
+  const mm = document.getElementById('mobileMenu');
+  if (mm && mm.classList.contains('open')) {
+    mm.classList.remove('open');
+    document.getElementById('mainNav').classList.remove('menu-open');
+  }
 }
 
 /* ===== MEGA MENU ===== */
@@ -61,7 +67,10 @@ function initPage(id) {
 }
 
 function toggleMenu() {
-  document.getElementById('mobileMenu').classList.toggle('open');
+  const mm  = document.getElementById('mobileMenu');
+  const nav = document.getElementById('mainNav');
+  mm.classList.toggle('open');
+  if (nav) nav.classList.toggle('menu-open', mm.classList.contains('open'));
 }
 
 function toggleMobGroup(id) {
@@ -476,8 +485,11 @@ function toggleHistTable() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  const currentYear = new Date().getFullYear();
   const yrEl = document.getElementById('footerYear');
-  if (yrEl) yrEl.textContent = new Date().getFullYear();
+  if (yrEl) yrEl.textContent = currentYear;
+  const yrElMob = document.getElementById('footerYearMob');
+  if (yrElMob) yrElMob.textContent = currentYear;
   renderReports('all');
   renderCourses('all');
   renderPlans();
