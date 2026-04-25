@@ -455,19 +455,43 @@ function buildSampleFiiDiiSeries() {
   return series;
 }
 
-function fetchFiiDii() {
-  // NSE's live FII/DII API needs session cookies a simple proxy can't
-  // supply, so we render the headline of the same sample series the
-  // 30-day table uses. The two panels will always agree.
+async function fetchFiiDii() {
+  // 1. Try the cookie-aware server-side endpoint first.
+  try {
+    const res = await fetch('/fii-dii.php?cb=' + Date.now(), { signal: AbortSignal.timeout(15000) });
+    if (res.ok) {
+      const payload = await res.json();
+      const arr = payload && Array.isArray(payload.data) ? payload.data : null;
+      if (arr && arr.length > 0) {
+        const upper = s => (s || '').toString().toUpperCase();
+        const fii = arr.find(r => upper(r.category || r.CATEGORY).includes('FII'));
+        const dii = arr.find(r => upper(r.category || r.CATEGORY).includes('DII'));
+        if (fii && dii) {
+          const dateStr = fii.date || fii.DATE || payload.fetched_date || '';
+          const dateEl = document.getElementById('fiidiiDate');
+          if (dateEl) {
+            const stale = !!payload.stale;
+            dateEl.textContent =
+              (stale ? 'Stale (NSE unreachable) — last good: ' : 'As of ') +
+              (dateStr || 'today') + ' • Source: NSE India';
+          }
+          applyFiiDii(fii, dii);
+          return;
+        }
+      }
+    }
+  } catch (e) { /* fall through to sample */ }
+
+  // 2. Fallback to the same sample series the 30-day table uses.
   applyFiiDii(
     { buyValue: SAMPLE_LATEST.fii.buy.toFixed(2), sellValue: SAMPLE_LATEST.fii.sell.toFixed(2), netValue: SAMPLE_LATEST.fii.net.toFixed(2) },
     { buyValue: SAMPLE_LATEST.dii.buy.toFixed(2), sellValue: SAMPLE_LATEST.dii.sell.toFixed(2), netValue: SAMPLE_LATEST.dii.net.toFixed(2) }
   );
   const series = buildSampleFiiDiiSeries();
   const latestDateLabel = (series[0] && series[0].date) || new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'short' });
-  // Add the year for context
   const yr = new Date().getFullYear();
-  document.getElementById('fiidiiDate').textContent = 'Sample data — ' + latestDateLabel + ' ' + yr;
+  const dateEl = document.getElementById('fiidiiDate');
+  if (dateEl) dateEl.textContent = 'Sample data — ' + latestDateLabel + ' ' + yr;
 }
 
 function initFiiDii() {
