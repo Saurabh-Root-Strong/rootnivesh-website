@@ -54,7 +54,52 @@
   <ul class="nav-links" id="navLinks">
     <li><a onclick="showPage('home');closeMegas()" class="active">Home</a></li>
     <li><a onclick="showPage('ipo');closeMegas()">New IPO</a></li>
-    <li><a onclick="showPage('learner');closeMegas()">Learner Club</a></li>
+    <!-- TOOLS mega trigger -->
+    <li>
+      <div class="nav-dd-trigger" id="triggerTools" onclick="toggleMega('megaTools','triggerTools')">
+        Tools <span class="dd-arrow">▾</span>
+      </div>
+      <div class="mega-menu" id="megaTools">
+        <div class="mega-inner cols-1">
+          <div class="mega-col">
+            <div class="mega-col-header">
+              <div class="mega-col-icon">🔧</div>
+              <span class="mega-col-title">Financial Tools</span>
+            </div>
+            <div class="mega-row" onclick="megaGoTool('emi')">
+              <span class="mega-row-label">EMI Calculator</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-emi')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-emi">
+              <div class="mega-sub-inner">
+                <p>Calculate monthly EMI, total interest payable and principal breakdown for any loan type.</p>
+                <span class="mega-sub-go" onclick="megaGoTool('emi')">Open Calculator →</span>
+              </div>
+            </div>
+            <div class="mega-row" onclick="megaGoTool('sip')">
+              <span class="mega-row-label">SIP Calculator</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-sip','snav-sip')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-sip">
+              <div class="mega-sub-inner">
+                <p>Project the future value of a monthly SIP, with invested amount and gains broken out.</p>
+                <span class="mega-sub-go" onclick="megaGoTool('sip')">Open Calculator →</span>
+              </div>
+            </div>
+            <div class="mega-row" onclick="megaGoTool('pos')">
+              <span class="mega-row-label">Position Sizing Calculator</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-pos')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-pos">
+              <div class="mega-sub-inner">
+                <p>Find the exact number of shares to buy so your loss never exceeds a set % of capital.</p>
+                <span class="mega-sub-go" onclick="megaGoTool('pos')">Open Calculator →</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
 
     <!-- CALLS mega trigger -->
     <li>
@@ -136,52 +181,7 @@
 
     <li><a onclick="showPage('reports');closeMegas()">Research Reports</a></li>
 
-    <!-- TOOLS mega trigger -->
-    <li>
-      <div class="nav-dd-trigger" id="triggerTools" onclick="toggleMega('megaTools','triggerTools')">
-        Tools <span class="dd-arrow">▾</span>
-      </div>
-      <div class="mega-menu" id="megaTools">
-        <div class="mega-inner cols-1">
-          <div class="mega-col">
-            <div class="mega-col-header">
-              <div class="mega-col-icon">🔧</div>
-              <span class="mega-col-title">Financial Tools</span>
-            </div>
-            <div class="mega-row" onclick="megaGoTool('emi')">
-              <span class="mega-row-label">EMI Calculator</span>
-              <div class="mega-plus" onclick="megaToggleSub(event,'msub-emi')">+</div>
-            </div>
-            <div class="mega-sub" id="msub-emi">
-              <div class="mega-sub-inner">
-                <p>Calculate monthly EMI, total interest payable and principal breakdown for any loan type.</p>
-                <span class="mega-sub-go" onclick="megaGoTool('emi')">Open Calculator →</span>
-              </div>
-            </div>
-            <div class="mega-row" onclick="megaGoTool('sip')">
-              <span class="mega-row-label">SIP Calculator</span>
-              <div class="mega-plus" onclick="megaToggleSub(event,'msub-sip','snav-sip')">+</div>
-            </div>
-            <div class="mega-sub" id="msub-sip">
-              <div class="mega-sub-inner">
-                <p>Project the future value of a monthly SIP, with invested amount and gains broken out.</p>
-                <span class="mega-sub-go" onclick="megaGoTool('sip')">Open Calculator →</span>
-              </div>
-            </div>
-            <div class="mega-row" onclick="megaGoTool('pos')">
-              <span class="mega-row-label">Position Sizing Calculator</span>
-              <div class="mega-plus" onclick="megaToggleSub(event,'msub-pos')">+</div>
-            </div>
-            <div class="mega-sub" id="msub-pos">
-              <div class="mega-sub-inner">
-                <p>Find the exact number of shares to buy so your loss never exceeds a set % of capital.</p>
-                <span class="mega-sub-go" onclick="megaGoTool('pos')">Open Calculator →</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </li>
+    <li><a onclick="showPage('learner');closeMegas()">Learner Club</a></li>
 
     <li><a onclick="showPage('about');closeMegas()">About</a></li>
     <li><a onclick="showPage('contact');closeMegas()" class="nav-cta">Contact</a></li>
@@ -194,7 +194,19 @@
 <div class="mobile-menu" id="mobileMenu">
   <a class="mob-link" onclick="showPage('home')"><span class="mob-link-icon">🏠</span><span>Home</span></a>
   <a class="mob-link" onclick="showPage('ipo')"><span class="mob-link-icon">🆕</span><span>New IPO</span></a>
-  <a class="mob-link" onclick="showPage('learner')"><span class="mob-link-icon">📚</span><span>Learner Club</span></a>
+  <!-- Tools accordion (swapped with Learner Club — now 3rd) -->
+  <div class="mob-group" id="mob-group-tools">
+    <button class="mob-group-header" onclick="toggleMobGroup('mob-group-tools')">
+      <span class="mob-link-icon">🔧</span>
+      <span class="mob-group-title">Tools</span>
+      <span class="mob-chevron">▾</span>
+    </button>
+    <div class="mob-group-body">
+      <a class="mob-sub" onclick="megaGoTool('emi')"><span>🏦</span><span>EMI Calculator</span></a>
+      <a class="mob-sub" onclick="megaGoTool('sip')"><span>💰</span><span>SIP Calculator</span></a>
+      <a class="mob-sub" onclick="megaGoTool('pos')"><span>📐</span><span>Position Sizing</span></a>
+    </div>
+  </div>
 
   <!-- Calls accordion -->
   <div class="mob-group" id="mob-group-calls">
@@ -216,19 +228,7 @@
 
   <a class="mob-link" onclick="showPage('reports')"><span class="mob-link-icon">📊</span><span>Research Reports</span></a>
 
-  <!-- Tools accordion -->
-  <div class="mob-group" id="mob-group-tools">
-    <button class="mob-group-header" onclick="toggleMobGroup('mob-group-tools')">
-      <span class="mob-link-icon">🔧</span>
-      <span class="mob-group-title">Tools</span>
-      <span class="mob-chevron">▾</span>
-    </button>
-    <div class="mob-group-body">
-      <a class="mob-sub" onclick="megaGoTool('emi')"><span>🏦</span><span>EMI Calculator</span></a>
-      <a class="mob-sub" onclick="megaGoTool('sip')"><span>💰</span><span>SIP Calculator</span></a>
-      <a class="mob-sub" onclick="megaGoTool('pos')"><span>📐</span><span>Position Sizing</span></a>
-    </div>
-  </div>
+  <a class="mob-link" onclick="showPage('learner')"><span class="mob-link-icon">📚</span><span>Learner Club</span></a>
 
   <a class="mob-link" onclick="showPage('about')"><span class="mob-link-icon">👤</span><span>About</span></a>
   <a class="mob-link mob-link-cta" onclick="showPage('contact')"><span class="mob-link-icon">📧</span><span>Contact</span></a>
@@ -1517,8 +1517,8 @@
      Order matters — data must load first.
      Bump the ?v= number whenever you change either file to bust
      long-cached copies on visitors' phones. -->
-<script src="js/data.js?v=9"></script>
-<script src="js/script.js?v=9"></script>
+<script src="js/data.js?v=10"></script>
+<script src="js/script.js?v=10"></script>
 
 
 <section style="padding:40px 20px; max-width:900px; margin:auto; line-height:1.7;">
