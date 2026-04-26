@@ -1357,15 +1357,67 @@
 
   /* ====== PREMIUM PLANS (Calls page) ====== */
   .plans-list {
-    display: flex; flex-direction: column; gap: 20px;
+    display: flex; flex-direction: column; gap: 16px;
     max-width: 1100px; margin: 0 auto;
   }
   .plan-card {
-    display: grid; grid-template-columns: 1fr 320px; gap: 0;
     background: var(--card-bg); border: 1px solid var(--border);
-    border-radius: 18px; overflow: hidden; transition: var(--transition);
+    border-radius: 18px; overflow: hidden;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
-  .plan-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 18px 44px rgba(0,0,0,0.35); }
+  .plan-card:hover { border-color: var(--border2); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+  .plan-card.open { border-color: var(--border2); }
+
+  /* ── Accordion summary header (always visible, click to toggle) ── */
+  .plan-card-toggle {
+    width: 100%;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; padding: 18px 22px;
+    background: transparent; border: none; cursor: pointer;
+    text-align: left; font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s ease;
+  }
+  .plan-card-toggle:hover { background: rgba(201,168,76,0.04); }
+  .plan-card.open .plan-card-toggle { background: rgba(201,168,76,0.06); }
+  .plan-toggle-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .plan-toggle-icon { font-size: 26px; flex-shrink: 0; }
+  .plan-toggle-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .plan-toggle-name {
+    font-family: 'Cormorant Garamond', serif; font-size: 1.45rem;
+    font-weight: 700; color: var(--white); line-height: 1.1;
+  }
+  .plan-toggle-tagline {
+    font-family: 'Space Mono', monospace; font-size: 10.5px;
+    color: var(--gold); text-transform: uppercase; letter-spacing: 1.2px;
+  }
+  .plan-toggle-right {
+    display: flex; align-items: center; gap: 14px; flex-shrink: 0;
+  }
+  .plan-toggle-price {
+    font-family: 'Space Mono', monospace; font-size: 12.5px;
+    color: var(--grey2); white-space: nowrap;
+  }
+  .plan-toggle-chev {
+    font-size: 14px; color: var(--gold);
+    width: 28px; height: 28px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border2); border-radius: 50%;
+    background: rgba(201,168,76,0.06);
+    transition: transform 0.3s ease;
+  }
+  .plan-card.open .plan-toggle-chev { transform: rotate(180deg); }
+
+  /* ── Collapsible body wrap ── */
+  .plan-collapse {
+    display: grid; grid-template-columns: 1fr 320px; gap: 0;
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-top: 1px solid transparent;
+  }
+  .plan-card.open .plan-collapse {
+    max-height: 1200px;
+    border-top-color: var(--border);
+  }
   .plan-body { padding: 28px 32px; }
   .plan-head {
     display: flex; align-items: flex-start; justify-content: space-between;
@@ -1525,9 +1577,14 @@
   }
 
   @media (max-width: 768px) {
-    .plan-card { grid-template-columns: 1fr; }
+    .plan-collapse { grid-template-columns: 1fr; }
     .plan-pricing { border-left: none; border-top: 1px solid var(--border); }
     .plan-controls { grid-template-columns: 1fr; }
+    .plan-card-toggle { padding: 14px 16px; gap: 10px; }
+    .plan-toggle-name { font-size: 1.25rem; }
+    .plan-toggle-icon { font-size: 22px; }
+    .plan-toggle-price { display: none; } /* save space on phones */
+    .plan-card.open .plan-collapse { max-height: 1600px; } /* extra room for stacked content */
   }
 
   /* ====================================================================

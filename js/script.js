@@ -1140,11 +1140,19 @@ function fmtINRdec(n) { return '₹' + n.toLocaleString('en-IN', { minimumFracti
 function renderPlans() {
   const grid = document.getElementById('plansList');
   if (!grid) return;
-  grid.innerHTML = PLANS.map(p => renderPlanCard(p)).join('');
+  // First card open by default so visitors see something expanded;
+  // subsequent cards collapsed to the summary header.
+  grid.innerHTML = PLANS.map((p, i) => renderPlanCard(p, i === 0)).join('');
   PLANS.forEach(p => updatePlanPricing(p.id));
 }
 
-function renderPlanCard(p) {
+function togglePlanCard(planId) {
+  const card = document.getElementById('plan-card-' + planId);
+  if (!card) return;
+  card.classList.toggle('open');
+}
+
+function renderPlanCard(p, openByDefault) {
   const featuresList = (p.features || []).map(f =>
     '<li>' + f + '</li>'
   ).join('');
@@ -1183,40 +1191,66 @@ function renderPlanCard(p) {
       '</div>';
   }
 
-  // Card markup ---------------------------------------------------------
+  // Card markup — accordion: clickable summary header + collapsible content
   const dataAttrs = p.type === 'subscription'
     ? 'data-plan-type="subscription" data-type="' + defaultSelection.type + '" data-duration="1"'
     : 'data-plan-type="' + p.type + '" data-tier="' + defaultSelection.tierId + '"';
+  const openClass = openByDefault ? ' open' : '';
+
+  // Quick price preview shown in the collapsed header
+  let pricePreview;
+  if (p.type === 'subscription') {
+    const t = defaultSelection.type;
+    pricePreview = 'from ' + fmtINR(p.pricing[t][1]) + ' / month';
+  } else if (p.type === 'service') {
+    pricePreview = 'from ' + fmtINR(p.tiers[0].price) + ' / month';
+  } else {
+    pricePreview = 'from ' + fmtINR(p.tiers[0].price);
+  }
 
   return ''
-    + '<div class="plan-card plan-card-' + p.type + '" id="plan-card-' + p.id + '" ' + dataAttrs + '>'
-    +   '<div class="plan-body">'
-    +     '<div class="plan-head">'
-    +       '<div>'
-    +         '<h3>' + p.icon + ' ' + p.name + '</h3>'
-    +         '<div class="plan-tagline">' + p.tagline + '</div>'
+    + '<div class="plan-card plan-card-' + p.type + openClass + '" id="plan-card-' + p.id + '" ' + dataAttrs + '>'
+
+    // ── ALWAYS-VISIBLE HEADER (click to toggle) ──────────────────────
+    +   '<button class="plan-card-toggle" onclick="togglePlanCard(\'' + p.id + '\')" aria-label="Toggle ' + p.name + ' plan details">'
+    +     '<div class="plan-toggle-left">'
+    +       '<span class="plan-toggle-icon">' + p.icon + '</span>'
+    +       '<div class="plan-toggle-text">'
+    +         '<span class="plan-toggle-name">' + p.name + '</span>'
+    +         '<span class="plan-toggle-tagline">' + p.tagline + '</span>'
     +       '</div>'
     +     '</div>'
-    +     '<p class="plan-desc">' + p.description + '</p>'
-    +     (featuresList ? '<ul class="plan-features-list">' + featuresList + '</ul>' : '')
-    +     '<div class="plan-controls">' + selector + '</div>'
-    +   '</div>'
-    +   '<div class="plan-pricing">'
-    +     '<div class="plan-pricing-title">' + (p.type === 'program' ? 'Programme Fee' : 'Pricing') + '</div>'
-    +     '<div class="plan-pricing-meta">'
-    +       '<span class="plan-pricing-meta-name">' + p.name + '</span>'
-    +       '<span class="plan-pricing-meta-dur"  id="plan-pricing-dur-'  + p.id + '">—</span>'
+    +     '<div class="plan-toggle-right">'
+    +       '<span class="plan-toggle-price">' + pricePreview + '</span>'
+    +       '<span class="plan-toggle-chev">▾</span>'
     +     '</div>'
-    +     '<div class="plan-pricing-payable">'
-    +       '<span>' + (p.type === 'service' ? 'Per Month' : p.type === 'program' ? 'One-time' : 'Total') + '</span>'
-    +       '<span id="plan-payable-' + p.id + '">—</span>'
+    +   '</button>'
+
+    // ── COLLAPSIBLE BODY ─────────────────────────────────────────────
+    +   '<div class="plan-collapse">'
+    +     '<div class="plan-body">'
+    +       '<p class="plan-desc">' + p.description + '</p>'
+    +       (featuresList ? '<ul class="plan-features-list">' + featuresList + '</ul>' : '')
+    +       '<div class="plan-controls">' + selector + '</div>'
     +     '</div>'
-    +     '<p class="plan-pricing-note" id="plan-note-' + p.id + '"></p>'
-    +     '<button class="btn btn-gold plan-cta" onclick="subscribeToPlan(\'' + p.id + '\')">'
-    +       (p.type === 'program' ? 'Apply for Programme' : 'Get Started')
-    +     '</button>'
-    +     '<p class="plan-pricing-tag">+ 18% GST applicable as per SEBI norms</p>'
+    +     '<div class="plan-pricing">'
+    +       '<div class="plan-pricing-title">' + (p.type === 'program' ? 'Programme Fee' : 'Pricing') + '</div>'
+    +       '<div class="plan-pricing-meta">'
+    +         '<span class="plan-pricing-meta-name">' + p.name + '</span>'
+    +         '<span class="plan-pricing-meta-dur"  id="plan-pricing-dur-'  + p.id + '">—</span>'
+    +       '</div>'
+    +       '<div class="plan-pricing-payable">'
+    +         '<span>' + (p.type === 'service' ? 'Per Month' : p.type === 'program' ? 'One-time' : 'Total') + '</span>'
+    +         '<span id="plan-payable-' + p.id + '">—</span>'
+    +       '</div>'
+    +       '<p class="plan-pricing-note" id="plan-note-' + p.id + '"></p>'
+    +       '<button class="btn btn-gold plan-cta" onclick="subscribeToPlan(\'' + p.id + '\')">'
+    +         (p.type === 'program' ? 'Apply for Programme' : 'Get Started')
+    +       '</button>'
+    +       '<p class="plan-pricing-tag">+ 18% GST applicable as per SEBI norms</p>'
+    +     '</div>'
     +   '</div>'
+
     + '</div>';
 }
 
