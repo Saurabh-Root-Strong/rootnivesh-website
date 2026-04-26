@@ -41,7 +41,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=6">
+<link rel="stylesheet" href="css/style.css?v=12">
 </head>
 <body>
 
@@ -433,6 +433,56 @@
         </div>
 
       </div><!-- /fiidii-master-grid -->
+    </div>
+  </section>
+
+  <!-- ===== TOP 5 GAINERS / LOSERS ===== -->
+  <section style="padding: 28px 0; background: rgba(7,19,31,0.5); border-bottom: 1px solid var(--border);">
+    <div class="container">
+      <div class="movers-header">
+        <div class="movers-title-row">
+          <span class="fiidii-icon">🏆</span>
+          <span class="fiidii-heading">NIFTY 50 — Top Movers</span>
+          <span class="fiidii-live-badge"><span class="tlive-pulse"></span>LIVE</span>
+        </div>
+        <span class="fiidii-date" id="moversDate">Loading…</span>
+      </div>
+
+      <div class="movers-grid">
+        <div class="movers-card movers-gainers">
+          <div class="movers-card-header">
+            <span class="movers-card-icon">📈</span>
+            <span class="movers-card-title">Top 5 Gainers</span>
+          </div>
+          <div class="table-wrap" style="border-radius:10px; border-color:rgba(46,204,113,0.18); overflow-x:auto">
+            <table class="movers-table">
+              <thead>
+                <tr><th>Stock</th><th>LTP (₹)</th><th>Change %</th></tr>
+              </thead>
+              <tbody id="gainersBody">
+                <tr><td colspan="3" style="text-align:center; padding:14px; color:var(--grey); font-size:11.5px">Loading NSE data…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="movers-card movers-losers">
+          <div class="movers-card-header">
+            <span class="movers-card-icon">📉</span>
+            <span class="movers-card-title">Top 5 Losers</span>
+          </div>
+          <div class="table-wrap" style="border-radius:10px; border-color:rgba(231,76,60,0.18); overflow-x:auto">
+            <table class="movers-table">
+              <thead>
+                <tr><th>Stock</th><th>LTP (₹)</th><th>Change %</th></tr>
+              </thead>
+              <tbody id="losersBody">
+                <tr><td colspan="3" style="text-align:center; padding:14px; color:var(--grey); font-size:11.5px">Loading NSE data…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1517,8 +1567,8 @@
      Order matters — data must load first.
      Bump the ?v= number whenever you change either file to bust
      long-cached copies on visitors' phones. -->
-<script src="js/data.js?v=11"></script>
-<script src="js/script.js?v=11"></script>
+<script src="js/data.js?v=12"></script>
+<script src="js/script.js?v=12"></script>
 
 
 <section style="padding:40px 20px; max-width:900px; margin:auto; line-height:1.7;">

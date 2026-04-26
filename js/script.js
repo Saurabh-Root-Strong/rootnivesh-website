@@ -532,6 +532,53 @@ async function fetchFiiDii() {
 function initFiiDii() {
   fetchFiiDii();
   fetchFiiDiiHistory();
+  fetchTopMovers();
+}
+
+/* ===== Top 5 Gainers / Top 5 Losers (Nifty 50) =====
+   Hits /gainers-losers.php which does the cookie handshake
+   server-side. Refreshed every 5 min during market hours by
+   the auto-poll set up in DOMContentLoaded. */
+async function fetchTopMovers() {
+  try {
+    const res = await fetch('/gainers-losers.php?cb=' + Date.now(), { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) throw new Error('http ' + res.status);
+    const data = await res.json();
+    if (!data || !Array.isArray(data.gainers) || !Array.isArray(data.losers)) throw new Error('bad payload');
+    renderMovers('gainersBody', data.gainers, 'up');
+    renderMovers('losersBody',  data.losers,  'down');
+    const dateEl = document.getElementById('moversDate');
+    if (dateEl) {
+      const at = data.fetched_at ? new Date(data.fetched_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '';
+      const stale = !!data.stale;
+      const tag = data.market_open ? 'LIVE' : 'CLOSED';
+      dateEl.textContent = (stale ? 'Stale — ' : 'Updated ') + at + ' • ' + tag + ' • Source: NSE India';
+    }
+  } catch (e) {
+    const fail = '<tr><td colspan="3" style="text-align:center; padding:14px; color:var(--grey); font-size:11.5px">Could not load NSE data.</td></tr>';
+    const g = document.getElementById('gainersBody'); if (g) g.innerHTML = fail;
+    const l = document.getElementById('losersBody');  if (l) l.innerHTML = fail;
+  }
+}
+
+function renderMovers(bodyId, rows, direction) {
+  const tbody = document.getElementById(bodyId);
+  if (!tbody) return;
+  if (!rows || rows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:14px; color:var(--grey); font-size:11.5px">No data.</td></tr>';
+    return;
+  }
+  const cls = direction === 'up' ? 'mv-pct-up' : 'mv-pct-down';
+  tbody.innerHTML = rows.map(r => {
+    const sym = (r.symbol || '?').toString();
+    const price = r.price != null ? r.price.toLocaleString('en-IN', { maximumFractionDigits: 2 }) : '—';
+    const pct = r.pChange != null ? ((r.pChange >= 0 ? '+' : '') + r.pChange.toFixed(2) + '%') : '—';
+    return '<tr>' +
+      '<td class="mv-symbol">' + sym + '</td>' +
+      '<td class="mv-price">' + price + '</td>' +
+      '<td class="' + cls + '">' + pct + '</td>' +
+    '</tr>';
+  }).join('');
 }
 
 /* ---- 30-day historical table — uses the same shared series. ---- */
