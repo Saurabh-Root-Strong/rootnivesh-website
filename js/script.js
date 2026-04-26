@@ -1145,86 +1145,94 @@ function renderPlans() {
 }
 
 function renderPlanCard(p) {
-  const types = Object.keys(p.pricing);
-  const defaultType = types[0];
-  const typeToggle = types.length > 1
-    ? '<div class="plan-type-toggle">' + types.map(t =>
-        '<button class="plan-type-btn ' + (t === defaultType ? 'active' : '') + '" ' +
-              'onclick="selectPlanType(\'' + p.id + '\',\'' + t + '\',this)">' + TYPE_LABELS[t] + '</button>'
-      ).join('') + '</div>'
-    : '<div class="plan-type-single">' + TYPE_LABELS[defaultType] + ' Segment</div>';
+  const featuresList = (p.features || []).map(f =>
+    '<li>' + f + '</li>'
+  ).join('');
 
-  const durationOpts = PLAN_DURATIONS.map(d => {
-    const price = p.pricing[defaultType][d.months];
-    return '<option value="' + d.months + '">' + d.label + ' — ' + fmtINR(price) + '</option>';
-  }).join('');
+  // Selector area varies by plan type ----------------------------------
+  let selector, defaultSelection;
+
+  if (p.type === 'subscription') {
+    const types = Object.keys(p.pricing);
+    const defaultType = types[0];
+    defaultSelection = { type: defaultType, duration: '1' };
+    const opts = PLAN_DURATIONS.map(d => {
+      const price = p.pricing[defaultType][d.months];
+      return '<option value="' + d.months + '">' + d.label + ' — ' + fmtINR(price) + '</option>';
+    }).join('');
+    selector =
+      '<div class="plan-control-group">' +
+        '<label>Choose duration</label>' +
+        '<select class="plan-duration" onchange="selectPlanDuration(\'' + p.id + '\', this.value)">' + opts + '</select>' +
+      '</div>';
+  } else {
+    // 'service' or 'program' — pick a tier, no duration math.
+    const t0 = p.tiers[0];
+    defaultSelection = { tierId: t0.id };
+    selector =
+      '<div class="plan-control-group">' +
+        '<label>Choose ' + (p.type === 'service' ? 'tier' : 'programme') + '</label>' +
+        '<div class="plan-tier-toggle">' +
+          p.tiers.map((t, i) =>
+            '<button class="plan-tier-btn ' + (i === 0 ? 'active' : '') + '" ' +
+                  'onclick="selectPlanTier(\'' + p.id + '\',\'' + t.id + '\',this)">' +
+              t.name +
+            '</button>'
+          ).join('') +
+        '</div>' +
+      '</div>';
+  }
+
+  // Card markup ---------------------------------------------------------
+  const dataAttrs = p.type === 'subscription'
+    ? 'data-plan-type="subscription" data-type="' + defaultSelection.type + '" data-duration="1"'
+    : 'data-plan-type="' + p.type + '" data-tier="' + defaultSelection.tierId + '"';
 
   return ''
-    + '<div class="plan-card" id="plan-card-' + p.id + '" data-type="' + defaultType + '" data-duration="1">'
+    + '<div class="plan-card plan-card-' + p.type + '" id="plan-card-' + p.id + '" ' + dataAttrs + '>'
     +   '<div class="plan-body">'
     +     '<div class="plan-head">'
     +       '<div>'
     +         '<h3>' + p.icon + ' ' + p.name + '</h3>'
     +         '<div class="plan-tagline">' + p.tagline + '</div>'
     +       '</div>'
-    +       '<a class="plan-features-link" onclick="showPage(\'contact\')">What You Get →</a>'
     +     '</div>'
     +     '<p class="plan-desc">' + p.description + '</p>'
-    +     '<div class="plan-controls">'
-    +       '<div class="plan-control-group">'
-    +         '<label>Segment</label>'
-    +         typeToggle
-    +       '</div>'
-    +       '<div class="plan-control-group">'
-    +         '<label>Duration</label>'
-    +         '<select class="plan-duration" onchange="selectPlanDuration(\'' + p.id + '\', this.value)">' + durationOpts + '</select>'
-    +       '</div>'
-    +     '</div>'
+    +     (featuresList ? '<ul class="plan-features-list">' + featuresList + '</ul>' : '')
+    +     '<div class="plan-controls">' + selector + '</div>'
     +   '</div>'
     +   '<div class="plan-pricing">'
-    +     '<div class="plan-pricing-title">Pricing</div>'
+    +     '<div class="plan-pricing-title">' + (p.type === 'program' ? 'Programme Fee' : 'Pricing') + '</div>'
     +     '<div class="plan-pricing-meta">'
     +       '<span class="plan-pricing-meta-name">' + p.name + '</span>'
-    +       '<span class="plan-pricing-meta-type" id="plan-pricing-type-' + p.id + '">' + TYPE_LABELS[defaultType] + '</span>'
-    +       '<span class="plan-pricing-meta-dur"  id="plan-pricing-dur-'  + p.id + '">1 Month</span>'
+    +       '<span class="plan-pricing-meta-dur"  id="plan-pricing-dur-'  + p.id + '">—</span>'
     +     '</div>'
-    +     '<div class="plan-pricing-rows">'
-    +       '<div class="plan-pricing-row"><span>Total Amount</span><span id="plan-base-' + p.id + '">—</span></div>'
-    +       '<div class="plan-pricing-row"><span>GST (18%)</span><span id="plan-gst-'  + p.id + '">—</span></div>'
+    +     '<div class="plan-pricing-payable">'
+    +       '<span>' + (p.type === 'service' ? 'Per Month' : p.type === 'program' ? 'One-time' : 'Total') + '</span>'
+    +       '<span id="plan-payable-' + p.id + '">—</span>'
     +     '</div>'
-    +     '<div class="plan-pricing-payable"><span>Payable</span><span id="plan-payable-' + p.id + '">—</span></div>'
-    +     '<button class="btn btn-gold plan-cta" onclick="subscribeToPlan(\'' + p.id + '\')">Start Premium</button>'
+    +     '<p class="plan-pricing-note" id="plan-note-' + p.id + '"></p>'
+    +     '<button class="btn btn-gold plan-cta" onclick="subscribeToPlan(\'' + p.id + '\')">'
+    +       (p.type === 'program' ? 'Apply for Programme' : 'Get Started')
+    +     '</button>'
+    +     '<p class="plan-pricing-tag">+ 18% GST applicable as per SEBI norms</p>'
     +   '</div>'
     + '</div>';
-}
-
-function selectPlanType(planId, type, btnEl) {
-  const card = document.getElementById('plan-card-' + planId);
-  if (!card) return;
-  card.setAttribute('data-type', type);
-  card.querySelectorAll('.plan-type-btn').forEach(b => b.classList.remove('active'));
-  if (btnEl) btnEl.classList.add('active');
-  // Refresh duration options because prices differ per type
-  const plan = PLANS.find(p => p.id === planId);
-  const sel = card.querySelector('.plan-duration');
-  if (plan && sel) {
-    const cur = sel.value;
-    sel.innerHTML = PLAN_DURATIONS.map(d => {
-      const price = plan.pricing[type][d.months];
-      return '<option value="' + d.months + '"' + (String(d.months) === cur ? ' selected' : '') + '>' +
-             d.label + ' — ' + fmtINR(price) + '</option>';
-    }).join('');
-  }
-  document.getElementById('plan-pricing-type-' + planId).textContent = TYPE_LABELS[type];
-  updatePlanPricing(planId);
 }
 
 function selectPlanDuration(planId, months) {
   const card = document.getElementById('plan-card-' + planId);
   if (!card) return;
   card.setAttribute('data-duration', months);
-  const label = (PLAN_DURATIONS.find(d => String(d.months) === String(months)) || {}).label || months + ' Months';
-  document.getElementById('plan-pricing-dur-' + planId).textContent = label;
+  updatePlanPricing(planId);
+}
+
+function selectPlanTier(planId, tierId, btnEl) {
+  const card = document.getElementById('plan-card-' + planId);
+  if (!card) return;
+  card.setAttribute('data-tier', tierId);
+  card.querySelectorAll('.plan-tier-btn').forEach(b => b.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
   updatePlanPricing(planId);
 }
 
@@ -1233,25 +1241,48 @@ function updatePlanPricing(planId) {
   if (!card) return;
   const plan = PLANS.find(p => p.id === planId);
   if (!plan) return;
-  const type = card.getAttribute('data-type');
-  const dur  = card.getAttribute('data-duration');
-  const base = (plan.pricing[type] || {})[dur];
-  if (base == null) return;
-  const gst = base * GST_RATE;
-  const payable = base + gst;
-  document.getElementById('plan-base-'    + planId).textContent = fmtINR(base);
-  document.getElementById('plan-gst-'     + planId).textContent = fmtINRdec(gst);
-  document.getElementById('plan-payable-' + planId).textContent = fmtINRdec(payable);
+
+  const durEl     = document.getElementById('plan-pricing-dur-'   + planId);
+  const payableEl = document.getElementById('plan-payable-' + planId);
+  const noteEl    = document.getElementById('plan-note-'    + planId);
+
+  if (plan.type === 'subscription') {
+    const type = card.getAttribute('data-type');
+    const dur  = card.getAttribute('data-duration');
+    const base = (plan.pricing[type] || {})[dur];
+    if (base == null) return;
+    const dlabel = (PLAN_DURATIONS.find(d => String(d.months) === String(dur)) || {}).label || dur + ' Months';
+    if (durEl)     durEl.textContent     = dlabel;
+    if (payableEl) payableEl.textContent = fmtINR(base);
+    if (noteEl)    noteEl.textContent    = '';
+  } else {
+    const tierId = card.getAttribute('data-tier');
+    const tier   = (plan.tiers || []).find(t => t.id === tierId) || plan.tiers[0];
+    if (!tier) return;
+    if (durEl)     durEl.textContent     = tier.name;
+    if (payableEl) payableEl.textContent = fmtINR(tier.price) + (tier.suffix || '');
+    if (noteEl)    noteEl.textContent    = tier.note || '';
+  }
 }
 
 function subscribeToPlan(planId) {
   const card = document.getElementById('plan-card-' + planId);
   const plan = PLANS.find(p => p.id === planId);
   if (!card || !plan) return;
-  const type = card.getAttribute('data-type');
-  const dur  = card.getAttribute('data-duration');
-  const label = (PLAN_DURATIONS.find(d => String(d.months) === String(dur)) || {}).label || dur + ' Months';
-  enquireFor('Premium Plan', plan.name + ' — ' + TYPE_LABELS[type] + ' • ' + label, 'subscribe');
+
+  let label;
+  if (plan.type === 'subscription') {
+    const type = card.getAttribute('data-type');
+    const dur  = card.getAttribute('data-duration');
+    const dlabel = (PLAN_DURATIONS.find(d => String(d.months) === String(dur)) || {}).label || dur + ' Months';
+    label = plan.name + ' — ' + TYPE_LABELS[type] + ' • ' + dlabel;
+  } else {
+    const tierId = card.getAttribute('data-tier');
+    const tier   = (plan.tiers || []).find(t => t.id === tierId) || plan.tiers[0];
+    label = plan.name + ' — ' + tier.name + ' (' + fmtINR(tier.price) + (tier.suffix || '') + ')';
+  }
+  const intent = plan.type === 'program' ? 'enrol' : 'subscribe';
+  enquireFor(plan.type === 'program' ? 'Mentorship Program' : 'Premium Plan', label, intent);
 }
 
 /* Generic "send me details about X" entry point used by every

@@ -1470,6 +1470,60 @@
     width: 100%; justify-content: center; margin-top: 4px;
   }
 
+  /* ====== Tier picker (Elite + Mentorship) ====== */
+  .plan-tier-toggle {
+    display: flex; flex-direction: column; gap: 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border); border-radius: 10px; padding: 4px;
+  }
+  .plan-tier-btn {
+    background: transparent; border: 1px solid transparent; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+    color: var(--grey2); padding: 9px 14px; border-radius: 7px;
+    text-align: left; transition: var(--transition);
+  }
+  .plan-tier-btn:hover { background: rgba(201,168,76,0.06); color: var(--white); }
+  .plan-tier-btn.active {
+    background: linear-gradient(135deg, rgba(201,168,76,0.18), rgba(201,168,76,0.07));
+    color: var(--gold); border-color: var(--border2);
+  }
+
+  /* ====== Plan feature bullet list ====== */
+  .plan-features-list {
+    list-style: none; padding: 0; margin: 0 0 18px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .plan-features-list li {
+    position: relative; padding-left: 22px;
+    font-size: 13px; color: var(--grey2); line-height: 1.55;
+  }
+  .plan-features-list li::before {
+    content: '✓'; position: absolute; left: 0; top: 0;
+    color: var(--gold); font-weight: 700;
+  }
+
+  /* ====== Pricing tag + note ====== */
+  .plan-pricing-tag {
+    font-size: 10.5px; color: var(--grey);
+    margin: 6px 0 0; text-align: center;
+    font-family: 'Space Mono', monospace; letter-spacing: 0.3px;
+  }
+  .plan-pricing-note {
+    font-size: 11.5px; color: var(--grey2); line-height: 1.5;
+    margin: -2px 0 0; min-height: 1.2em;
+  }
+
+  /* ====== Hero tagline (the deep-quant line) ====== */
+  .hero-tagline {
+    margin-top: 14px; font-size: 13px; color: var(--grey2);
+    font-family: 'Space Mono', monospace; letter-spacing: 0.5px;
+    line-height: 1.5;
+  }
+  .hero-tagline strong { color: var(--gold); font-weight: 700; }
+  @media (max-width: 640px) {
+    .hero-tagline { font-size: 12px; }
+  }
+
   @media (max-width: 768px) {
     .plan-card { grid-template-columns: 1fr; }
     .plan-pricing { border-left: none; border-top: 1px solid var(--border); }

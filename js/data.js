@@ -93,41 +93,92 @@ const IPO_LOOKUP_CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
 const IPO_DESCRIPTIONS = {};
 
 
-/* ----------- Premium subscription plans ----------------------------------- */
-/* Edit prices freely. GST_RATE applies on top of every plan price. */
+/* ----------- Premium plans — RootNivesh upsell funnel ---------------------
+   Four tiers covering the full client journey:
+     1. Starter      — equity calls, beginners, lowest-friction entry
+     2. Pro F&O      — derivatives for serious traders
+     3. Elite        — dedicated 1-on-1 advisory tiers
+     4. Mentorship   — high-ticket coaching programmes
+   ---
+   Each plan has a `type` field that tells renderPlans() how to lay it out:
+     "subscription"  → 1/3/6/12-month duration selector
+     "service"       → tier picker (Standard / Premium / Ultra) at monthly rates
+     "program"       → program picker (Beginner / Advanced / Mastery) one-time
+   --------------------------------------------------------------------- */
 const GST_RATE = 0.18;
 
 const PLANS = [
   {
-    id: 'max',
-    name: 'Max',
-    icon: '💎',
-    tagline: 'Stable, low-risk equity',
-    description: 'Research-driven, low-risk equity calls focused on cash-segment delivery. Weekly portfolio fine-tuning balances growth and protection.',
+    id: 'starter',
+    name: 'Starter',
+    icon: '🎯',
+    tagline: 'Equity calls • WhatsApp delivery',
+    type: 'subscription',
+    description: 'Beginner-friendly entry plan. 2–3 high-quality cash-segment equity calls every week, focused on swing and short-term trades, delivered on WhatsApp.',
+    features: [
+      '2–3 equity calls per week',
+      'Swing + short-term trades',
+      'Basic risk-management guidance',
+      'WhatsApp + email delivery'
+    ],
     pricing: {
-      cash: { 1: 4999, 3: 13499, 6: 24999, 12: 44999 }
+      cash: { 1: 2999, 3: 7999, 6: 14999, 12: 24999 }
     }
   },
   {
-    id: 'smart',
-    name: 'Smart',
-    icon: '⚡',
-    tagline: 'Balanced cash + F&O',
-    description: 'Smart equity and derivatives recommendations for moderate risk tolerance. Mix of intraday, swing, and short-term positional calls.',
-    pricing: {
-      cash: { 1: 7999,  3: 21999, 6: 39999,  12: 69999 },
-      fno:  { 1: 9999,  3: 27999, 6: 49999,  12: 89999 }
-    }
-  },
-  {
-    id: 'pro',
-    name: 'Pro',
+    id: 'pro-fno',
+    name: 'Pro F&O',
     icon: '🔥',
-    tagline: 'Active F&O traders',
-    description: 'High-conviction derivatives strategies for active traders. Premium intraday F&O setups with tight execution windows and risk control.',
+    tagline: 'Derivatives Edge — serious traders',
+    type: 'subscription',
+    description: 'Quant-driven futures & options playbook. Intraday + positional F&O calls, option strategies for BTST and expiry setups, with tight risk-reward discipline.',
+    features: [
+      'Intraday + positional F&O calls',
+      'Option strategies (BTST, expiry setups)',
+      'Defined risk : reward on every trade',
+      'Faster, real-time WhatsApp updates'
+    ],
     pricing: {
-      fno: { 1: 14999, 3: 39999, 6: 74999, 12: 134999 }
+      fno: { 1: 5999, 3: 15999, 6: 29999, 12: 54999 }
     }
+  },
+  {
+    id: 'elite',
+    name: 'Elite',
+    icon: '💎',
+    tagline: 'Dedicated advisory — multi-market',
+    type: 'service',
+    description: 'Personalised, dedicated trade assistance. Calls customised to your capital, real portfolio tracking, and coverage across Equity, F&O, Forex and Commodity markets.',
+    features: [
+      'Dedicated relationship manager',
+      'Calls customised to your capital',
+      'Portfolio tracking & rebalancing',
+      'Multi-market: Equity / F&O / Forex / Commodity'
+    ],
+    tiers: [
+      { id: 'standard', name: 'Standard', price: 9999,  suffix: '/month', note: 'Core advisory access' },
+      { id: 'premium',  name: 'Premium',  price: 19999, suffix: '/month', note: 'Faster turnaround + portfolio review' },
+      { id: 'ultra',    name: 'Ultra',    price: 34999, suffix: '/month', note: 'Concierge service across all markets' }
+    ]
+  },
+  {
+    id: 'mentorship',
+    name: 'Mentorship',
+    icon: '🎓',
+    tagline: '1-on-1 coaching • premium segment',
+    type: 'program',
+    description: 'High-touch personal coaching. Strategy building, trader psychology, risk mastery and a lifetime framework you can apply across markets — not just signals you blindly follow.',
+    features: [
+      'Personal 1:1 coaching sessions',
+      'Live strategy building',
+      'Trader psychology + risk mastery',
+      'Lifetime framework, not just signals'
+    ],
+    tiers: [
+      { id: 'beginner', name: 'Beginner Program',     price: 15000, suffix: '',  note: 'Foundation in research-driven trading' },
+      { id: 'advanced', name: 'Advanced Trading',     price: 25000, suffix: '',  note: 'Quant + technical + risk integration' },
+      { id: 'mastery',  name: 'Complete Mastery',     price: 45000, suffix: '+', note: 'All-markets framework, lifetime access' }
+    ]
   }
 ];
 
