@@ -1619,12 +1619,12 @@
   @media (max-width: 640px) {
     section { padding: 44px 0; }
     .container { padding: 0 1rem; }
-    nav { padding: 0 1rem; height: 60px; }
-    .nav-logo-img { height: 44px; }
-    .hamburger { width: 28px; height: 28px; gap: 4px; }
+    nav { padding: 0 1rem; height: 50px; }
+    .nav-logo-img { height: 40px; }
+    .hamburger { width: 26px; height: 26px; gap: 4px; padding: 2px; }
     .hamburger span { width: 20px; }
-    .ticker-tape { top: 60px; height: 30px; }
-    .hero { padding-top: 76px; }
+    .ticker-tape { top: 50px; height: 28px; }
+    .hero { padding-top: 64px; }
 
     h1 { font-size: clamp(2.1rem, 9vw, 2.9rem) !important; line-height: 1.08; }
     .hero-headline { font-size: clamp(1.7rem, 7.5vw, 2.4rem) !important; line-height: 1.18 !important; }
