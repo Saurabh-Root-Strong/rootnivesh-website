@@ -614,7 +614,9 @@ window.addEventListener('DOMContentLoaded', () => {
 /* ===== REPORTS — render only (reportsData lives in data.js) ===== */
 function renderReports(cat) {
   const data = cat === 'all' ? reportsData : reportsData.filter(r => r.cat === cat);
-  document.getElementById('reportsGrid').innerHTML = data.map(r => `
+  document.getElementById('reportsGrid').innerHTML = data.map(r => {
+    const safeTitle = (r.title + ' (' + r.ticker + ')').replace(/'/g, "\\'");
+    return `
     <div class="card">
       <div style="display:flex; justify-content:space-between; align-items:flex-start">
         <div class="card-tag tag-${r.tag}">${r.tag.toUpperCase()}</div>
@@ -629,9 +631,10 @@ function renderReports(cat) {
       </div>
       <div class="card-footer" style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center">
         <span style="font-size:11px; color:var(--grey)">${r.date}</span>
-        <button class="btn btn-outline" style="padding:6px 14px; font-size:12px">Read Full Report →</button>
+        <button class="btn btn-outline" style="padding:6px 14px; font-size:12px" onclick="enquireFor('Research Report','${safeTitle}','request')">Read Full Report →</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 function filterReports(cat, btn) {
   document.querySelectorAll('#reportTabs .tab').forEach(t => t.classList.remove('active'));
@@ -642,7 +645,10 @@ function filterReports(cat, btn) {
 /* ===== COURSES — render only (coursesData lives in data.js) ===== */
 function renderCourses(level) {
   const data = level === 'all' ? coursesData : coursesData.filter(c => c.level === level);
-  document.getElementById('coursesGrid').innerHTML = data.map(c => `
+  document.getElementById('coursesGrid').innerHTML = data.map(c => {
+    const safeTitle = c.title.replace(/'/g, "\\'");
+    const intent = c.badge === 'Free' ? 'enrol' : 'enrol';
+    return `
     <div class="course-card card">
       <div class="course-icon">${c.icon}</div>
       <div class="card-tag ${c.badge === 'Free' ? 'tag-free' : 'tag-premium'}">${c.badge}</div>
@@ -654,11 +660,12 @@ function renderCourses(level) {
         <span style="text-transform:capitalize; color:var(--gold); text-transform:capitalize">${c.level}</span>
       </div>
       <div class="card-footer" style="margin-top:16px">
-        <button class="btn btn-gold" style="width:100%; justify-content:center" onclick="showPage('contact')">
+        <button class="btn btn-gold" style="width:100%; justify-content:center" onclick="enquireFor('Learner Club Course','${safeTitle}','${intent}')">
           ${c.badge === 'Free' ? 'Start Free →' : 'Enroll Now →'}
         </button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 function filterCourses(level, btn) {
   document.querySelectorAll('#page-learner .tabs .tab').forEach(t => t.classList.remove('active'));
@@ -1177,14 +1184,38 @@ function subscribeToPlan(planId) {
   const type = card.getAttribute('data-type');
   const dur  = card.getAttribute('data-duration');
   const label = (PLAN_DURATIONS.find(d => String(d.months) === String(dur)) || {}).label || dur + ' Months';
-  // Stash selection so the contact form can read it (optional integration).
-  try { sessionStorage.setItem('rn-pending-plan', JSON.stringify({ plan: plan.name, type: TYPE_LABELS[type], duration: label })); } catch (e) {}
+  enquireFor('Premium Plan', plan.name + ' — ' + TYPE_LABELS[type] + ' • ' + label, 'subscribe');
+}
+
+/* Generic "send me details about X" entry point used by every
+   Enroll / Subscribe / Request CTA across the site. Routes to
+   Contact page, pre-fills Subject + Message so when the visitor
+   hits Send, the email arriving at contact@rootnivesh.in carries
+   the exact item they were interested in. */
+function enquireFor(category, label, intent) {
   showPage('contact');
   setTimeout(() => {
     const msgEl = document.getElementById('cfMessage');
-    if (msgEl && !msgEl.value) {
-      msgEl.value = 'Hi, I\'d like to subscribe to the ' + plan.name + ' plan (' + TYPE_LABELS[type] + ', ' + label + '). Please share next steps.';
+    const subjEl = document.getElementById('cfSubject');
+    if (subjEl) {
+      const map = {
+        'Premium Plan':         'Subscription Enquiry',
+        'Research Report':      'Research Report Query',
+        'Learner Club Course':  'Learner Club',
+      };
+      const opt = map[category] || 'General Enquiry';
+      const found = Array.from(subjEl.options).find(o => o.text === opt || o.value === opt);
+      if (found) subjEl.value = found.value;
     }
+    if (msgEl && !msgEl.value) {
+      const verb = intent === 'subscribe' ? 'subscribe to'
+                 : intent === 'enrol'     ? 'enroll in'
+                 : intent === 'request'   ? 'receive the full'
+                 : 'know more about';
+      msgEl.value = "Hi, I'd like to " + verb + " " + category.toLowerCase() + ': ' + label + '. Please share next steps.';
+    }
+    const nameEl = document.getElementById('cfName');
+    if (nameEl) try { nameEl.focus({ preventScroll: false }); } catch (e) {}
   }, 100);
 }
 
