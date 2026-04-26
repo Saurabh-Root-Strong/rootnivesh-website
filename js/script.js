@@ -237,13 +237,27 @@ function startCarousel() {
 }
 
 /* ===== MINI LEAD FORM ===== */
-function submitMiniForm() {
+async function submitMiniForm() {
   const name = document.getElementById('mfName').value.trim();
   const phone = document.getElementById('mfPhone').value.trim();
   const email = document.getElementById('mfEmail').value.trim();
   const interest = document.getElementById('mfInterest').value;
   if (!name || !phone || !email || !interest) {
     alert('Please fill Name, Phone, Email and select your interest.'); return;
+  }
+  const fd = new FormData();
+  fd.append('source', 'lead');
+  fd.append('name', name);
+  fd.append('phone', phone);
+  fd.append('email', email);
+  fd.append('interest', interest);
+  try {
+    const res = await fetch('/contact.php', { method: 'POST', body: fd, signal: AbortSignal.timeout(15000) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.ok !== true) throw new Error(data.error || 'send failed');
+  } catch (e) {
+    alert('Could not send right now. Please WhatsApp us at +91 74670 94575 instead.');
+    return;
   }
   document.getElementById('miniFormFields').style.display = 'none';
   const s = document.getElementById('miniFormSuccess');
@@ -1267,11 +1281,29 @@ function calcSIP() {
 }
 
 /* ===== CONTACT FORM ===== */
-function submitContact() {
-  const name = document.getElementById('cfName').value;
-  const email = document.getElementById('cfEmail').value;
-  const msg = document.getElementById('cfMessage').value;
+async function submitContact() {
+  const name = document.getElementById('cfName').value.trim();
+  const email = document.getElementById('cfEmail').value.trim();
+  const phoneEl = document.getElementById('cfPhone');
+  const phone = phoneEl ? phoneEl.value.trim() : '';
+  const msg = document.getElementById('cfMessage').value.trim();
   if (!name || !email || !msg) { alert('Please fill Name, Email, and Message.'); return; }
+
+  const fd = new FormData();
+  fd.append('source', 'contact');
+  fd.append('name', name);
+  fd.append('email', email);
+  if (phone) fd.append('phone', phone);
+  fd.append('message', msg);
+
+  try {
+    const res = await fetch('/contact.php', { method: 'POST', body: fd, signal: AbortSignal.timeout(15000) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.ok !== true) throw new Error(data.error || 'send failed');
+  } catch (e) {
+    alert('Could not send right now. Please WhatsApp us at +91 74670 94575 or email contact@rootnivesh.in instead.');
+    return;
+  }
   document.getElementById('contactFormWrap').style.display = 'none';
   document.getElementById('formSuccess').classList.add('show');
 }
