@@ -1115,9 +1115,8 @@ async function fetchIpo(tab) {
     renderIpoTable(arr, tab);
     autoFillIpoBusinessCells(); // async; updates cells in place when lookups land
     if (status) {
-      const now = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-      const suffix = tab === 'closed' ? ' • Last ' + IPO_CLOSED_DAYS + ' days' : '';
-      status.textContent = 'Source: NSE India • Last fetched at ' + now + suffix;
+      const suffix = tab === 'closed' ? 'Showing the last ' + IPO_CLOSED_DAYS + ' days.' : '';
+      status.textContent = suffix;
     }
   } catch (e) {
     renderIpoTable([], tab);
