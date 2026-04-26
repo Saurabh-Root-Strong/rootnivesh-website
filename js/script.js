@@ -346,7 +346,7 @@ async function refreshTicker() {
       const status = document.getElementById('marketStatus');
       if (status) {
         const open = isMarketOpen();
-        status.textContent = open ? 'NSE • LIVE (15min delay)' : 'NSE • CLOSED';
+        status.textContent = open ? 'NSE • LIVE' : 'NSE • CLOSED';
         status.style.color = open ? 'var(--green)' : 'var(--grey)';
       }
       return;
