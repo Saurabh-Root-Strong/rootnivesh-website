@@ -1282,18 +1282,22 @@ function calcSIP() {
 
 /* ===== CONTACT FORM ===== */
 async function submitContact() {
-  const name = document.getElementById('cfName').value.trim();
-  const email = document.getElementById('cfEmail').value.trim();
-  const phoneEl = document.getElementById('cfPhone');
-  const phone = phoneEl ? phoneEl.value.trim() : '';
-  const msg = document.getElementById('cfMessage').value.trim();
-  if (!name || !email || !msg) { alert('Please fill Name, Email, and Message.'); return; }
+  const get = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const first = get('cfName');
+  const last  = get('cfLast');
+  const email = get('cfEmail');
+  const phone = get('cfPhone');
+  const subject = get('cfSubject');
+  const msg = get('cfMessage');
+  if (!first || !email || !msg) { alert('Please fill Name, Email, and Message.'); return; }
 
+  const fullName = last ? (first + ' ' + last) : first;
   const fd = new FormData();
   fd.append('source', 'contact');
-  fd.append('name', name);
+  fd.append('name', fullName);
   fd.append('email', email);
-  if (phone) fd.append('phone', phone);
+  if (phone)   fd.append('phone', phone);
+  if (subject) fd.append('interest', subject);
   fd.append('message', msg);
 
   try {
