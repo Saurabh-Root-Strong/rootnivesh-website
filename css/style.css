@@ -1295,30 +1295,35 @@
   footer {
     background: var(--navy2); border-top: 1px solid var(--border); padding: 60px 0 30px;
   }
-  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
-  .footer-brand p { font-size: 13px; color: var(--grey); line-height: 1.7; margin-top: 14px; max-width: 280px; }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 48px; }
+  .footer-brand { display: flex; flex-direction: column; gap: 16px; }
+  .footer-brand-logo { display: inline-block; width: max-content; }
+  .footer-brand-logo img { height: 56px; width: auto; display: block; }
+  .footer-brand p { font-size: 13px; color: var(--grey); line-height: 1.7; margin: 0; max-width: 280px; }
   footer h5 { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--grey); margin-bottom: 16px; font-family: 'Space Mono', monospace; }
   footer ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
   footer ul li a { font-size: 13.5px; color: var(--grey2); text-decoration: none; transition: var(--transition); cursor: pointer; }
   footer ul li a:hover { color: var(--gold); }
   .footer-bottom {
+    margin-top: 8px;        /* extra gap on top of footer-grid's bottom margin */
     padding-top: 28px;
     border-top: 1px solid var(--border);
     display: flex; justify-content: space-between; align-items: center;
-    flex-wrap: wrap; gap: 12px;
+    flex-wrap: wrap; gap: 16px;
   }
-  /* Stack the three footer-bottom items cleanly on phones so the
-     copyright, SEBI badge, and disclaimer don't end up sitting on
-     top of each other. Also leave room for the floating WhatsApp
-     button (≈70px tall in its bottom-right). */
+  /* On phones the 3 footer-bottom items stack cleanly so they don't
+     collide with each other or the description text above. */
   @media (max-width: 768px) {
     .footer-bottom {
       flex-direction: column; align-items: flex-start;
-      gap: 14px; padding-top: 24px;
+      gap: 14px;
+      margin-top: 8px;
+      padding-top: 24px;
     }
-    .footer-bottom p { line-height: 1.5; }
-    footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+    .footer-bottom p { line-height: 1.6; margin: 0; }
+    footer { padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
   }
+  .social-links { margin-top: 0 !important; }
   .footer-bottom p { font-size: 12px; color: var(--grey); }
   .sebi-badge { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--gold); background: rgba(201,168,76,0.1); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); }
   .social-links { display: flex; gap: 10px; margin-top: 16px; }
