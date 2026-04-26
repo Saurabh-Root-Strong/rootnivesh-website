@@ -110,6 +110,27 @@ function initPage(id) {
   if (id === 'learner') renderCourses('all');
   if (id === 'calls') { renderPlans(); renderCalls('intraday'); }
   if (id === 'ipo') { fetchIpo(currentIpoTab); }
+  if (id === 'contact') resetContactForm();
+}
+
+/* Bring the Contact form back to its empty pre-submission state.
+   Called every time the visitor lands on the Contact page so the
+   "Message Sent!" success block from a previous submission doesn't
+   replace the form for their next enquiry. */
+function resetContactForm() {
+  const wrap    = document.getElementById('contactFormWrap');
+  const success = document.getElementById('formSuccess');
+  if (wrap)    wrap.style.display = '';
+  if (success) success.classList.remove('show');
+  // Also clear all input values so it reads as a fresh form. Pre-fill
+  // logic in enquireFor() runs after this on the same tick, so plan /
+  // course / report context still lands in the message field.
+  ['cfName','cfLast','cfEmail','cfPhone','cfMessage'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const subj = document.getElementById('cfSubject');
+  if (subj) subj.selectedIndex = 0;
 }
 
 function toggleMenu() {
