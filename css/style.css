@@ -1279,6 +1279,11 @@
   @media (max-width: 768px) {
     .movers-grid { grid-template-columns: 1fr; gap: 12px; }
   }
+  /* Top Movers tables only have 3 short columns — they should fit
+     in any phone width. Override the global mobile rule that forces
+     all .table-wrap > table to 720px / 600px / 520px. */
+  .movers-card .table-wrap table { min-width: 0 !important; width: 100%; }
+  .movers-card .table-wrap::after { content: none !important; } /* drop swipe-hint gradient */
 
   /* ====== DISCLAIMER ====== */
   .disclaimer {
@@ -1298,7 +1303,24 @@
   footer ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
   footer ul li a { font-size: 13.5px; color: var(--grey2); text-decoration: none; transition: var(--transition); cursor: pointer; }
   footer ul li a:hover { color: var(--gold); }
-  .footer-bottom { padding-top: 28px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .footer-bottom {
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px;
+  }
+  /* Stack the three footer-bottom items cleanly on phones so the
+     copyright, SEBI badge, and disclaimer don't end up sitting on
+     top of each other. Also leave room for the floating WhatsApp
+     button (≈70px tall in its bottom-right). */
+  @media (max-width: 768px) {
+    .footer-bottom {
+      flex-direction: column; align-items: flex-start;
+      gap: 14px; padding-top: 24px;
+    }
+    .footer-bottom p { line-height: 1.5; }
+    footer { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+  }
   .footer-bottom p { font-size: 12px; color: var(--grey); }
   .sebi-badge { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--gold); background: rgba(201,168,76,0.1); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); }
   .social-links { display: flex; gap: 10px; margin-top: 16px; }
