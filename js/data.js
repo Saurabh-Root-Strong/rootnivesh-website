@@ -114,6 +114,7 @@ const PLANS = [
     icon: '🎯',
     tagline: 'Equity calls • WhatsApp delivery',
     type: 'subscription',
+    valueLabel: 'Basic Analysis',
     description: 'Beginner-friendly entry plan. 2–3 high-quality cash-segment equity calls every week, focused on swing and short-term trades, delivered on WhatsApp.',
     features: [
       '2–3 equity calls per week',
@@ -131,6 +132,7 @@ const PLANS = [
     icon: '🔥',
     tagline: 'Derivatives Edge — serious traders',
     type: 'subscription',
+    valueLabel: 'Deep Quant Research',
     description: 'Quant-driven futures & options playbook. Intraday + positional F&O calls, option strategies for BTST and expiry setups, with tight risk-reward discipline.',
     features: [
       'Intraday + positional F&O calls',
@@ -148,6 +150,7 @@ const PLANS = [
     icon: '💎',
     tagline: 'Dedicated advisory — multi-market',
     type: 'service',
+    valueLabel: 'Bespoke Advisory',
     description: 'Personalised, dedicated trade assistance. Calls customised to your capital, real portfolio tracking, and coverage across Equity, F&O, Forex and Commodity markets.',
     features: [
       'Dedicated relationship manager',
@@ -167,6 +170,7 @@ const PLANS = [
     icon: '🎓',
     tagline: '1-on-1 coaching • premium segment',
     type: 'program',
+    valueLabel: 'Lifetime Mastery',
     description: 'High-touch personal coaching. Strategy building, trader psychology, risk mastery and a lifetime framework you can apply across markets — not just signals you blindly follow.',
     features: [
       'Personal 1:1 coaching sessions',

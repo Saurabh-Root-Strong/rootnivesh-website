@@ -1394,8 +1394,13 @@
     display: flex; align-items: center; gap: 14px; flex-shrink: 0;
   }
   .plan-toggle-price {
-    font-family: 'Space Mono', monospace; font-size: 12.5px;
-    color: var(--grey2); white-space: nowrap;
+    font-family: 'Space Mono', monospace; font-size: 11.5px;
+    color: var(--gold); white-space: nowrap;
+    background: rgba(201,168,76,0.08);
+    border: 1px solid var(--border);
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.5px; text-transform: uppercase;
   }
   .plan-toggle-chev {
     font-size: 14px; color: var(--gold);
@@ -1583,7 +1588,7 @@
     .plan-card-toggle { padding: 14px 16px; gap: 10px; }
     .plan-toggle-name { font-size: 1.25rem; }
     .plan-toggle-icon { font-size: 22px; }
-    .plan-toggle-price { display: none; } /* save space on phones */
+    .plan-toggle-price { font-size: 11px; max-width: 96px; text-align: right; line-height: 1.25; }
     .plan-card.open .plan-collapse { max-height: 1600px; } /* extra room for stacked content */
   }
 

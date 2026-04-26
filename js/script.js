@@ -1197,16 +1197,13 @@ function renderPlanCard(p, openByDefault) {
     : 'data-plan-type="' + p.type + '" data-tier="' + defaultSelection.tierId + '"';
   const openClass = openByDefault ? ' open' : '';
 
-  // Quick price preview shown in the collapsed header
-  let pricePreview;
-  if (p.type === 'subscription') {
-    const t = defaultSelection.type;
-    pricePreview = 'from ' + fmtINR(p.pricing[t][1]) + ' / month';
-  } else if (p.type === 'service') {
-    pricePreview = 'from ' + fmtINR(p.tiers[0].price) + ' / month';
-  } else {
-    pricePreview = 'from ' + fmtINR(p.tiers[0].price);
-  }
+  // Value label for the collapsed header — sells the depth of the
+  // research, not the rupee figure. Falls back to a sensible default
+  // if the plan didn't define one.
+  const valueLabel = p.valueLabel ||
+    (p.type === 'subscription' ? 'Research-Backed Calls'
+   : p.type === 'service'      ? 'Premium Strategy'
+   :                              'Personal Mastery');
 
   return ''
     + '<div class="plan-card plan-card-' + p.type + openClass + '" id="plan-card-' + p.id + '" ' + dataAttrs + '>'
@@ -1221,7 +1218,7 @@ function renderPlanCard(p, openByDefault) {
     +       '</div>'
     +     '</div>'
     +     '<div class="plan-toggle-right">'
-    +       '<span class="plan-toggle-price">' + pricePreview + '</span>'
+    +       '<span class="plan-toggle-price">' + valueLabel + '</span>'
     +       '<span class="plan-toggle-chev">▾</span>'
     +     '</div>'
     +   '</button>'
@@ -1234,7 +1231,7 @@ function renderPlanCard(p, openByDefault) {
     +       '<div class="plan-controls">' + selector + '</div>'
     +     '</div>'
     +     '<div class="plan-pricing">'
-    +       '<div class="plan-pricing-title">' + (p.type === 'program' ? 'Programme Fee' : 'Pricing') + '</div>'
+    +       '<div class="plan-pricing-title">' + valueLabel + '</div>'
     +       '<div class="plan-pricing-meta">'
     +         '<span class="plan-pricing-meta-name">' + p.name + '</span>'
     +         '<span class="plan-pricing-meta-dur"  id="plan-pricing-dur-'  + p.id + '">—</span>'
