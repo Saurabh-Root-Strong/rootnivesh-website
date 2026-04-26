@@ -45,10 +45,6 @@
     /* Real RN logo bitmap — sized to fill available navbar height. */
     height: 42px; width: auto; display: block;
     object-fit: contain;
-    /* Logo has a transparent background; on the dark navy navbar
-       the dark-blue text in the logo can blend in slightly.
-       A subtle bright filter keeps it readable. */
-    filter: brightness(1.05) contrast(1.05);
   }
   /* Keep the old class names defined as no-ops in case any old
      cached HTML still references them — they render nothing. */
