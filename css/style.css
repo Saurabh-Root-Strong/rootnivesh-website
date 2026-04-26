@@ -1619,9 +1619,12 @@
   @media (max-width: 640px) {
     section { padding: 44px 0; }
     .container { padding: 0 1rem; }
-    nav { padding: 0 1rem; height: 80px; }
-    .ticker-tape { top: 80px; height: 32px; }
-    .hero { padding-top: 92px; }
+    nav { padding: 0 1rem; height: 60px; }
+    .nav-logo-img { height: 44px; }
+    .hamburger { width: 28px; height: 28px; gap: 4px; }
+    .hamburger span { width: 20px; }
+    .ticker-tape { top: 60px; height: 30px; }
+    .hero { padding-top: 76px; }
 
     h1 { font-size: clamp(2.1rem, 9vw, 2.9rem) !important; line-height: 1.08; }
     .hero-headline { font-size: clamp(1.7rem, 7.5vw, 2.4rem) !important; line-height: 1.18 !important; }
