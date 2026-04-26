@@ -114,7 +114,7 @@ const PLANS = [
     icon: '🎯',
     tagline: 'Equity calls • WhatsApp delivery',
     type: 'subscription',
-    valueLabel: 'Basic Analysis',
+    valueLabel: 'Smart Equity Picks',
     description: 'Beginner-friendly entry plan. 2–3 high-quality cash-segment equity calls every week, focused on swing and short-term trades, delivered on WhatsApp.',
     features: [
       '2–3 equity calls per week',
