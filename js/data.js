@@ -14,25 +14,31 @@
 
 /* ----------- URL routing -------------------------------------------------- */
 const PAGE_TO_PATH = {
-  home:     '/',
-  ipo:      '/ipo',
-  learner:  '/learner',
-  calls:    '/calls',
-  reports:  '/reports',
-  tools:    '/tools',
-  about:    '/about',
-  contact:  '/contact'
+  home:       '/',
+  ipo:        '/ipo',
+  learner:    '/learner',
+  calls:      '/calls',
+  reports:    '/reports',
+  tools:      '/tools',
+  about:      '/about',
+  contact:    '/contact',
+  privacy:    '/privacy',
+  terms:      '/terms',
+  disclaimer: '/disclaimer'
 };
 
 const PAGE_TITLES = {
-  home:    'RootNivesh Research | SEBI Registered Research Analyst',
-  ipo:     'New IPO | RootNivesh Research',
-  learner: 'Learner Club | RootNivesh Research',
-  calls:   'Trading & Investment Calls | RootNivesh Research',
-  reports: 'Research Reports | RootNivesh Research',
-  tools:   'Smart Calculators | RootNivesh Research',
-  about:   'About Us | RootNivesh Research',
-  contact: 'Contact | RootNivesh Research'
+  home:       'RootNivesh Research | SEBI Registered Research Analyst',
+  ipo:        'New IPO | RootNivesh Research',
+  learner:    'Learner Club | RootNivesh Research',
+  calls:      'Trading & Investment Calls | RootNivesh Research',
+  reports:    'Research Reports | RootNivesh Research',
+  tools:      'Smart Calculators | RootNivesh Research',
+  about:      'About Us | RootNivesh Research',
+  contact:    'Contact | RootNivesh Research',
+  privacy:    'Privacy Policy | RootNivesh Research',
+  terms:      'Terms of Use | RootNivesh Research',
+  disclaimer: 'Disclaimer | RootNivesh Research'
 };
 
 

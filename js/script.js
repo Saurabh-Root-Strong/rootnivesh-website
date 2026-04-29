@@ -660,8 +660,7 @@ async function fetchFiiDiiHistory() {
           const stale = !!payload.stale;
           dateEl.textContent =
             (stale ? 'Stale — last good: ' : 'As of ') +
-            (latest.date || payload.fetched_date || '') +
-            ' • Source: ' + (payload.source || 'Groww');
+            (latest.date || payload.fetched_date || '');
         }
 
         const statusEl = document.getElementById('histLoadStatus');
