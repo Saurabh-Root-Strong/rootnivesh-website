@@ -1347,19 +1347,34 @@ function subscribeToPlan(planId) {
   const plan = PLANS.find(p => p.id === planId);
   if (!card || !plan) return;
 
-  let label;
+  // Build a plan-specific WhatsApp greeting that includes the exact
+  // selection (subscription duration / tier) and the price the visitor
+  // saw, so the team can confirm the order in one message.
+  let summary, priceLine = '';
   if (plan.type === 'subscription') {
-    const type = card.getAttribute('data-type');
-    const dur  = card.getAttribute('data-duration');
+    const type   = card.getAttribute('data-type');
+    const dur    = card.getAttribute('data-duration');
     const dlabel = (PLAN_DURATIONS.find(d => String(d.months) === String(dur)) || {}).label || dur + ' Months';
-    label = plan.name + ' — ' + TYPE_LABELS[type] + ' • ' + dlabel;
+    const price  = (plan.pricing[type] || {})[dur];
+    summary   = plan.name + ' — ' + (TYPE_LABELS[type] || type) + ' • ' + dlabel;
+    if (price != null) priceLine = '\nPrice: ' + fmtINR(price) + ' (+ 18% GST)';
   } else {
     const tierId = card.getAttribute('data-tier');
     const tier   = (plan.tiers || []).find(t => t.id === tierId) || plan.tiers[0];
-    label = plan.name + ' — ' + tier.name + ' (' + fmtINR(tier.price) + (tier.suffix || '') + ')';
+    summary   = plan.name + ' — ' + tier.name;
+    priceLine = '\nPrice: ' + fmtINR(tier.price) + (tier.suffix || '') + ' (+ 18% GST)';
   }
-  const intent = plan.type === 'program' ? 'enrol' : 'subscribe';
-  enquireFor(plan.type === 'program' ? 'Mentorship Program' : 'Premium Plan', label, intent);
+
+  const verb = plan.type === 'program' ? 'enrol in' : 'subscribe to';
+  const message =
+    'Hi RootNivesh, I\'d like to ' + verb + ':\n' +
+    '*' + summary + '*' +
+    priceLine +
+    '\n\nPlease share the next steps to get started.';
+
+  const number = (typeof WHATSAPP_NUMBER !== 'undefined') ? WHATSAPP_NUMBER : '917467094575';
+  const url = 'https://wa.me/' + number + '?text=' + encodeURIComponent(message);
+  window.open(url, '_blank', 'noopener');
 }
 
 /* Generic "send me details about X" entry point used by every

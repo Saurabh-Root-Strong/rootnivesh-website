@@ -113,6 +113,10 @@ const IPO_DESCRIPTIONS = {};
    --------------------------------------------------------------------- */
 const GST_RATE = 0.18;
 
+// WhatsApp business number used by the "Get Started" CTAs across plans.
+// Format: country code + number, no plus or spaces (wa.me requirement).
+const WHATSAPP_NUMBER = '917467094575';
+
 const PLANS = [
   {
     id: 'starter',
@@ -129,7 +133,7 @@ const PLANS = [
       'WhatsApp + email delivery'
     ],
     pricing: {
-      cash: { 1: 2999, 3: 7999, 6: 14999, 12: 24999 }
+      cash: { 1: 299, 3: 799, 6: 1499, 12: 2799 }
     }
   },
   {
@@ -138,7 +142,7 @@ const PLANS = [
     icon: '🔥',
     tagline: 'Derivatives Edge — serious traders',
     type: 'subscription',
-    valueLabel: 'Deep Quant Research',
+    valueLabel: 'Derivatives Edge',
     description: 'Quant-driven futures & options playbook. Intraday + positional F&O calls, option strategies for BTST and expiry setups, with tight risk-reward discipline.',
     features: [
       'Intraday + positional F&O calls',
@@ -147,7 +151,25 @@ const PLANS = [
       'Faster, real-time WhatsApp updates'
     ],
     pricing: {
-      fno: { 1: 5999, 3: 15999, 6: 29999, 12: 54999 }
+      fno: { 1: 599, 3: 1599, 6: 2999, 12: 5499 }
+    }
+  },
+  {
+    id: 'deep-quant',
+    name: 'Deep Quant Research',
+    icon: '🧠',
+    tagline: 'Quant + fundamentals — research depth',
+    type: 'subscription',
+    valueLabel: 'Deep Quant Research',
+    description: 'Our flagship research stream. Combines factor-driven quant screening across 4,000+ NSE/BSE names with deep fundamental analysis, multi-timeframe technicals and sector context for high-conviction calls.',
+    features: [
+      'Quant-screened high-conviction calls',
+      'Factor models: momentum, quality, value',
+      'Sector / macro context with every call',
+      'Cash + F&O + select positional ideas'
+    ],
+    pricing: {
+      research: { 1: 799, 3: 2199, 6: 3999, 12: 7499 }
     }
   },
   {
@@ -165,9 +187,9 @@ const PLANS = [
       'Multi-market: Equity / F&O / Forex / Commodity'
     ],
     tiers: [
-      { id: 'standard', name: 'Standard', price: 9999,  suffix: '/month', note: 'Core advisory access' },
-      { id: 'premium',  name: 'Premium',  price: 19999, suffix: '/month', note: 'Faster turnaround + portfolio review' },
-      { id: 'ultra',    name: 'Ultra',    price: 34999, suffix: '/month', note: 'Concierge service across all markets' }
+      { id: 'standard', name: 'Standard', price: 999,  suffix: '/month', note: 'Core advisory access' },
+      { id: 'premium',  name: 'Premium',  price: 1999, suffix: '/month', note: 'Faster turnaround + portfolio review' },
+      { id: 'ultra',    name: 'Ultra',    price: 3499, suffix: '/month', note: 'Concierge service across all markets' }
     ]
   },
   {
@@ -185,9 +207,9 @@ const PLANS = [
       'Lifetime framework, not just signals'
     ],
     tiers: [
-      { id: 'beginner', name: 'Beginner Program',     price: 15000, suffix: '',  note: 'Foundation in research-driven trading' },
-      { id: 'advanced', name: 'Advanced Trading',     price: 25000, suffix: '',  note: 'Quant + technical + risk integration' },
-      { id: 'mastery',  name: 'Complete Mastery',     price: 45000, suffix: '+', note: 'All-markets framework, lifetime access' }
+      { id: 'beginner', name: 'Beginner Program',     price: 14999, suffix: '',  note: 'Foundation in research-driven trading' },
+      { id: 'advanced', name: 'Advanced Trading',     price: 24999, suffix: '',  note: 'Quant + technical + risk integration' },
+      { id: 'mastery',  name: 'Complete Mastery',     price: 39999, suffix: '+', note: 'All-markets framework, lifetime access' }
     ]
   }
 ];
@@ -199,7 +221,7 @@ const PLAN_DURATIONS = [
   { months: 12, label: '12 Months' }
 ];
 
-const TYPE_LABELS = { cash: 'Cash', fno: 'F&O' };
+const TYPE_LABELS = { cash: 'Cash', fno: 'F&O', research: 'Research' };
 
 
 /* ----------- Sample research reports (homepage / Reports page) ------------ */
