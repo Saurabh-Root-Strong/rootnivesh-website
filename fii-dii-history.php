@@ -108,10 +108,13 @@ function fetch_groww_history() {
 
         // Buy/sell values when Groww provides them — used by the live tiles
         // so the headline numbers always reconcile with the net (buy − sell = net).
-        $fiiBuy  = $entry['fii']['buyValue']  ?? null;
-        $fiiSell = $entry['fii']['sellValue'] ?? null;
-        $diiBuy  = $entry['dii']['buyValue']  ?? null;
-        $diiSell = $entry['dii']['sellValue'] ?? null;
+        // Try several path variants because Groww's __NEXT_DATA__ schema has
+        // changed across releases (sometimes buyValue, sometimes grossBuy,
+        // sometimes nested under "gross").
+        $fiiBuy  = $entry['fii']['buyValue']  ?? $entry['fii']['grossBuy']  ?? $entry['fii']['totalBuy']  ?? $entry['fii']['gross']['buy']  ?? $entry['fii']['buy']  ?? null;
+        $fiiSell = $entry['fii']['sellValue'] ?? $entry['fii']['grossSell'] ?? $entry['fii']['totalSell'] ?? $entry['fii']['gross']['sell'] ?? $entry['fii']['sell'] ?? null;
+        $diiBuy  = $entry['dii']['buyValue']  ?? $entry['dii']['grossBuy']  ?? $entry['dii']['totalBuy']  ?? $entry['dii']['gross']['buy']  ?? $entry['dii']['buy']  ?? null;
+        $diiSell = $entry['dii']['sellValue'] ?? $entry['dii']['grossSell'] ?? $entry['dii']['totalSell'] ?? $entry['dii']['gross']['sell'] ?? $entry['dii']['sell'] ?? null;
 
         $rows[] = [
             'date'    => format_date($date),

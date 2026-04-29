@@ -410,6 +410,16 @@ function applyFiiDii(fii, dii) {
   // We treat null/undefined as missing (Groww sometimes omits buy/sell). 0 is
   // a valid value (a no-trade day) and stays "available".
   const has = v => v !== null && v !== undefined && !isNaN(parseFloat(v));
+  // Hide a card's Buy/Sell sub-row entirely when neither value is available,
+  // so the tile doesn't show stranded "—" placeholders.
+  const setBsRowVisible = (cardId, visible) => {
+    const card = document.getElementById(cardId);
+    if (!card) return;
+    const row = card.querySelector('.fiidii-bsrow');
+    if (row) row.style.display = visible ? '' : 'none';
+    const bar = card.querySelector('.fiidii-bar-wrap');
+    if (bar) bar.style.display = visible ? '' : 'none';
+  };
 
   // FII
   const fiiNet = parseFloat(fii.netValue || fii.NET_VALUE || 0);
@@ -418,11 +428,15 @@ function applyFiiDii(fii, dii) {
   const fiiBuy  = has(fiiBuyRaw)  ? parseFloat(fiiBuyRaw)  : 0;
   const fiiSell = has(fiiSellRaw) ? parseFloat(fiiSellRaw) : 0;
   const fiiPos = fiiNet >= 0;
+  const fiiHasBs = has(fiiBuyRaw) || has(fiiSellRaw);
   document.getElementById('fiiNet').textContent   = fmtCr(fiiNet);
   document.getElementById('fiiNet').className     = 'fiidii-net ' + (fiiPos ? 'pos' : 'neg');
   document.getElementById('fiiNetLabel').textContent = fiiPos ? 'Net Buy' : 'Net Sell';
-  document.getElementById('fiiBuy').textContent  = has(fiiBuyRaw)  ? fmtCrAbs(fiiBuy)  : '—';
-  document.getElementById('fiiSell').textContent = has(fiiSellRaw) ? fmtCrAbs(fiiSell) : '—';
+  if (fiiHasBs) {
+    document.getElementById('fiiBuy').textContent  = has(fiiBuyRaw)  ? fmtCrAbs(fiiBuy)  : '—';
+    document.getElementById('fiiSell').textContent = has(fiiSellRaw) ? fmtCrAbs(fiiSell) : '—';
+  }
+  setBsRowVisible('fiiCard', fiiHasBs);
   const fiiBadge = document.getElementById('fiiBadge');
   fiiBadge.textContent = fiiPos ? 'NET BUY' : 'NET SELL';
   fiiBadge.className   = 'fiidii-net-badge ' + (fiiPos ? 'buy-badge' : 'sell-badge');
@@ -436,11 +450,15 @@ function applyFiiDii(fii, dii) {
   const diiBuy  = has(diiBuyRaw)  ? parseFloat(diiBuyRaw)  : 0;
   const diiSell = has(diiSellRaw) ? parseFloat(diiSellRaw) : 0;
   const diiPos = diiNet >= 0;
+  const diiHasBs = has(diiBuyRaw) || has(diiSellRaw);
   document.getElementById('diiNet').textContent   = fmtCr(diiNet);
   document.getElementById('diiNet').className     = 'fiidii-net ' + (diiPos ? 'pos' : 'neg');
   document.getElementById('diiNetLabel').textContent = diiPos ? 'Net Buy' : 'Net Sell';
-  document.getElementById('diiBuy').textContent  = has(diiBuyRaw)  ? fmtCrAbs(diiBuy)  : '—';
-  document.getElementById('diiSell').textContent = has(diiSellRaw) ? fmtCrAbs(diiSell) : '—';
+  if (diiHasBs) {
+    document.getElementById('diiBuy').textContent  = has(diiBuyRaw)  ? fmtCrAbs(diiBuy)  : '—';
+    document.getElementById('diiSell').textContent = has(diiSellRaw) ? fmtCrAbs(diiSell) : '—';
+  }
+  setBsRowVisible('diiCard', diiHasBs);
   const diiBadge = document.getElementById('diiBadge');
   diiBadge.textContent = diiPos ? 'NET BUY' : 'NET SELL';
   diiBadge.className   = 'fiidii-net-badge ' + (diiPos ? 'buy-badge' : 'sell-badge');

@@ -1229,6 +1229,31 @@
     .fiidii-cards { grid-template-columns: 1fr; }
   }
 
+  /* Make sure the FII/DII section never overflows the viewport on
+     phones — defensive sizing for cards, sentiment box, and the
+     30-day historical table. */
+  @media (max-width: 640px) {
+    .fiidii-master-grid { gap: 12px; }
+    .fiidii-card { padding: 14px 14px; }
+    .fiidii-sentiment { padding: 14px 14px; min-width: 0; }
+    .fiidii-net { font-size: 1.15rem; word-break: break-word; }
+    .fiidii-bsrow { gap: 10px; flex-wrap: wrap; }
+
+    .hist-table th, .hist-table td { padding: 6px 6px; font-size: 10.5px; }
+    .hist-table .td-date { font-size: 9.5px; }
+    .hist-flow-bar { gap: 2px; height: 12px; }
+    .hist-fii-bar, .hist-dii-bar { height: 6px; }
+    /* Last-line-of-defence: allow horizontal scroll inside the table
+       wrapper if content still exceeds viewport on a very narrow phone. */
+    .hist-scroll { overflow-x: auto; }
+  }
+  @media (max-width: 380px) {
+    .hist-table th, .hist-table td { padding: 5px 5px; font-size: 10px; }
+    .fiidii-net { font-size: 1.05rem; }
+    .fiidii-bs-val { font-size: 10.5px; }
+    .fiidii-bs-label { font-size: 9px; }
+  }
+
   /* ====== TOP MOVERS (Gainers / Losers) ====== */
   .movers-header {
     display: flex; align-items: center; justify-content: space-between;
