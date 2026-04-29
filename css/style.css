@@ -1265,7 +1265,11 @@
   }
   .movers-card {
     background: rgba(11,28,52,0.7); border: 1px solid var(--border);
-    border-radius: 14px; padding: 14px 14px 12px;
+    border-radius: 14px; padding: 14px 16px 12px;
+    min-width: 0; /* allow grid item to shrink so the table never overflows */
+  }
+  .movers-card .table-wrap {
+    width: 100%; overflow: hidden; /* no horizontal scroll for these short tables */
   }
   .movers-card-header {
     display: flex; align-items: center; gap: 8px;
@@ -1280,7 +1284,24 @@
   }
   .movers-gainers .movers-card-title { color: var(--green); }
   .movers-losers  .movers-card-title { color: var(--red); }
-  .movers-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+
+  /* Fixed table layout + explicit column widths so the 3 short
+     columns spread evenly across the full card width. Without this,
+     browsers shrink columns to content and dump leftover space at
+     the end of the row, leaving a big empty gap on the right. */
+  .movers-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .movers-table th:nth-child(1),
+  .movers-table td:nth-child(1) { width: 44%; }
+  .movers-table th:nth-child(2),
+  .movers-table td:nth-child(2) { width: 28%; }
+  .movers-table th:nth-child(3),
+  .movers-table td:nth-child(3) { width: 28%; }
+
   .movers-table th {
     padding: 6px 10px; text-align: left;
     font-family: 'Space Mono', monospace; font-size: 9.5px;
@@ -1292,21 +1313,42 @@
   .movers-table td:nth-child(2),
   .movers-table td:nth-child(3) { text-align: right; }
   .movers-table td {
-    padding: 7px 10px; font-family: 'Space Mono', monospace;
+    padding: 8px 10px; font-family: 'Space Mono', monospace;
     border-top: 1px solid rgba(255,255,255,0.04);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   .movers-table .mv-symbol { color: var(--white); font-weight: 700; font-size: 11.5px; }
   .movers-table .mv-price  { color: var(--grey2); font-size: 11.5px; }
   .movers-table .mv-pct-up   { color: var(--green); font-weight: 700; font-size: 12px; }
   .movers-table .mv-pct-down { color: var(--red);   font-weight: 700; font-size: 12px; }
+
+  /* Tablet & phone: stack the two cards */
   @media (max-width: 768px) {
     .movers-grid { grid-template-columns: 1fr; gap: 12px; }
+    .movers-card { padding: 14px 14px 10px; }
+    .movers-table th { padding: 6px 8px; font-size: 9px; }
+    .movers-table td { padding: 7px 8px; }
+    .movers-table .mv-symbol,
+    .movers-table .mv-price { font-size: 11px; }
+    .movers-table .mv-pct-up,
+    .movers-table .mv-pct-down { font-size: 11.5px; }
   }
-  /* Top Movers tables only have 3 short columns — they should fit
-     in any phone width. Override the global mobile rule that forces
-     all .table-wrap > table to 720px / 600px / 520px. */
+  /* Very narrow phones — keep all 3 columns visible without overflow */
+  @media (max-width: 380px) {
+    .movers-card { padding: 12px 10px 8px; }
+    .movers-table th { padding: 5px 6px; font-size: 8.5px; letter-spacing: 0.5px; }
+    .movers-table td { padding: 6px 6px; }
+    .movers-table .mv-symbol,
+    .movers-table .mv-price { font-size: 10.5px; }
+    .movers-table .mv-pct-up,
+    .movers-table .mv-pct-down { font-size: 11px; }
+  }
+
+  /* Top Movers tables have only 3 short columns — they should fit in any
+     viewport. Override the global mobile rule that forces all .table-wrap
+     tables to a 720/600/520px min-width and the swipe-hint gradient. */
   .movers-card .table-wrap table { min-width: 0 !important; width: 100%; }
-  .movers-card .table-wrap::after { content: none !important; } /* drop swipe-hint gradient */
+  .movers-card .table-wrap::after { content: none !important; }
 
   /* ====== DISCLAIMER ====== */
   .disclaimer {
