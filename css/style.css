@@ -1637,6 +1637,80 @@
     margin: -2px 0 0; min-height: 1.2em;
   }
 
+  /* ====== Plan chips (fancy sub-category descriptors) ====== */
+  .plan-chips-row {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin: 0 0 16px;
+  }
+  .plan-chip {
+    display: inline-flex; align-items: center;
+    background: linear-gradient(135deg, rgba(201,168,76,0.14), rgba(201,168,76,0.06));
+    border: 1px solid rgba(201,168,76,0.35);
+    color: var(--gold);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.6px;
+    padding: 4px 10px; border-radius: 999px;
+    text-transform: uppercase; white-space: nowrap;
+  }
+
+  /* ====== Offer ribbon next to plan name (LAUNCH OFFER, FLAGSHIP, etc.) ====== */
+  .plan-offer-ribbon {
+    display: inline-block;
+    background: linear-gradient(135deg, #E74C3C, #C0392B);
+    color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 8.5px; font-weight: 700;
+    letter-spacing: 1px;
+    padding: 2px 7px; border-radius: 4px;
+    margin-left: 8px; vertical-align: middle;
+    box-shadow: 0 2px 6px rgba(231,76,60,0.35);
+    text-transform: uppercase;
+  }
+
+  /* ====== Discount badge (X% OFF — pill in the pricing header) ====== */
+  .plan-discount-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #27ae60, #1e874b);
+    color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 9.5px; font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: 3px 9px; border-radius: 999px;
+    margin-left: 6px; vertical-align: middle;
+    box-shadow: 0 2px 8px rgba(46,204,113,0.3);
+  }
+
+  /* ====== MRP strike-through row above the payable price ====== */
+  .plan-pricing-mrp-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 12px; color: var(--grey);
+    margin-top: -4px;
+  }
+  .plan-pricing-mrp-label {
+    font-family: 'Space Mono', monospace; font-size: 10.5px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .plan-pricing-mrp {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px; color: var(--grey);
+    text-decoration: line-through;
+    text-decoration-color: rgba(231,76,60,0.7);
+    text-decoration-thickness: 1.5px;
+  }
+
+  /* ====== "You save ₹X (50% off)" line under the payable price ====== */
+  .plan-pricing-saved {
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; color: var(--green);
+    background: rgba(46,204,113,0.08);
+    border: 1px solid rgba(46,204,113,0.2);
+    border-radius: 8px;
+    padding: 6px 8px; margin: -2px 0 4px;
+    letter-spacing: 0.3px;
+  }
+
   /* ====== Hero tagline (the deep-quant line) ====== */
   .hero-tagline {
     margin-top: 14px; font-size: 13px; color: var(--grey2);

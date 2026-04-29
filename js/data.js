@@ -117,6 +117,11 @@ const GST_RATE = 0.18;
 // Format: country code + number, no plus or spaces (wa.me requirement).
 const WHATSAPP_NUMBER = '917467094575';
 
+// Each plan carries a `discountPct` so the displayed MRP (strike-through)
+// is computed as: mrp = price / (1 - discountPct/100). 50% across all
+// plans keeps the maths clean (mrp = price × 2) and the offer credible.
+// `chips` are short fancy descriptors shown as pills on each card.
+// `offerLabel` overlays a launch-style ribbon on the card header.
 const PLANS = [
   {
     id: 'starter',
@@ -125,12 +130,15 @@ const PLANS = [
     tagline: 'Equity calls • WhatsApp delivery',
     type: 'subscription',
     valueLabel: 'Smart Equity Picks',
-    description: 'Beginner-friendly entry plan. 2–3 high-quality cash-segment equity calls every week, focused on swing and short-term trades, delivered on WhatsApp.',
+    chips: ['Index-Based', 'Equity Delivery', 'WhatsApp Calls', 'Beginner Friendly'],
+    discountPct: 50,
+    offerLabel: 'LAUNCH OFFER',
+    description: 'Beginner-friendly entry plan. 2–3 high-quality index-based and large-cap cash-segment calls every week, delivered on WhatsApp with research-grade reasoning behind every pick.',
     features: [
-      '2–3 equity calls per week',
-      'Swing + short-term trades',
-      'Basic risk-management guidance',
-      'WhatsApp + email delivery'
+      '2–3 index-based equity calls per week',
+      'Cash-segment delivery, no leverage stress',
+      'Research-backed entry, target & stop-loss',
+      'Instant WhatsApp + email delivery'
     ],
     pricing: {
       cash: { 1: 299, 3: 799, 6: 1499, 12: 2799 }
@@ -140,15 +148,18 @@ const PLANS = [
     id: 'pro-fno',
     name: 'Pro F&O',
     icon: '🔥',
-    tagline: 'Derivatives Edge — serious traders',
+    tagline: 'Index derivatives — serious traders',
     type: 'subscription',
     valueLabel: 'Derivatives Edge',
-    description: 'Quant-driven futures & options playbook. Intraday + positional F&O calls, option strategies for BTST and expiry setups, with tight risk-reward discipline.',
+    chips: ['Index Derivatives', 'Options Edge', 'Real-Time Alerts', 'BTST + Expiry'],
+    discountPct: 50,
+    offerLabel: 'LAUNCH OFFER',
+    description: 'Quant-driven Nifty / BankNifty futures & options playbook. Intraday + positional F&O calls, option spreads for BTST and expiry setups, with tight risk-reward discipline on every trade.',
     features: [
-      'Intraday + positional F&O calls',
-      'Option strategies (BTST, expiry setups)',
+      'Index derivatives + stock F&O calls',
+      'Option spreads (BTST, expiry plays)',
       'Defined risk : reward on every trade',
-      'Faster, real-time WhatsApp updates'
+      'Real-time WhatsApp alerts during market hours'
     ],
     pricing: {
       fno: { 1: 599, 3: 1599, 6: 2999, 12: 5499 }
@@ -158,15 +169,18 @@ const PLANS = [
     id: 'deep-quant',
     name: 'Deep Quant Research',
     icon: '🧠',
-    tagline: 'Quant + fundamentals — research depth',
+    tagline: 'Research delivery — institutional depth',
     type: 'subscription',
-    valueLabel: 'Deep Quant Research',
-    description: 'Our flagship research stream. Combines factor-driven quant screening across 4,000+ NSE/BSE names with deep fundamental analysis, multi-timeframe technicals and sector context for high-conviction calls.',
+    valueLabel: 'Research-Delivery',
+    chips: ['Research Delivery', 'Multi-Factor Quant', '4,000+ Stocks Screened', 'Cross-Segment'],
+    discountPct: 50,
+    offerLabel: 'FLAGSHIP',
+    description: 'Our flagship research stream. Multi-factor quant screening across 4,000+ NSE/BSE names is fused with deep fundamental analysis, multi-timeframe technicals, and sector-macro context — delivered as high-conviction research-backed calls.',
     features: [
-      'Quant-screened high-conviction calls',
-      'Factor models: momentum, quality, value',
-      'Sector / macro context with every call',
-      'Cash + F&O + select positional ideas'
+      'Research-delivery: full thesis with every call',
+      'Multi-factor quant screening (momentum, quality, value)',
+      'Sector + macro context layered on every pick',
+      'Cash + F&O + positional coverage'
     ],
     pricing: {
       research: { 1: 799, 3: 2199, 6: 3999, 12: 7499 }
@@ -176,14 +190,17 @@ const PLANS = [
     id: 'elite',
     name: 'Elite',
     icon: '💎',
-    tagline: 'Dedicated advisory — multi-market',
+    tagline: 'Bespoke advisory — multi-market',
     type: 'service',
     valueLabel: 'Bespoke Advisory',
-    description: 'Personalised, dedicated trade assistance. Calls customised to your capital, real portfolio tracking, and coverage across Equity, F&O, Forex and Commodity markets.',
+    chips: ['Bespoke Strategy', 'Multi-Market', 'Portfolio Tracking', 'Dedicated RM'],
+    discountPct: 50,
+    offerLabel: 'PREMIUM',
+    description: 'Personalised, dedicated trade assistance. Calls customised to your capital, real portfolio tracking, and coverage across Equity, F&O, Forex and Commodity markets — all anchored to your individual risk profile.',
     features: [
       'Dedicated relationship manager',
       'Calls customised to your capital',
-      'Portfolio tracking & rebalancing',
+      'Live portfolio tracking & rebalancing',
       'Multi-market: Equity / F&O / Forex / Commodity'
     ],
     tiers: [
@@ -199,10 +216,13 @@ const PLANS = [
     tagline: '1-on-1 coaching • premium segment',
     type: 'program',
     valueLabel: 'Lifetime Mastery',
+    chips: ['1:1 Coaching', 'Lifetime Framework', 'Quant + Technical', 'All Markets'],
+    discountPct: 50,
+    offerLabel: 'EXCLUSIVE',
     description: 'High-touch personal coaching. Strategy building, trader psychology, risk mastery and a lifetime framework you can apply across markets — not just signals you blindly follow.',
     features: [
       'Personal 1:1 coaching sessions',
-      'Live strategy building',
+      'Live strategy building & back-testing',
       'Trader psychology + risk mastery',
       'Lifetime framework, not just signals'
     ],

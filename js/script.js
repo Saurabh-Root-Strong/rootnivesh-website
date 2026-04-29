@@ -1251,6 +1251,32 @@ function renderPlanCard(p, openByDefault) {
    : p.type === 'service'      ? 'Premium Strategy'
    :                              'Personal Mastery');
 
+  // Optional fancy chips (e.g. "Index-Based", "Research Delivery") and
+  // small ribbon (e.g. "LAUNCH OFFER") next to the plan name.
+  const chipsHTML = (p.chips && p.chips.length)
+    ? '<div class="plan-chips-row">' +
+        p.chips.map(c => '<span class="plan-chip">' + c + '</span>').join('') +
+      '</div>'
+    : '';
+  const offerRibbon = p.offerLabel
+    ? '<span class="plan-offer-ribbon">' + p.offerLabel + '</span>'
+    : '';
+  const discountPct = (typeof p.discountPct === 'number' && p.discountPct > 0 && p.discountPct < 90)
+    ? p.discountPct
+    : 0;
+  const discountBadgeHTML = discountPct
+    ? '<span class="plan-discount-badge" id="plan-disc-' + p.id + '">' + discountPct + '% OFF</span>'
+    : '';
+  const mrpRowHTML = discountPct
+    ? '<div class="plan-pricing-mrp-row">' +
+        '<span class="plan-pricing-mrp-label">MRP</span>' +
+        '<span class="plan-pricing-mrp" id="plan-mrp-' + p.id + '">—</span>' +
+      '</div>'
+    : '';
+  const savedRowHTML = discountPct
+    ? '<p class="plan-pricing-saved" id="plan-saved-' + p.id + '"></p>'
+    : '';
+
   return ''
     + '<div class="plan-card plan-card-' + p.type + openClass + '" id="plan-card-' + p.id + '" ' + dataAttrs + '>'
 
@@ -1259,7 +1285,7 @@ function renderPlanCard(p, openByDefault) {
     +     '<div class="plan-toggle-left">'
     +       '<span class="plan-toggle-icon">' + p.icon + '</span>'
     +       '<div class="plan-toggle-text">'
-    +         '<span class="plan-toggle-name">' + p.name + '</span>'
+    +         '<span class="plan-toggle-name">' + p.name + ' ' + offerRibbon + '</span>'
     +         '<span class="plan-toggle-tagline">' + p.tagline + '</span>'
     +       '</div>'
     +     '</div>'
@@ -1272,20 +1298,23 @@ function renderPlanCard(p, openByDefault) {
     // ── COLLAPSIBLE BODY ─────────────────────────────────────────────
     +   '<div class="plan-collapse">'
     +     '<div class="plan-body">'
+    +       chipsHTML
     +       '<p class="plan-desc">' + p.description + '</p>'
     +       (featuresList ? '<ul class="plan-features-list">' + featuresList + '</ul>' : '')
     +       '<div class="plan-controls">' + selector + '</div>'
     +     '</div>'
     +     '<div class="plan-pricing">'
-    +       '<div class="plan-pricing-title">' + valueLabel + '</div>'
+    +       '<div class="plan-pricing-title">' + valueLabel + ' ' + discountBadgeHTML + '</div>'
     +       '<div class="plan-pricing-meta">'
     +         '<span class="plan-pricing-meta-name">' + p.name + '</span>'
     +         '<span class="plan-pricing-meta-dur"  id="plan-pricing-dur-'  + p.id + '">—</span>'
     +       '</div>'
+    +       mrpRowHTML
     +       '<div class="plan-pricing-payable">'
     +         '<span>' + (p.type === 'service' ? 'Per Month' : p.type === 'program' ? 'One-time' : 'Total') + '</span>'
     +         '<span id="plan-payable-' + p.id + '">—</span>'
     +       '</div>'
+    +       savedRowHTML
     +       '<p class="plan-pricing-note" id="plan-note-' + p.id + '"></p>'
     +       '<button class="btn btn-gold plan-cta" onclick="subscribeToPlan(\'' + p.id + '\')">'
     +         (p.type === 'program' ? 'Apply for Programme' : 'Get Started')
@@ -1322,23 +1351,45 @@ function updatePlanPricing(planId) {
   const durEl     = document.getElementById('plan-pricing-dur-'   + planId);
   const payableEl = document.getElementById('plan-payable-' + planId);
   const noteEl    = document.getElementById('plan-note-'    + planId);
+  const mrpEl     = document.getElementById('plan-mrp-'     + planId);
+  const savedEl   = document.getElementById('plan-saved-'   + planId);
 
+  // Helper: given a selling price and a discountPct, compute the MRP
+  // such that price = MRP × (1 - discount/100). Returns null if no
+  // discount configured for this plan.
+  const discountPct = (typeof plan.discountPct === 'number' && plan.discountPct > 0 && plan.discountPct < 90)
+    ? plan.discountPct : 0;
+  const computeMrp = (price) => discountPct
+    ? Math.round(price / (1 - discountPct / 100))
+    : null;
+
+  let basePrice, suffix = '';
   if (plan.type === 'subscription') {
     const type = card.getAttribute('data-type');
     const dur  = card.getAttribute('data-duration');
-    const base = (plan.pricing[type] || {})[dur];
-    if (base == null) return;
+    basePrice = (plan.pricing[type] || {})[dur];
+    if (basePrice == null) return;
     const dlabel = (PLAN_DURATIONS.find(d => String(d.months) === String(dur)) || {}).label || dur + ' Months';
     if (durEl)     durEl.textContent     = dlabel;
-    if (payableEl) payableEl.textContent = fmtINR(base);
+    if (payableEl) payableEl.textContent = fmtINR(basePrice);
     if (noteEl)    noteEl.textContent    = '';
   } else {
     const tierId = card.getAttribute('data-tier');
     const tier   = (plan.tiers || []).find(t => t.id === tierId) || plan.tiers[0];
     if (!tier) return;
+    basePrice = tier.price;
+    suffix    = tier.suffix || '';
     if (durEl)     durEl.textContent     = tier.name;
-    if (payableEl) payableEl.textContent = fmtINR(tier.price) + (tier.suffix || '');
+    if (payableEl) payableEl.textContent = fmtINR(basePrice) + suffix;
     if (noteEl)    noteEl.textContent    = tier.note || '';
+  }
+
+  // MRP + savings line — only present in DOM when this plan has a discount.
+  if (mrpEl && savedEl && discountPct) {
+    const mrp = computeMrp(basePrice);
+    const saved = mrp - basePrice;
+    mrpEl.textContent   = fmtINR(mrp) + suffix;
+    savedEl.textContent = 'You save ' + fmtINR(saved) + ' (' + discountPct + '% off)';
   }
 }
 
