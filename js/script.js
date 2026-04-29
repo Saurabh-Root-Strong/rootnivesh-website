@@ -406,16 +406,23 @@ function fmtCrAbs(val) {
 }
 
 function applyFiiDii(fii, dii) {
+  // Helper: a buy/sell value is "available" if it's a finite, non-null number.
+  // We treat null/undefined as missing (Groww sometimes omits buy/sell). 0 is
+  // a valid value (a no-trade day) and stays "available".
+  const has = v => v !== null && v !== undefined && !isNaN(parseFloat(v));
+
   // FII
   const fiiNet = parseFloat(fii.netValue || fii.NET_VALUE || 0);
-  const fiiBuy = parseFloat(fii.buyValue  || fii.BUY_VALUE  || 0);
-  const fiiSell= parseFloat(fii.sellValue || fii.SELL_VALUE || 0);
+  const fiiBuyRaw  = fii.buyValue  ?? fii.BUY_VALUE;
+  const fiiSellRaw = fii.sellValue ?? fii.SELL_VALUE;
+  const fiiBuy  = has(fiiBuyRaw)  ? parseFloat(fiiBuyRaw)  : 0;
+  const fiiSell = has(fiiSellRaw) ? parseFloat(fiiSellRaw) : 0;
   const fiiPos = fiiNet >= 0;
   document.getElementById('fiiNet').textContent   = fmtCr(fiiNet);
   document.getElementById('fiiNet').className     = 'fiidii-net ' + (fiiPos ? 'pos' : 'neg');
   document.getElementById('fiiNetLabel').textContent = fiiPos ? 'Net Buy' : 'Net Sell';
-  document.getElementById('fiiBuy').textContent  = fmtCrAbs(fiiBuy);
-  document.getElementById('fiiSell').textContent = fmtCrAbs(fiiSell);
+  document.getElementById('fiiBuy').textContent  = has(fiiBuyRaw)  ? fmtCrAbs(fiiBuy)  : '—';
+  document.getElementById('fiiSell').textContent = has(fiiSellRaw) ? fmtCrAbs(fiiSell) : '—';
   const fiiBadge = document.getElementById('fiiBadge');
   fiiBadge.textContent = fiiPos ? 'NET BUY' : 'NET SELL';
   fiiBadge.className   = 'fiidii-net-badge ' + (fiiPos ? 'buy-badge' : 'sell-badge');
@@ -424,14 +431,16 @@ function applyFiiDii(fii, dii) {
 
   // DII
   const diiNet = parseFloat(dii.netValue || dii.NET_VALUE || 0);
-  const diiBuy = parseFloat(dii.buyValue  || dii.BUY_VALUE  || 0);
-  const diiSell= parseFloat(dii.sellValue || dii.SELL_VALUE || 0);
+  const diiBuyRaw  = dii.buyValue  ?? dii.BUY_VALUE;
+  const diiSellRaw = dii.sellValue ?? dii.SELL_VALUE;
+  const diiBuy  = has(diiBuyRaw)  ? parseFloat(diiBuyRaw)  : 0;
+  const diiSell = has(diiSellRaw) ? parseFloat(diiSellRaw) : 0;
   const diiPos = diiNet >= 0;
   document.getElementById('diiNet').textContent   = fmtCr(diiNet);
   document.getElementById('diiNet').className     = 'fiidii-net ' + (diiPos ? 'pos' : 'neg');
   document.getElementById('diiNetLabel').textContent = diiPos ? 'Net Buy' : 'Net Sell';
-  document.getElementById('diiBuy').textContent  = fmtCrAbs(diiBuy);
-  document.getElementById('diiSell').textContent = fmtCrAbs(diiSell);
+  document.getElementById('diiBuy').textContent  = has(diiBuyRaw)  ? fmtCrAbs(diiBuy)  : '—';
+  document.getElementById('diiSell').textContent = has(diiSellRaw) ? fmtCrAbs(diiSell) : '—';
   const diiBadge = document.getElementById('diiBadge');
   diiBadge.textContent = diiPos ? 'NET BUY' : 'NET SELL';
   diiBadge.className   = 'fiidii-net-badge ' + (diiPos ? 'buy-badge' : 'sell-badge');
@@ -530,7 +539,9 @@ async function fetchFiiDii() {
 }
 
 function initFiiDii() {
-  fetchFiiDii();
+  // History is the single source of truth for BOTH the tiles and the 30-day
+  // table — so the headline numbers always reconcile with the table's first row.
+  // fetchFiiDii() (NSE) only runs as a fallback if Groww's history is unreachable.
   fetchFiiDiiHistory();
   fetchTopMovers();
 }
@@ -613,14 +624,14 @@ function renderHistTable(rows) {
 }
 
 async function fetchFiiDiiHistory() {
-  // 1. Try the cookie-aware server-side endpoint.
+  // 1. Try Groww-backed history endpoint. This drives BOTH the table and the tiles.
   try {
     const res = await fetch('/fii-dii-history.php?cb=' + Date.now(), { signal: AbortSignal.timeout(20000) });
     if (res.ok) {
       const payload = await res.json();
       const rows = payload && Array.isArray(payload.rows) ? payload.rows : null;
       if (rows && rows.length > 0) {
-        // Convert NSE date format ("24-Apr-2026") to short label ("24 Apr") for the table.
+        // Convert "24-Apr-2026" to "24 Apr" for the table.
         const formatted = rows.map(r => {
           let label = r.date;
           if (typeof label === 'string') {
@@ -636,17 +647,35 @@ async function fetchFiiDiiHistory() {
         // renderHistTable expects oldest-first (it does its own reverse).
         formatted.reverse();
         renderHistTable(formatted);
+
+        // Drive the tiles from row[0] of the SAME data so headline tiles and
+        // table's first row are guaranteed to match.
+        const latest = rows[0];
+        applyFiiDii(
+          { netValue: latest.fii, buyValue: latest.fiiBuy, sellValue: latest.fiiSell },
+          { netValue: latest.dii, buyValue: latest.diiBuy, sellValue: latest.diiSell }
+        );
+        const dateEl = document.getElementById('fiidiiDate');
+        if (dateEl) {
+          const stale = !!payload.stale;
+          dateEl.textContent =
+            (stale ? 'Stale — last good: ' : 'As of ') +
+            (latest.date || payload.fetched_date || '') +
+            ' • Source: ' + (payload.source || 'Groww');
+        }
+
         const statusEl = document.getElementById('histLoadStatus');
         if (statusEl) {
           const stale = !!payload.stale;
-          statusEl.textContent = stale ? 'NSE data (stale cache)' : 'NSE data';
+          statusEl.textContent = stale ? 'Groww data (stale cache)' : 'Groww data';
         }
         return;
       }
     }
-  } catch (e) { /* fall through to sample */ }
+  } catch (e) { /* fall through to NSE/sample */ }
 
-  // 2. Fallback — use the deterministic sample series so the table never goes blank.
+  // 2. Fallback path: try NSE for the tiles, and use the sample series for the table.
+  fetchFiiDii();
   renderHistTable(genFallbackHistory());
   const statusEl = document.getElementById('histLoadStatus');
   if (statusEl) statusEl.textContent = 'Sample data';

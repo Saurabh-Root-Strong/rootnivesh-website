@@ -13,8 +13,9 @@
 
    Output shape consumed by the frontend:
      { ts, fetched_date, fetched_at, source, stale, rows: [...] }
-     rows: [{ date: "24-Apr-2026", fii: -8827.87, dii: 4700.71 }, ...]
-     newest-first, capped at 30 entries.
+     rows: [{ date, fii, dii, fiiBuy, fiiSell, diiBuy, diiSell }, ...]
+     newest-first, capped at 30 entries. Buy/sell may be null on
+     days where Groww doesn't expose them.
    ============================================================ */
 
 header('Access-Control-Allow-Origin: *');
@@ -92,11 +93,23 @@ function fetch_groww_history() {
         $fii  = $entry['fii']['netBuySell'] ?? null;
         $dii  = $entry['dii']['netBuySell'] ?? null;
         if ($date === null || $fii === null || $dii === null) continue;
+
+        // Buy/sell values when Groww provides them — used by the live tiles
+        // so the headline numbers always reconcile with the net (buy − sell = net).
+        $fiiBuy  = $entry['fii']['buyValue']  ?? null;
+        $fiiSell = $entry['fii']['sellValue'] ?? null;
+        $diiBuy  = $entry['dii']['buyValue']  ?? null;
+        $diiSell = $entry['dii']['sellValue'] ?? null;
+
         $rows[] = [
-            'date' => format_date($date),
-            'iso'  => $date,
-            'fii'  => floatval($fii),
-            'dii'  => floatval($dii),
+            'date'    => format_date($date),
+            'iso'     => $date,
+            'fii'     => floatval($fii),
+            'dii'     => floatval($dii),
+            'fiiBuy'  => $fiiBuy  !== null ? floatval($fiiBuy)  : null,
+            'fiiSell' => $fiiSell !== null ? floatval($fiiSell) : null,
+            'diiBuy'  => $diiBuy  !== null ? floatval($diiBuy)  : null,
+            'diiSell' => $diiSell !== null ? floatval($diiSell) : null,
         ];
     }
 
@@ -107,7 +120,15 @@ function fetch_groww_history() {
     foreach ($rows as $r) {
         if (isset($seen[$r['iso']])) continue;
         $seen[$r['iso']] = true;
-        $clean[] = ['date' => $r['date'], 'fii' => $r['fii'], 'dii' => $r['dii']];
+        $clean[] = [
+            'date'    => $r['date'],
+            'fii'     => $r['fii'],
+            'dii'     => $r['dii'],
+            'fiiBuy'  => $r['fiiBuy'],
+            'fiiSell' => $r['fiiSell'],
+            'diiBuy'  => $r['diiBuy'],
+            'diiSell' => $r['diiSell'],
+        ];
         if (count($clean) >= 30) break;
     }
     return $clean;
