@@ -728,18 +728,98 @@
   /* ====== CALLS ====== */
   .call-card {
     background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
-    padding: 24px; display: grid; grid-template-columns: 1fr auto; gap: 16px;
-    align-items: center; transition: var(--transition);
+    padding: 24px; transition: var(--transition);
+    position: relative; overflow: hidden;
+  }
+  .call-card-inner {
+    display: grid; grid-template-columns: 1fr auto; gap: 16px;
+    align-items: center;
   }
   .call-card:hover { border-color: var(--border2); transform: translateX(4px); }
   .call-stock { font-family: 'Space Mono', monospace; font-size: 1rem; font-weight: 700; color: var(--white); }
   .call-name { font-size: 12px; color: var(--grey); margin-top: 2px; }
-  .call-details { display: flex; gap: 20px; margin-top: 10px; }
+  .call-details { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 10px; }
   .call-detail { font-size: 12px; color: var(--grey); }
   .call-detail span { color: var(--white); font-weight: 600; }
-  .call-return { text-align: right; }
+  .call-return { text-align: right; flex-shrink: 0; }
   .call-return .r { font-family: 'Space Mono', monospace; font-size: 1.4rem; font-weight: 700; }
   .call-return small { display: block; font-size: 11px; color: var(--grey); margin-top: 2px; }
+
+  /* ====== LOCKED CALL CARD (subscription teaser) ======
+     Locked cards blur the underlying call details and float a centred
+     "Subscribe to view" overlay on top. Whole card is clickable and
+     scrolls to the plans section. */
+  .call-card-locked {
+    cursor: pointer;
+    border-color: var(--border2);
+    background: linear-gradient(135deg, rgba(15,39,68,0.7), rgba(11,30,53,0.85));
+  }
+  .call-card-locked .call-card-inner {
+    filter: blur(5px);
+    user-select: none; pointer-events: none;
+    opacity: 0.85;
+  }
+  .call-card-locked .call-lock-overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 6px;
+    background: linear-gradient(135deg, rgba(5,16,31,0.55), rgba(15,39,68,0.55));
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    border-radius: 16px;
+    transition: var(--transition);
+  }
+  .call-card-locked:hover .call-lock-overlay {
+    background: linear-gradient(135deg, rgba(5,16,31,0.65), rgba(201,168,76,0.18));
+  }
+  .call-card-locked .call-lock-icon {
+    font-size: 22px;
+    filter: drop-shadow(0 0 8px rgba(201,168,76,0.5));
+  }
+  .call-card-locked .call-lock-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px; font-weight: 700;
+    color: var(--white);
+    text-transform: uppercase; letter-spacing: 1.2px;
+    text-align: center;
+  }
+  .call-card-locked .call-lock-cta {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    color: var(--gold);
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.45);
+    padding: 6px 14px; border-radius: 999px;
+    margin-top: 4px;
+    transition: var(--transition);
+  }
+  .call-card-locked:hover .call-lock-cta {
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    color: var(--navy);
+    border-color: transparent;
+  }
+
+  /* Mobile responsiveness for call cards */
+  @media (max-width: 768px) {
+    .call-card { padding: 18px 16px; }
+    .call-card-inner { grid-template-columns: 1fr; gap: 10px; }
+    .call-return { text-align: left; }
+    .call-return .r { font-size: 1.2rem; }
+    .call-details { gap: 12px; row-gap: 6px; }
+    .call-detail { font-size: 11.5px; }
+    .call-stock { font-size: 0.95rem; }
+    .call-name { font-size: 11.5px; }
+    .call-card-locked .call-lock-title { font-size: 11px; }
+    .call-card-locked .call-lock-cta { font-size: 10.5px; padding: 5px 12px; }
+  }
+  @media (max-width: 420px) {
+    .call-card { padding: 16px 14px; }
+    .call-details { gap: 10px; }
+    .call-detail { font-size: 11px; }
+    .call-card-locked .call-lock-icon { font-size: 18px; }
+    .call-card-locked .call-lock-title { font-size: 10.5px; letter-spacing: 0.8px; }
+  }
 
   /* ====== CALLS ACCORDION ====== */
   .calls-accordion {

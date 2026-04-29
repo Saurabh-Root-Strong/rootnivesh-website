@@ -131,7 +131,7 @@ const PLANS = [
     type: 'subscription',
     valueLabel: 'Smart Equity Picks',
     chips: ['Index-Based', 'Equity Delivery', 'WhatsApp Calls', 'Beginner Friendly'],
-    discountPct: 50,
+    discountPct: 25,
     offerLabel: 'LAUNCH OFFER',
     description: 'Beginner-friendly entry plan. 2–3 high-quality index-based and large-cap cash-segment calls every week, delivered on WhatsApp with research-grade reasoning behind every pick.',
     features: [
@@ -152,7 +152,7 @@ const PLANS = [
     type: 'subscription',
     valueLabel: 'Derivatives Edge',
     chips: ['Index Derivatives', 'Options Edge', 'Real-Time Alerts', 'BTST + Expiry'],
-    discountPct: 50,
+    discountPct: 40,
     offerLabel: 'LAUNCH OFFER',
     description: 'Quant-driven Nifty / BankNifty futures & options playbook. Intraday + positional F&O calls, option spreads for BTST and expiry setups, with tight risk-reward discipline on every trade.',
     features: [
@@ -194,7 +194,7 @@ const PLANS = [
     type: 'service',
     valueLabel: 'Bespoke Advisory',
     chips: ['Bespoke Strategy', 'Multi-Market', 'Portfolio Tracking', 'Dedicated RM'],
-    discountPct: 50,
+    discountPct: 35,
     offerLabel: 'PREMIUM',
     description: 'Personalised, dedicated trade assistance. Calls customised to your capital, real portfolio tracking, and coverage across Equity, F&O, Forex and Commodity markets — all anchored to your individual risk profile.',
     features: [
@@ -217,7 +217,7 @@ const PLANS = [
     type: 'program',
     valueLabel: 'Lifetime Mastery',
     chips: ['1:1 Coaching', 'Lifetime Framework', 'Quant + Technical', 'All Markets'],
-    discountPct: 50,
+    discountPct: 30,
     offerLabel: 'EXCLUSIVE',
     description: 'High-touch personal coaching. Strategy building, trader psychology, risk mastery and a lifetime framework you can apply across markets — not just signals you blindly follow.',
     features: [

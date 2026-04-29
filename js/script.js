@@ -824,30 +824,56 @@ function switchCallsGroup(group) {
 
 function renderCalls(type) {
   const data = callsData[type] || [];
-  const isLong = (type === 'value' || type === 'monthly');
-  document.getElementById('callsGrid').innerHTML = data.map(c => `
-    <div class="call-card">
-      <div>
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap">
-          <span class="${c.action === 'buy' ? 'badge-buy' : 'badge-sell'}">${c.action.toUpperCase()}</span>
-          <span style="font-size:11px; color:var(--grey); text-transform:capitalize">${type}</span>
-          <span style="font-size:11px; color:var(--grey); background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:10px;">⏱ ${c.horizon}</span>
+  // Reveal the first call so visitors can see proof of track record;
+  // gate every subsequent call behind a "blur + Subscribe to View" overlay
+  // that scrolls to the plans section on click. Conversion teaser pattern.
+  const visibleCount = 1;
+  document.getElementById('callsGrid').innerHTML = data.map((c, i) => {
+    const locked = i >= visibleCount;
+    const wrapperAttrs = locked
+      ? ' class="call-card call-card-locked" role="button" tabindex="0" onclick="scrollToPlans()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();scrollToPlans();}"'
+      : ' class="call-card"';
+    const lockOverlay = locked
+      ? `<div class="call-lock-overlay">
+           <span class="call-lock-icon">🔒</span>
+           <span class="call-lock-title">Subscribe to view full call</span>
+           <span class="call-lock-cta">View Plans →</span>
+         </div>`
+      : '';
+    return `
+    <div${wrapperAttrs}>
+      <div class="call-card-inner">
+        <div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap">
+            <span class="${c.action === 'buy' ? 'badge-buy' : 'badge-sell'}">${c.action.toUpperCase()}</span>
+            <span style="font-size:11px; color:var(--grey); text-transform:capitalize">${type}</span>
+            <span style="font-size:11px; color:var(--grey); background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:10px;">⏱ ${c.horizon}</span>
+          </div>
+          <div class="call-stock">${c.stock}</div>
+          <div class="call-name">${c.name}</div>
+          <div class="call-details">
+            <div class="call-detail">Entry: <span>${c.entry}</span></div>
+            <div class="call-detail">Target: <span style="color:var(--green)">${c.target}</span></div>
+            <div class="call-detail">SL: <span style="color:var(--red)">${c.sl}</span></div>
+            <div class="call-detail">R:R <span>${c.rr}</span></div>
+            <div class="call-detail">Date: <span>${c.date}</span></div>
+          </div>
         </div>
-        <div class="call-stock">${c.stock}</div>
-        <div class="call-name">${c.name}</div>
-        <div class="call-details">
-          <div class="call-detail">Entry: <span>${c.entry}</span></div>
-          <div class="call-detail">Target: <span style="color:var(--green)">${c.target}</span></div>
-          <div class="call-detail">SL: <span style="color:var(--red)">${c.sl}</span></div>
-          <div class="call-detail">R:R <span>${c.rr}</span></div>
-          <div class="call-detail">Date: <span>${c.date}</span></div>
+        <div class="call-return">
+          <div class="r ${parseFloat(c.ret) >= 0 ? 'badge-pos' : 'badge-neg'}">${c.ret}</div>
+          <small>Return</small>
         </div>
       </div>
-      <div class="call-return">
-        <div class="r ${parseFloat(c.ret) >= 0 ? 'badge-pos' : 'badge-neg'}">${c.ret}</div>
-        <small>Return</small>
-      </div>
-    </div>`).join('');
+      ${lockOverlay}
+    </div>`;
+  }).join('');
+}
+
+// Smooth-scroll to the plans section. Used by the locked-call overlay
+// so visitors who tap a teaser jump straight to "where to subscribe".
+function scrollToPlans() {
+  const el = document.getElementById('plansSection');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /* ================================================================
