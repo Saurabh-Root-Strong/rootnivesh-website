@@ -2119,8 +2119,17 @@
   }
   pre, code { white-space: pre-wrap; word-break: break-word; }
 
-  /* Tables: allow horizontal scroll inside their wrapper instead of breaking the page */
-  .container table { display: block; max-width: 100%; overflow-x: auto; }
+  /* Tables: on phones only, allow any unwrapped table to scroll horizontally
+     instead of breaking the page. This rule deliberately only applies on
+     mobile because `display:block` cancels `table-layout:fixed` and column
+     percentages — fine on a narrow phone where we want native scroll, but
+     a layout-breaker on desktop. The movers and 30-day tables already
+     manage their own widths, so we exclude them here. */
+  @media (max-width: 768px) {
+    .container table:not(.movers-table):not(.hist-table) {
+      display: block; max-width: 100%; overflow-x: auto;
+    }
+  }
 
   /* Legal-page (privacy / terms / disclaimer) typography on tablet & phone */
   @media (max-width: 768px) {
