@@ -16,9 +16,18 @@
      a "stale" flag so the frontend can label it accurately
    ============================================================ */
 
-header('Access-Control-Allow-Origin: *');
+// Allow only requests from rootnivesh.in (production) and localhost (dev).
+// Any other origin gets the response without an Access-Control-Allow-Origin
+// header, so browsers will block it from reading the body.
+$allowedOrigins = ['https://rootnivesh.in', 'https://www.rootnivesh.in', 'http://localhost', 'http://127.0.0.1'];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($origin, $allowedOrigins, true)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Vary: Origin');
+}
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store, max-age=0');
+header('X-Content-Type-Options: nosniff');
 
 $cacheDir  = __DIR__ . '/data';
 $cacheFile = $cacheDir . '/fiidii-cache.json';

@@ -9,9 +9,32 @@
    error message from.
    ============================================================ */
 
-header('Access-Control-Allow-Origin: *');
+$allowedOrigins = ['https://rootnivesh.in', 'https://www.rootnivesh.in', 'http://localhost', 'http://127.0.0.1'];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($origin, $allowedOrigins, true)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Vary: Origin');
+}
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store, max-age=0');
+header('X-Content-Type-Options: nosniff');
+
+// Block obvious auto-submit floods: at most 1 submission per IP per 30 seconds.
+// Tracked in data/contact-rate.json. This is best-effort, not crypto-grade.
+$rateDir  = __DIR__ . '/data';
+$rateFile = $rateDir . '/contact-rate.json';
+if (!is_dir($rateDir)) { @mkdir($rateDir, 0755, true); }
+$ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+$rate = file_exists($rateFile) ? (json_decode(@file_get_contents($rateFile), true) ?: []) : [];
+$nowTs = time();
+foreach ($rate as $k => $v) { if ($nowTs - $v > 600) unset($rate[$k]); }
+if (isset($rate[$ip]) && ($nowTs - $rate[$ip]) < 30) {
+    http_response_code(429);
+    echo json_encode(['ok' => false, 'error' => 'Please wait a moment before submitting again.']);
+    exit;
+}
+$rate[$ip] = $nowTs;
+@file_put_contents($rateFile, json_encode($rate));
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);

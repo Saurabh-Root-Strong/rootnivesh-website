@@ -3,9 +3,15 @@
 // Frontend calls: /proxy.php?url=<URL-encoded target>
 // Whitelist enforced for safety.
 
-header('Access-Control-Allow-Origin: *');
+$allowedOrigins = ['https://rootnivesh.in', 'https://www.rootnivesh.in', 'http://localhost', 'http://127.0.0.1'];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($origin, $allowedOrigins, true)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Vary: Origin');
+}
 header('Access-Control-Allow-Methods: GET');
 header('Cache-Control: no-store, max-age=0');
+header('X-Content-Type-Options: nosniff');
 
 $url = isset($_GET['url']) ? $_GET['url'] : '';
 if ($url === '') {

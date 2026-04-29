@@ -2033,3 +2033,104 @@
     .mini-form-section { padding: 24px 18px; border-radius: 16px; }
     .tool-card { padding: 24px 18px; }
   }
+
+  /* ============================================================
+     MOBILE SAFETY PASS — added 29 Apr 2026.
+     A final-pass set of rules that prevent the most common mobile
+     breakages: horizontal overflow, undersized touch targets,
+     overflowing images/tables, and the new /privacy /terms
+     /disclaimer pages reading too narrow on small phones.
+     ============================================================ */
+
+  /* Belt-and-braces against horizontal scroll on every page */
+  html, body { max-width: 100vw; overflow-x: hidden; }
+
+  /* Stop any image, video, iframe, or pre block from blowing out a page */
+  img, video, iframe, embed, object {
+    max-width: 100%;
+    height: auto;
+  }
+  pre, code { white-space: pre-wrap; word-break: break-word; }
+
+  /* Tables: allow horizontal scroll inside their wrapper instead of breaking the page */
+  .container table { display: block; max-width: 100%; overflow-x: auto; }
+
+  /* Legal-page (privacy / terms / disclaimer) typography on tablet & phone */
+  @media (max-width: 768px) {
+    #page-privacy section .container,
+    #page-terms section .container,
+    #page-disclaimer section .container {
+      padding-left: 18px; padding-right: 18px;
+    }
+    #page-privacy h3,
+    #page-terms h3,
+    #page-disclaimer h3 {
+      font-size: 18px; margin-top: 28px; margin-bottom: 10px;
+    }
+    #page-privacy p, #page-privacy li,
+    #page-terms p, #page-terms li,
+    #page-disclaimer p, #page-disclaimer li {
+      font-size: 14.5px; line-height: 1.7;
+    }
+    #page-privacy ul, #page-terms ul, #page-disclaimer ul {
+      margin-left: 16px !important;
+    }
+    #page-privacy .btn-group,
+    #page-terms .btn-group,
+    #page-disclaimer .btn-group {
+      flex-direction: column; gap: 10px; width: 100%;
+    }
+    #page-privacy .btn-group .btn,
+    #page-terms .btn-group .btn,
+    #page-disclaimer .btn-group .btn {
+      width: 100%; justify-content: center;
+    }
+  }
+
+  /* Legal-page tighter on small phones */
+  @media (max-width: 480px) {
+    #page-privacy h1,
+    #page-terms h1,
+    #page-disclaimer h1 {
+      font-size: 30px;
+    }
+    #page-privacy h3,
+    #page-terms h3,
+    #page-disclaimer h3 {
+      font-size: 16.5px;
+    }
+    #page-privacy .reg-box,
+    #page-terms .reg-box,
+    #page-disclaimer .reg-box {
+      padding: 14px; font-size: 13px;
+    }
+  }
+
+  /* Touch-target accessibility: any button or link styled like a button
+     should be at least ~44px tall on touch devices, per WCAG. */
+  @media (pointer: coarse) {
+    .btn { min-height: 44px; }
+    .nav-cta { min-height: 40px; }
+    footer ul li a, .mob-link { padding: 6px 0; }
+  }
+
+  /* Footer grid gracefully stacks on phones (was 4-up on desktop) */
+  @media (max-width: 640px) {
+    .footer-grid {
+      grid-template-columns: 1fr 1fr !important;
+      gap: 28px 20px !important;
+    }
+  }
+  @media (max-width: 420px) {
+    .footer-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  /* Tiny-phone safety: 320px Galaxy Fold-style screens — prevent
+     fixed-width inline styles from pushing the page wider than the
+     viewport. */
+  @media (max-width: 360px) {
+    [style*="max-width:920px"] { max-width: 100% !important; }
+    .container { padding-left: 14px; padding-right: 14px; }
+  }

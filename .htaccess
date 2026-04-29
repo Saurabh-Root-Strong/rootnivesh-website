@@ -4,20 +4,102 @@
 
 RewriteEngine On
 
-# Don't rewrite real files or folders (videos, images, css/js, proxy.php, etc.)
+# ────────────────────────────────────────────────────────────
+# 1. FORCE HTTPS — redirect any plain http:// hit to https://
+# ────────────────────────────────────────────────────────────
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# ────────────────────────────────────────────────────────────
+# 2. BLOCK DIRECT ACCESS TO SENSITIVE FILES / FOLDERS
+#    Visitors must never be able to fetch the cache files,
+#    git history, env files, backups, or this .htaccess itself.
+# ────────────────────────────────────────────────────────────
+RewriteRule ^\.git(/|$)        - [F,L]
+RewriteRule ^\.env             - [F,L]
+RewriteRule ^data(/|$)         - [F,L]
+RewriteRule ^memory(/|$)       - [F,L]
+RewriteRule ^.*\.htaccess$     - [F,L]
+RewriteRule ^.*\.htpasswd$     - [F,L]
+RewriteRule \.(bak|backup|old|orig|swp|sql|log|ini|conf|sh)$ - [F,L]
+RewriteRule ^.*\.md$           - [F,L]
+
+# ────────────────────────────────────────────────────────────
+# 3. SPA ROUTING (unchanged behaviour)
+# ────────────────────────────────────────────────────────────
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-
-# Don't rewrite anything inside the static asset folders
 RewriteCond %{REQUEST_URI} !^/(css|js|images|videos|docs)/
 RewriteCond %{REQUEST_URI} !^/proxy\.php$
+RewriteCond %{REQUEST_URI} !^/contact\.php$
+RewriteCond %{REQUEST_URI} !^/fii-dii\.php$
+RewriteCond %{REQUEST_URI} !^/fii-dii-history\.php$
+RewriteCond %{REQUEST_URI} !^/gainers-losers\.php$
 RewriteCond %{REQUEST_URI} !^/sitemap\.xml$
 RewriteCond %{REQUEST_URI} !^/google[a-z0-9]+\.html$
-
-# Send every other request to index.html so the SPA can route client-side
 RewriteRule ^.*$ /index.html [L]
 
-# Long-cache static assets so repeat visits are fast
+# ────────────────────────────────────────────────────────────
+# 4. SECURITY HEADERS (require mod_headers; LiteSpeed has it)
+# ────────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+  # Force browsers to use HTTPS for the next year (HSTS)
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+
+  # Stop other sites from embedding rootnivesh.in in an <iframe> (clickjacking protection)
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  # Stop browsers from MIME-sniffing a response away from its declared Content-Type
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Don't leak the user's full URL to outside sites in Referer
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Disable browser features the site doesn't need
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
+
+  # Cross-origin protections — allow same-site, deny everything else by default
+  Header always set X-XSS-Protection "1; mode=block"
+
+  # Content Security Policy — restrict where scripts, styles, fonts, images,
+  # and network calls can come from. 'unsafe-inline' is needed because the
+  # site uses inline onclick handlers and inline style="..." attributes.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
+
+  # Hide which web server / version is serving the response
+  Header unset X-Powered-By
+  Header unset Server
+</IfModule>
+
+# Disable directory listing for any folder that lacks an index file
+Options -Indexes
+
+# Hide the server signature in error pages
+ServerSignature Off
+
+# ────────────────────────────────────────────────────────────
+# 5. PHP HARDENING (Hostinger supports php_flag in .htaccess for
+#    most plans; if your plan doesn't, set these in php.ini)
+# ────────────────────────────────────────────────────────────
+<IfModule mod_php.c>
+  php_flag display_errors Off
+  php_flag display_startup_errors Off
+  php_flag log_errors On
+  php_flag expose_php Off
+  php_flag allow_url_fopen Off
+  php_flag allow_url_include Off
+</IfModule>
+<IfModule lsapi_module>
+  php_flag display_errors Off
+  php_flag display_startup_errors Off
+  php_flag log_errors On
+  php_flag expose_php Off
+</IfModule>
+
+# ────────────────────────────────────────────────────────────
+# 6. STATIC ASSET CACHING (unchanged)
+# ────────────────────────────────────────────────────────────
 <IfModule mod_expires.c>
   ExpiresActive On
   ExpiresByType image/jpeg "access plus 30 days"
