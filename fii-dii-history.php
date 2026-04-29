@@ -51,11 +51,15 @@ if (!$cache || empty($cache['ts'])) {
     if ($istNow >= $cutoff && (empty($cache['fetched_date']) || $cache['fetched_date'] !== $todayIST)) {
         $shouldRefresh = true;
     }
-    // Schema migration: caches written before the buy/sell fields were added
-    // lack the fiiBuy key. Force a refresh once so the new tiles can show
-    // matching buy/sell numbers without manual cache deletion.
-    if (!empty($cache['rows']) && is_array($cache['rows']) && !array_key_exists('fiiBuy', $cache['rows'][0])) {
-        $shouldRefresh = true;
+    // Schema migration: caches written before buy/sell extraction was added,
+    // OR caches that captured buy/sell as null because the path lookup was
+    // wrong (Groww uses grossBuy/grossSell, not buyValue/sellValue), are
+    // force-refreshed so the new code can populate them correctly.
+    if (!empty($cache['rows']) && is_array($cache['rows'])) {
+        $first = $cache['rows'][0];
+        if (!array_key_exists('fiiBuy', $first) || $first['fiiBuy'] === null) {
+            $shouldRefresh = true;
+        }
     }
 }
 
