@@ -45,6 +45,12 @@ if (!$cache || empty($cache['ts'])) {
     if ($istNow >= $cutoff && (empty($cache['fetched_date']) || $cache['fetched_date'] !== $todayIST)) {
         $shouldRefresh = true;
     }
+    // Schema migration: caches written before the buy/sell fields were added
+    // lack the fiiBuy key. Force a refresh once so the new tiles can show
+    // matching buy/sell numbers without manual cache deletion.
+    if (!empty($cache['rows']) && is_array($cache['rows']) && !array_key_exists('fiiBuy', $cache['rows'][0])) {
+        $shouldRefresh = true;
+    }
 }
 
 function format_date($iso) {
