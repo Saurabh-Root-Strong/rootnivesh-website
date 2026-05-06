@@ -562,6 +562,23 @@ function initFiiDii() {
   // fetchFiiDii() (NSE) only runs as a fallback if Groww's history is unreachable.
   fetchFiiDiiHistory();
   fetchTopMovers();
+  fetchIndices();
+  // Auto-refresh live market widgets every 5 min during NSE hours (Mon–Fri, 09:15–15:30 IST).
+  // Holidays are gated server-side via the market_open flag in each PHP endpoint.
+  setInterval(() => {
+    if (isMarketOpenIST()) {
+      fetchTopMovers();
+      fetchIndices();
+    }
+  }, 5 * 60 * 1000);
+}
+
+function isMarketOpenIST() {
+  const nowIST = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+  const day = nowIST.getDay(); // 0 = Sun, 6 = Sat
+  if (day === 0 || day === 6) return false;
+  const minutes = nowIST.getHours() * 60 + nowIST.getMinutes();
+  return minutes >= (9 * 60 + 15) && minutes <= (15 * 60 + 30);
 }
 
 /* ===== Top 5 Gainers / Top 5 Losers (Nifty 50) =====
@@ -587,6 +604,51 @@ async function fetchTopMovers() {
     const fail = '<tr><td colspan="3" style="text-align:center; padding:14px; color:var(--grey); font-size:11.5px">Could not load NSE data.</td></tr>';
     const g = document.getElementById('gainersBody'); if (g) g.innerHTML = fail;
     const l = document.getElementById('losersBody');  if (l) l.innerHTML = fail;
+  }
+}
+
+/* ===== Hero indices: Nifty 50 + BSE Sensex =====
+   Hits /indices.php which pulls from Yahoo Finance and caches
+   server-side. Refreshed every 5 min during market hours. */
+async function fetchIndices() {
+  try {
+    const res = await fetch('/indices.php?cb=' + Date.now(), { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) throw new Error('http ' + res.status);
+    const data = await res.json();
+    if (!data || !data.nifty || !data.sensex) throw new Error('bad payload');
+    renderIndex('niftyPrice',  'niftyChange',  data.nifty);
+    renderIndex('sensexPrice', 'sensexChange', data.sensex);
+    // The "1D" tag inside the Nifty card flips to "CLOSED" outside market hours.
+    const status = document.getElementById('idxStatus');
+    if (status) {
+      status.textContent = data.market_open ? '1D' : 'CLOSED';
+      status.classList.toggle('closed', !data.market_open);
+    }
+    const meta = document.getElementById('idxMeta');
+    if (meta) {
+      const at = data.fetched_at ? new Date(data.fetched_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '';
+      const tag = data.market_open ? 'LIVE' : 'CLOSED';
+      meta.textContent = (data.stale ? 'Stale — ' : 'Updated ') + at + ' • ' + tag + ' • Source: Yahoo Finance';
+    }
+  } catch (e) {
+    const meta = document.getElementById('idxMeta');
+    if (meta) meta.textContent = 'Could not load index data.';
+  }
+}
+
+function renderIndex(priceId, changeId, idx) {
+  const p = document.getElementById(priceId);
+  const c = document.getElementById(changeId);
+  if (p) p.textContent = idx.price.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+  if (c) {
+    const up  = idx.change >= 0;
+    // Sign on the points (+298.15), but the % already carries its own sign when negative,
+    // so we omit a redundant + when positive — matches the Groww-style "+298.15 (1.24%)".
+    const pts = (up ? '+' : '') + idx.change.toFixed(2);
+    const pct = idx.pChange.toFixed(2) + '%';
+    c.textContent = pts + ' (' + pct + ')';
+    c.classList.toggle('idx-up',   up);
+    c.classList.toggle('idx-down', !up);
   }
 }
 

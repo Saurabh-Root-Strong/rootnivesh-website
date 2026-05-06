@@ -271,11 +271,33 @@
             <button class="btn btn-outline" onclick="showPage('calls')">📞 Latest Calls</button>
           </div>
         </div>
-        <div class="hero-media">
-          <video class="hero-media-el" autoplay loop muted playsinline preload="metadata">
-            <source src="videos/Stock-Market-Discussion.mp4" type="video/mp4">
-            Your browser does not support embedded video.
-          </video>
+        <div class="hero-media hero-indices">
+          <div class="idx-card">
+            <div class="idx-card-logo idx-logo-nifty" aria-hidden="true">
+              <svg viewBox="-20 -20 40 40" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="0"  cy="-8" rx="5"  ry="11" fill="#E74C3C"/>
+                <ellipse cx="8"  cy="0"  rx="11" ry="5"  fill="#F39C12"/>
+                <ellipse cx="0"  cy="8"  rx="5"  ry="11" fill="#2ECC71"/>
+                <ellipse cx="-8" cy="0"  rx="11" ry="5"  fill="#F4D03F"/>
+              </svg>
+            </div>
+            <div class="idx-card-name">NIFTY 50</div>
+            <div class="idx-card-row">
+              <div class="idx-card-price" id="niftyPrice">—</div>
+              <div class="idx-card-change" id="niftyChange">—</div>
+              <div class="idx-card-period" id="idxStatus">1D</div>
+            </div>
+          </div>
+          <div class="idx-card">
+            <div class="idx-card-logo idx-logo-sensex" aria-hidden="true">BSE</div>
+            <div class="idx-card-name">BSE SENSEX</div>
+            <div class="idx-card-row">
+              <div class="idx-card-price" id="sensexPrice">—</div>
+              <div class="idx-card-change" id="sensexChange">—</div>
+              <div class="idx-card-period">1D</div>
+            </div>
+          </div>
+          <div class="idx-card-meta" id="idxMeta">Loading…</div>
         </div>
       </div>
       <div class="hero-stats">
