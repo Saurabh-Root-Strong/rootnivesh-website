@@ -618,22 +618,31 @@ async function fetchIndices() {
     if (!data || !data.nifty || !data.sensex) throw new Error('bad payload');
     renderIndex('niftyPrice',  'niftyChange',  data.nifty);
     renderIndex('sensexPrice', 'sensexChange', data.sensex);
-    // The "1D" tag inside the Nifty card flips to "CLOSED" outside market hours.
-    const status = document.getElementById('idxStatus');
-    if (status) {
-      status.textContent = data.market_open ? '1D' : 'CLOSED';
-      status.classList.toggle('closed', !data.market_open);
-    }
+    // Per-card update time — comes from the upstream exchange (NSE / BSE) directly,
+    // so the two cards can show different timestamps if the exchanges tick at
+    // different cadences. Falls back to server fetch time if the source omitted one.
+    setCardTime('niftyTime',  data.nifty.updated  || data.fetched_at, data.market_open);
+    setCardTime('sensexTime', data.sensex.updated || data.fetched_at, data.market_open);
     const meta = document.getElementById('idxMeta');
     if (meta) {
       const at = data.fetched_at ? new Date(data.fetched_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '';
       const tag = data.market_open ? 'LIVE' : 'CLOSED';
-      meta.textContent = (data.stale ? 'Stale — ' : 'Updated ') + at + ' • ' + tag + ' • Source: Yahoo Finance';
+      meta.textContent = (data.stale ? 'Stale — ' : 'Updated ') + at + ' • ' + tag;
     }
   } catch (e) {
     const meta = document.getElementById('idxMeta');
     if (meta) meta.textContent = 'Could not load index data.';
   }
+}
+
+function setCardTime(elId, isoStr, marketOpen) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (!isoStr) { el.textContent = marketOpen ? '—' : 'CLOSED'; el.classList.toggle('closed', !marketOpen); return; }
+  // Render in IST 12-hour, matches what visitors expect from Indian broker apps.
+  const t = new Date(isoStr).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+  el.textContent = t;
+  el.classList.toggle('closed', !marketOpen);
 }
 
 function renderIndex(priceId, changeId, idx) {

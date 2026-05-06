@@ -498,7 +498,8 @@
   }
   .idx-card-change {
     font-family: 'DM Sans', sans-serif;
-    font-size: 14px; font-weight: 600; white-space: nowrap;
+    font-size: clamp(1rem, 1.55vw, 1.18rem);
+    font-weight: 700; white-space: nowrap; letter-spacing: -0.2px;
   }
   .idx-up   { color: #00B386; }
   .idx-down { color: #EB5B3C; }
@@ -506,6 +507,7 @@
     margin-left: auto;
     font-family: 'DM Sans', sans-serif;
     font-size: 12px; font-weight: 500; color: #888;
+    white-space: nowrap;
   }
   .idx-card-period.closed { color: #b97a00; font-weight: 600; }
   .idx-card-meta {
@@ -515,7 +517,7 @@
   @media (max-width: 700px) {
     .hero-media.hero-indices { padding: 14px; gap: 10px; }
     .idx-card { padding: 14px 16px 12px; }
-    .idx-card-change { font-size: 13px; }
+    .idx-card-change { font-size: 1rem; }
   }
   @media (max-width: 900px) {
     .hero-grid { grid-template-columns: 1fr; gap: 32px; text-align: center; }
