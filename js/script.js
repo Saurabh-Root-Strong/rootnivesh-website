@@ -638,11 +638,18 @@ async function fetchIndices() {
 function setCardTime(elId, isoStr, marketOpen) {
   const el = document.getElementById(elId);
   if (!el) return;
-  if (!isoStr) { el.textContent = marketOpen ? '—' : 'CLOSED'; el.classList.toggle('closed', !marketOpen); return; }
-  // Render in IST 12-hour, matches what visitors expect from Indian broker apps.
-  const t = new Date(isoStr).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-  el.textContent = t;
-  el.classList.toggle('closed', !marketOpen);
+  if (!marketOpen) {
+    // Market shut → show the canonical NSE/BSE close (15:30 IST) regardless
+    // of what the upstream reports (NSE often emits 16:00 from the closing
+    // auction tick, which confuses users who expect "3:30 PM").
+    el.textContent = '3:30 PM';
+    el.classList.add('closed');
+    return;
+  }
+  if (!isoStr) { el.textContent = '—'; el.classList.remove('closed'); return; }
+  // Live market: show the source's actual tick time, IST 12-hour.
+  el.textContent = new Date(isoStr).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+  el.classList.remove('closed');
 }
 
 function renderIndex(priceId, changeId, idx) {

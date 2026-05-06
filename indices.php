@@ -25,7 +25,7 @@ header('Cache-Control: no-store, max-age=0');
 header('X-Content-Type-Options: nosniff');
 
 $cacheDir  = __DIR__ . '/data';
-$cacheFile = $cacheDir . '/indices-cache-v2.json';
+$cacheFile = $cacheDir . '/indices-cache-v3.json';
 if (!is_dir($cacheDir)) { @mkdir($cacheDir, 0755, true); }
 
 $now    = time();
@@ -105,27 +105,46 @@ function fetch_nse_nifty() {
 
 function fetch_bse_sensex() {
     global $UA;
-    $resp = http_get('https://api.bseindia.com/BseIndiaAPI/api/SensexData/w?json=true', [
+    $headers = [
         'User-Agent: ' . $UA,
-        'Accept: application/json, */*',
+        'Accept: application/json, text/plain, */*',
+        'Accept-Language: en-US,en;q=0.9',
         'Referer: https://www.bseindia.com/',
         'Origin: https://www.bseindia.com',
-    ]);
-    if ($resp['status'] !== 200 || !$resp['body']) return null;
-    $j = json_decode($resp['body'], true);
-    if (!$j) return null;
-    $row = (is_array($j) && isset($j[0]) && is_array($j[0])) ? $j[0] : $j;
-    $price   = floatval($row['CurrValue'] ?? $row['Currvalue'] ?? $row['Curr_Val'] ?? 0);
-    $change  = floatval($row['Chg']       ?? $row['Change']    ?? 0);
-    $pChange = floatval($row['PerChg']    ?? $row['perchg']    ?? 0);
-    if ($price <= 0) return null;
-    return [
-        'price'   => $price,
-        'change'  => $change,
-        'pChange' => $pChange,
-        'updated' => parse_ist_time($row['Updtime'] ?? $row['updtime'] ?? ''),
-        'source'  => 'BSE',
+        'X-Requested-With: XMLHttpRequest',
     ];
+    // BSE has shuffled their endpoints over the years and the same
+    // response payload comes back under a few different paths.
+    $endpoints = [
+        'https://api.bseindia.com/BseIndiaAPI/api/SensexData/w?json=true',
+        'https://api.bseindia.com/RealtimeBseIndiaAPI/api/GetSensexData/w?json=true',
+        'https://api.bseindia.com/BseIndiaAPI/api/Sensex/GetSensexData/w?json=true',
+    ];
+    foreach ($endpoints as $url) {
+        $resp = http_get($url, $headers);
+        if ($resp['status'] !== 200 || !$resp['body']) continue;
+        $j = json_decode($resp['body'], true);
+        if (!is_array($j)) continue;
+        // Try every plausible row location in priority order.
+        $candidates = [];
+        if (isset($j[0]) && is_array($j[0]))             $candidates[] = $j[0];
+        if (isset($j['Table'][0]))                        $candidates[] = $j['Table'][0];
+        if (isset($j['Table']) && is_array($j['Table']))  $candidates[] = $j['Table'];
+        $candidates[] = $j;
+        foreach ($candidates as $row) {
+            if (!is_array($row)) continue;
+            $price = floatval($row['CurrValue'] ?? $row['Currvalue'] ?? $row['Curr_Val'] ?? $row['CurrentVal'] ?? 0);
+            if ($price <= 0) continue;
+            return [
+                'price'   => $price,
+                'change'  => floatval($row['Chg']    ?? $row['Change']    ?? 0),
+                'pChange' => floatval($row['PerChg'] ?? $row['perchg']    ?? $row['ChgPer'] ?? 0),
+                'updated' => parse_ist_time($row['Updtime'] ?? $row['updtime'] ?? $row['UpdateTime'] ?? ''),
+                'source'  => 'BSE',
+            ];
+        }
+    }
+    return null;
 }
 
 function fetch_yahoo($symbol) {
