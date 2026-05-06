@@ -623,15 +623,9 @@ async function fetchIndices() {
     // different cadences. Falls back to server fetch time if the source omitted one.
     setCardTime('niftyTime',  data.nifty.updated  || data.fetched_at, data.market_open);
     setCardTime('sensexTime', data.sensex.updated || data.fetched_at, data.market_open);
-    const meta = document.getElementById('idxMeta');
-    if (meta) {
-      const at = data.fetched_at ? new Date(data.fetched_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '';
-      const tag = data.market_open ? 'LIVE' : 'CLOSED';
-      meta.textContent = (data.stale ? 'Stale — ' : 'Updated ') + at + ' • ' + tag;
-    }
   } catch (e) {
-    const meta = document.getElementById('idxMeta');
-    if (meta) meta.textContent = 'Could not load index data.';
+    // Silent fail — cards keep whatever they had; per-card "—" placeholders
+    // surface the issue to the user without a noisy meta line.
   }
 }
 
