@@ -489,7 +489,7 @@
     letter-spacing: 0.2px;
   }
   .idx-card-row {
-    display: flex; align-items: baseline; gap: 10px; flex-wrap: nowrap;
+    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
     margin-top: 2px;
   }
   .idx-card-price {
@@ -519,6 +519,23 @@
     .hero-media.hero-indices { padding: 14px; gap: 10px; }
     .idx-card { padding: 14px 16px 12px; }
     .idx-card-change { font-size: 1rem; }
+  }
+  /* Below ~460px the price + change + time stop fitting on one line.
+     Force the time onto its own line (right-aligned) so nothing overflows
+     and the price stays at full size. */
+  @media (max-width: 460px) {
+    .hero-media.hero-indices { padding: 12px; gap: 10px; }
+    .idx-card { padding: 12px 14px 12px; border-radius: 12px; }
+    .idx-card-logo { width: 34px; height: 34px; }
+    .idx-card-name { font-size: 14px; }
+    .idx-card-price { font-size: 1.55rem; }
+    .idx-card-change { font-size: 0.95rem; }
+    .idx-card-period {
+      flex-basis: 100%;
+      margin-left: 0;
+      text-align: right;
+      font-size: 11px;
+    }
   }
   @media (max-width: 900px) {
     .hero-grid { grid-template-columns: 1fr; gap: 32px; text-align: center; }

@@ -640,11 +640,12 @@ async function fetchIndices() {
     if (!data || !data.nifty || !data.sensex) throw new Error('bad payload');
     renderIndex('niftyPrice',  'niftyChange',  data.nifty);
     renderIndex('sensexPrice', 'sensexChange', data.sensex);
-    // Per-card update time — comes from the upstream exchange (NSE / BSE) directly,
-    // so the two cards can show different timestamps if the exchanges tick at
-    // different cadences. Falls back to server fetch time if the source omitted one.
-    setCardTime('niftyTime',  data.nifty.updated  || data.fetched_at, data.market_open);
-    setCardTime('sensexTime', data.sensex.updated || data.fetched_at, data.market_open);
+    // Both cards share the server fetch time so they always display the same
+    // timestamp. NSE / BSE tick at different cadences, so showing per-source
+    // times confused users into thinking one feed was lagging.
+    const sharedTs = data.fetched_at || data.nifty.updated || data.sensex.updated;
+    setCardTime('niftyTime',  sharedTs, data.market_open);
+    setCardTime('sensexTime', sharedTs, data.market_open);
   } catch (e) {
     // Silent fail — cards keep whatever they had; per-card "—" placeholders
     // surface the issue to the user without a noisy meta line.
