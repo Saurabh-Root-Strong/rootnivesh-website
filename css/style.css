@@ -2016,6 +2016,25 @@
     .hero-tagline { font-size: 12px; }
   }
 
+  /* Free-WhatsApp-group nudge sitting under the main hero CTAs.
+     Subtle green tint so it reads as a secondary path (not competing
+     with the gold "primary" buttons). */
+  .hero-wa-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 14px;
+    color: #25D366;
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    text-decoration: none;
+    padding: 6px 0;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .hero-wa-link strong { color: #25D366; font-weight: 700; }
+  .hero-wa-link:hover { color: #1ebf5b; transform: translateX(2px); }
+  .hero-wa-link:hover strong { color: #1ebf5b; }
+  @media (max-width: 640px) {
+    .hero-wa-link { font-size: 12px; }
+  }
+
   @media (max-width: 768px) {
     .plan-collapse { grid-template-columns: 1fr; }
     .plan-pricing { border-left: none; border-top: 1px solid var(--border); }
