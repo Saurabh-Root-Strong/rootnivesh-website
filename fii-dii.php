@@ -53,11 +53,16 @@ if (file_exists($cacheFile)) {
    - Cache age >= 60 min                            -> refresh
    - It's after 19:30 IST and cache fetched_date < today -> refresh */
 $shouldRefresh = false;
+$dayOfWeek = (int)$istNow->format('w');           // 0=Sun, 6=Sat
+$mins      = (int)$istNow->format('G') * 60 + (int)$istNow->format('i');
+$marketOpen = $dayOfWeek >= 1 && $dayOfWeek <= 5 && $mins >= 540 && $mins <= 930;
+// 60s during market hours, 1 hour outside — same policy as fii-dii-history.php.
+$ttl = $marketOpen ? 60 : 3600;
 if (!$cache || empty($cache['ts'])) {
     $shouldRefresh = true;
 } else {
     $age = $now - intval($cache['ts']);
-    if ($age >= 3600) {
+    if ($age >= $ttl) {
         $shouldRefresh = true;
     }
     if ($istNow >= $publishCutoff && (empty($cache['fetched_date']) || $cache['fetched_date'] !== $todayIST)) {

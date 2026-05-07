@@ -42,11 +42,18 @@ if (file_exists($cacheFile)) {
 }
 
 $shouldRefresh = false;
+$dayOfWeek = (int)$istNow->format('w');           // 0=Sun, 6=Sat
+$mins      = (int)$istNow->format('G') * 60 + (int)$istNow->format('i');
+$marketOpen = $dayOfWeek >= 1 && $dayOfWeek <= 5 && $mins >= 540 && $mins <= 930;
+// 60s during market hours (Mon-Fri 9:00-15:30 IST) so the displayed data
+// matches every other live widget on the site. 1 hour outside since FII/DII
+// publishes once daily — no point hammering Groww off-hours.
+$ttl = $marketOpen ? 60 : 3600;
 if (!$cache || empty($cache['ts'])) {
     $shouldRefresh = true;
 } else {
     $age = $now - intval($cache['ts']);
-    if ($age >= 6 * 3600) $shouldRefresh = true;
+    if ($age >= $ttl) $shouldRefresh = true;
     $cutoff = clone $istNow; $cutoff->setTime(19, 30, 0);
     if ($istNow >= $cutoff && (empty($cache['fetched_date']) || $cache['fetched_date'] !== $todayIST)) {
         $shouldRefresh = true;
