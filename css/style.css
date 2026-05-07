@@ -1359,6 +1359,14 @@
     color: var(--white); text-transform: uppercase; letter-spacing: 1px;
   }
   .hist-table-sub { font-size: 10px; color: var(--grey); font-family: 'Space Mono', monospace; }
+  .hist-table-date {
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(7,19,31,0.6);
+    font-family: 'Space Mono', monospace;
+    font-size: 10.5px; color: var(--grey); letter-spacing: 0.4px;
+  }
+  .hist-table-date.stale { color: var(--gold); }
   .hist-scroll {
     max-height: 280px; overflow-y: auto;
   }

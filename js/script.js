@@ -522,10 +522,11 @@ function buildSampleFiiDiiSeries() {
    publishes FII/DII T+1 in the evening, so "today's" data may actually be
    yesterday's session). `kind` = 'live' | 'stale' | 'sample'. */
 function setFiiDiiDate(dateStr, kind) {
-  const headEl = document.getElementById('fiidiiDate');
-  const fiiEl  = document.getElementById('fiiDate');
-  const diiEl  = document.getElementById('diiDate');
-  const label  = dateStr || 'today';
+  const headEl  = document.getElementById('fiidiiDate');
+  const fiiEl   = document.getElementById('fiiDate');
+  const diiEl   = document.getElementById('diiDate');
+  const tableEl = document.getElementById('histTableDate');
+  const label   = dateStr || 'today';
   let headTxt, cardTxt;
   if (kind === 'stale') {
     headTxt = 'Stale (NSE unreachable) — last good: ' + label + ' • Source: NSE India';
@@ -538,7 +539,7 @@ function setFiiDiiDate(dateStr, kind) {
     cardTxt = 'As of ' + label;
   }
   if (headEl) headEl.textContent = headTxt;
-  [fiiEl, diiEl].forEach(el => {
+  [fiiEl, diiEl, tableEl].forEach(el => {
     if (!el) return;
     el.textContent = cardTxt;
     el.classList.toggle('stale', kind === 'stale' || kind === 'sample');
