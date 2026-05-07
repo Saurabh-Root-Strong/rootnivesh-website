@@ -948,7 +948,7 @@ function renderCalls(type) {
     const lockOverlay = locked
       ? `<div class="call-lock-overlay">
            <span class="call-lock-icon">🔒</span>
-           <span class="call-lock-title">Subscribe to view full call</span>
+           <span class="call-lock-title">Subscribe to view stock name</span>
            <span class="call-lock-cta">View Plans →</span>
          </div>`
       : '';
