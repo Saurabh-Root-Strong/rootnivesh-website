@@ -1292,6 +1292,19 @@ async function fetchIpo(tab) {
 function filterIpo(tab, btn) {
   document.querySelectorAll('#page-ipo .tabs .tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
+
+  // 'allotment' has no public API — every IPO is handled by its registrar's
+  // own portal — so we just swap to a static panel of registrar quick-links
+  // and skip the NSE fetch entirely.
+  const tablePanel = document.getElementById('ipoTablePanel');
+  const allotPanel = document.getElementById('ipoAllotmentPanel');
+  if (tab === 'allotment') {
+    if (tablePanel) tablePanel.style.display = 'none';
+    if (allotPanel) allotPanel.style.display = 'block';
+    return;
+  }
+  if (tablePanel) tablePanel.style.display = 'block';
+  if (allotPanel) allotPanel.style.display = 'none';
   fetchIpo(tab);
 }
 
