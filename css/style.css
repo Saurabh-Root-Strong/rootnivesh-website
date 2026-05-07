@@ -2271,6 +2271,80 @@
     #ipoTable [data-ipo-business] > div { max-width: 200px !important; }
   }
 
+  /* ==========================================================
+     IPO TABLE — stacked card layout on mobile
+     ----------------------------------------------------------
+     6 columns can't fit on a phone. Below 720px we drop the
+     horizontal scroll behaviour and render each row as a
+     self-contained card: company name as header, the rest as
+     labelled rows underneath. Long "About Company" text is
+     line-clamped to 4 lines so each card stays readable.
+     ========================================================== */
+  @media (max-width: 720px) {
+    #page-ipo .table-wrap {
+      overflow-x: visible;
+      border: none;
+      background: transparent;
+    }
+    #ipoTable, #ipoTable tbody { display: block; width: 100%; }
+    #ipoTable thead { display: none; }
+    #ipoTable table { min-width: 0 !important; }
+    #ipoTable tr {
+      display: block;
+      background: rgba(11,28,52,0.55);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin: 0 0 12px;
+      transition: border-color 0.2s;
+    }
+    #ipoTable tr:hover { border-color: var(--border2); }
+    #ipoTable td {
+      display: block;
+      border: none !important;
+      padding: 4px 0 !important;
+      text-align: left !important;
+      font-size: 13px;
+      color: var(--grey2);
+      min-width: 0 !important;
+    }
+    /* Company name — first cell becomes the card title */
+    #ipoTable td:first-child {
+      font-size: 1.05rem !important;
+      font-weight: 700 !important;
+      color: var(--white) !important;
+      margin-bottom: 10px;
+      padding-bottom: 10px !important;
+      border-bottom: 1px solid var(--border) !important;
+    }
+    /* Inline "field: value" labels for the middle cells */
+    #ipoTable td:nth-child(2)::before { content: 'Type: ';      color: var(--grey); margin-right: 4px; }
+    #ipoTable td:nth-child(3)::before { content: 'Open: ';      color: var(--grey); margin-right: 4px; }
+    #ipoTable td:nth-child(4)::before { content: 'Close: ';     color: var(--grey); margin-right: 4px; }
+    #ipoTable td:nth-child(5)::before { content: 'Price: ';     color: var(--grey); margin-right: 4px; }
+    /* About Company — section break + clamp so the card never goes huge */
+    #ipoTable td:nth-child(6) {
+      margin-top: 10px;
+      padding-top: 10px !important;
+      border-top: 1px solid var(--border) !important;
+    }
+    #ipoTable [data-ipo-business] > div {
+      max-width: none !important;
+      width: 100%;
+    }
+    /* Truncate the long descriptive text to 4 lines on mobile so each
+       IPO card stays scannable. The sector tag (gold caps) is the
+       FIRST inner div and stays full-height — only the description
+       (last inner div) is clamped. */
+    #ipoTable [data-ipo-business] > div > div:last-child {
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
   /* Touch-only refinements (any pointer device that can't hover precisely) */
   @media (pointer: coarse) {
     /* Disable hover lifts that look weird without a mouse cursor */
