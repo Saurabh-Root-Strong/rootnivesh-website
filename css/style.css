@@ -97,7 +97,7 @@
 
   /* ── MEGA MENU ── */
   .mega-menu {
-    display: none; position: fixed; top: 128px; left: 0; width: 100%;
+    display: none; position: fixed; top: 120px; left: 0; width: 100%;
     background: #07131F; border-bottom: 2px solid var(--border2);
     box-shadow: 0 24px 60px rgba(0,0,0,0.6);
     z-index: 1001; animation: ddFade 0.2s ease;
@@ -197,9 +197,9 @@
   }
   .mobile-menu {
     display: none; position: fixed;
-    top: 128px; left: 0; right: 0;
-    height: calc(100vh - 128px);
-    height: calc(100dvh - 128px); /* dvh handles iOS dynamic toolbar */
+    top: 120px; left: 0; right: 0;
+    height: calc(100vh - 120px);
+    height: calc(100dvh - 120px); /* dvh handles iOS dynamic toolbar */
     background: #07131F;
     border-top: 1px solid var(--border);
     padding: 8px 12px calc(24px + env(safe-area-inset-bottom));
@@ -355,17 +355,17 @@
   .ticker-tape {
     position: fixed; top: 92px; left: 0; width: 100%;
     background: rgba(5,12,22,0.92); border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; height: 36px; overflow: hidden; z-index: 999;
+    display: flex; align-items: center; height: 28px; overflow: hidden; z-index: 999;
   }
-  .page { padding-top: 36px; } /* clears the fixed ticker */
+  .page { padding-top: 28px; } /* clears the fixed ticker */
   .ticker-live-bar {
-    display: flex; align-items: center; gap: 6px; flex-shrink: 0;
-    padding: 0 14px; border-right: 1px solid var(--border);
+    display: flex; align-items: center; gap: 5px; flex-shrink: 0;
+    padding: 0 10px; border-right: 1px solid var(--border);
     height: 100%; background: rgba(201,168,76,0.07);
   }
   .ticker-live-dot {
-    display: flex; align-items: center; gap: 5px;
-    font-family: 'Space Mono', monospace; font-size: 10px;
+    display: flex; align-items: center; gap: 4px;
+    font-family: 'Space Mono', monospace; font-size: 9px;
     font-weight: 700; color: var(--gold); letter-spacing: 1px;
     white-space: nowrap;
   }
@@ -378,7 +378,7 @@
     50%      { opacity: 0.7; box-shadow: 0 0 0 5px rgba(46,204,113,0); }
   }
   .ticker-market-status {
-    font-family: 'Space Mono', monospace; font-size: 9px;
+    font-family: 'Space Mono', monospace; font-size: 8.5px;
     color: var(--grey); letter-spacing: 0.5px; white-space: nowrap;
   }
   .ticker-scroll-wrap { flex: 1; overflow: hidden; height: 100%; position: relative; }
@@ -1153,7 +1153,7 @@
   .page-split {
     display: grid;
     grid-template-columns: 280px 1fr;
-    min-height: calc(100vh - 128px);
+    min-height: calc(100vh - 120px);
     gap: 0;
   }
   .snav-wrap {
@@ -1161,8 +1161,8 @@
     border-right: 1px solid var(--border);
     padding: 32px 0;
     position: sticky;
-    top: 128px;
-    height: calc(100vh - 128px);
+    top: 120px;
+    height: calc(100vh - 120px);
     overflow-y: auto;
   }
   .snav-wrap::-webkit-scrollbar { width: 4px; }
@@ -2472,9 +2472,9 @@
     height: calc(92px + env(safe-area-inset-top, 0px));
   }
   .ticker-tape { top: calc(92px + env(safe-area-inset-top, 0px)); }
-  .mega-menu  { top: calc(128px + env(safe-area-inset-top, 0px)); }
+  .mega-menu  { top: calc(120px + env(safe-area-inset-top, 0px)); }
   .mobile-menu {
-    top: calc(128px + env(safe-area-inset-top, 0px));
+    top: calc(120px + env(safe-area-inset-top, 0px));
     padding-bottom: calc(16px + env(safe-area-inset-bottom));
   }
   footer {
