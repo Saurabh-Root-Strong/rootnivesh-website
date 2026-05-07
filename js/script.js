@@ -1356,9 +1356,19 @@ function renderPlanCard(p, openByDefault) {
     const types = Object.keys(p.pricing);
     const defaultType = types[0];
     defaultSelection = { type: defaultType, duration: '1' };
+    // Per-duration savings vs paying monthly. The 1-month price is the
+    // base rate; longer durations are progressively cheaper, so the
+    // "save X%" is real (computed from actual prices, not fabricated).
+    const monthly1 = p.pricing[defaultType][1];
     const opts = PLAN_DURATIONS.map(d => {
       const price = p.pricing[defaultType][d.months];
-      return '<option value="' + d.months + '">' + d.label + ' — ' + fmtINR(price) + '</option>';
+      const fullCost = monthly1 * d.months;
+      const savedPct = d.months > 1 && fullCost > price
+        ? Math.round((1 - price / fullCost) * 100)
+        : 0;
+      const tail = savedPct > 0 ? ' • Save ' + savedPct + '%' : '';
+      const best = d.months === 12 ? ' ★ Best Value' : '';
+      return '<option value="' + d.months + '">' + d.label + ' — ' + fmtINR(price) + tail + best + '</option>';
     }).join('');
     selector =
       '<div class="plan-control-group">' +
@@ -1407,20 +1417,26 @@ function renderPlanCard(p, openByDefault) {
   const offerRibbon = p.offerLabel
     ? '<span class="plan-offer-ribbon">' + p.offerLabel + '</span>'
     : '';
+  // Subscription plans get a dynamic discount badge (updates with selected
+  // duration). Service / programme plans keep the static plan-level discount
+  // because they have tiers, not durations.
+  const isSubscription = p.type === 'subscription';
   const discountPct = (typeof p.discountPct === 'number' && p.discountPct > 0 && p.discountPct < 90)
     ? p.discountPct
     : 0;
-  const discountBadgeHTML = discountPct
-    ? '<span class="plan-discount-badge" id="plan-disc-' + p.id + '">' + discountPct + '% OFF</span>'
-    : '';
-  const mrpRowHTML = discountPct
-    ? '<div class="plan-pricing-mrp-row">' +
-        '<span class="plan-pricing-mrp-label">MRP</span>' +
-        '<span class="plan-pricing-mrp" id="plan-mrp-' + p.id + '">—</span>' +
+  const discountBadgeHTML = isSubscription
+    ? '<span class="plan-discount-badge" id="plan-disc-' + p.id + '" style="display:none">&mdash;</span>'
+    : (discountPct ? '<span class="plan-discount-badge">' + discountPct + '% OFF</span>' : '');
+  // MRP / savings rows: always rendered for subscriptions (populated dynamically),
+  // rendered only when discount > 0 for service/programme plans.
+  const mrpRowHTML = (isSubscription || discountPct)
+    ? '<div class="plan-pricing-mrp-row" id="plan-mrp-row-' + p.id + '"' + (isSubscription ? ' style="display:none"' : '') + '>' +
+        '<span class="plan-pricing-mrp-label">' + (isSubscription ? 'If paid monthly' : 'MRP') + '</span>' +
+        '<span class="plan-pricing-mrp" id="plan-mrp-' + p.id + '">&mdash;</span>' +
       '</div>'
     : '';
-  const savedRowHTML = discountPct
-    ? '<p class="plan-pricing-saved" id="plan-saved-' + p.id + '"></p>'
+  const savedRowHTML = (isSubscription || discountPct)
+    ? '<p class="plan-pricing-saved" id="plan-saved-' + p.id + '"' + (isSubscription ? ' style="display:none"' : '') + '></p>'
     : '';
 
   return ''
@@ -1500,39 +1516,58 @@ function updatePlanPricing(planId) {
   const mrpEl     = document.getElementById('plan-mrp-'     + planId);
   const savedEl   = document.getElementById('plan-saved-'   + planId);
 
-  // Helper: given a selling price and a discountPct, compute the MRP
-  // such that price = MRP × (1 - discount/100). Returns null if no
-  // discount configured for this plan.
-  const discountPct = (typeof plan.discountPct === 'number' && plan.discountPct > 0 && plan.discountPct < 90)
-    ? plan.discountPct : 0;
-  const computeMrp = (price) => discountPct
-    ? Math.round(price / (1 - discountPct / 100))
-    : null;
+  const mrpRowEl = document.getElementById('plan-mrp-row-' + planId);
+  const badgeEl  = document.getElementById('plan-disc-'    + planId);
 
   let basePrice, suffix = '';
   if (plan.type === 'subscription') {
     const type = card.getAttribute('data-type');
-    const dur  = card.getAttribute('data-duration');
+    const dur  = Number(card.getAttribute('data-duration'));
     basePrice = (plan.pricing[type] || {})[dur];
     if (basePrice == null) return;
     const dlabel = (PLAN_DURATIONS.find(d => String(d.months) === String(dur)) || {}).label || dur + ' Months';
     if (durEl)     durEl.textContent     = dlabel;
     if (payableEl) payableEl.textContent = fmtINR(basePrice);
     if (noteEl)    noteEl.textContent    = '';
-  } else {
-    const tierId = card.getAttribute('data-tier');
-    const tier   = (plan.tiers || []).find(t => t.id === tierId) || plan.tiers[0];
-    if (!tier) return;
-    basePrice = tier.price;
-    suffix    = tier.suffix || '';
-    if (durEl)     durEl.textContent     = tier.name;
-    if (payableEl) payableEl.textContent = fmtINR(basePrice) + suffix;
-    if (noteEl)    noteEl.textContent    = tier.note || '';
+
+    // Per-duration savings vs paying monthly. For 1-month, hide MRP/badge —
+    // there's no comparison to make. For 3/6/12, show the real savings the
+    // longer commitment unlocks. This is what makes longer subs visibly
+    // cheaper instead of every duration showing the same fake 25%.
+    const monthly1 = (plan.pricing[type] || {})[1];
+    const fullCost = monthly1 != null ? monthly1 * dur : null;
+    if (mrpEl && savedEl && mrpRowEl && badgeEl && fullCost && fullCost > basePrice) {
+      const saved    = fullCost - basePrice;
+      const savedPct = Math.round((saved / fullCost) * 100);
+      mrpEl.textContent   = fmtINR(fullCost);
+      savedEl.textContent = 'You save ' + fmtINR(saved) + ' (' + savedPct + '% off vs monthly)';
+      mrpRowEl.style.display = '';
+      savedEl.style.display  = '';
+      badgeEl.textContent    = savedPct + '% OFF';
+      badgeEl.style.display  = '';
+    } else if (mrpRowEl && savedEl && badgeEl) {
+      // 1-month: no comparison, show clean monthly rate only.
+      mrpRowEl.style.display = 'none';
+      savedEl.style.display  = 'none';
+      badgeEl.style.display  = 'none';
+    }
+    return;
   }
 
-  // MRP + savings line — only present in DOM when this plan has a discount.
+  // Service / programme plans — keep the static plan-level discount logic.
+  const tierId = card.getAttribute('data-tier');
+  const tier   = (plan.tiers || []).find(t => t.id === tierId) || plan.tiers[0];
+  if (!tier) return;
+  basePrice = tier.price;
+  suffix    = tier.suffix || '';
+  if (durEl)     durEl.textContent     = tier.name;
+  if (payableEl) payableEl.textContent = fmtINR(basePrice) + suffix;
+  if (noteEl)    noteEl.textContent    = tier.note || '';
+
+  const discountPct = (typeof plan.discountPct === 'number' && plan.discountPct > 0 && plan.discountPct < 90)
+    ? plan.discountPct : 0;
   if (mrpEl && savedEl && discountPct) {
-    const mrp = computeMrp(basePrice);
+    const mrp   = Math.round(basePrice / (1 - discountPct / 100));
     const saved = mrp - basePrice;
     mrpEl.textContent   = fmtINR(mrp) + suffix;
     savedEl.textContent = 'You save ' + fmtINR(saved) + ' (' + discountPct + '% off)';
