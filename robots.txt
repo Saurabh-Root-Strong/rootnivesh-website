@@ -1,0 +1,18 @@
+# RootNivesh Research — robots.txt
+# https://rootnivesh.in/
+
+User-agent: *
+Allow: /
+
+# Disallow internal API endpoints — these return JSON, not pages,
+# and have no value for search engines.
+Disallow: /proxy.php
+Disallow: /indices.php
+Disallow: /gainers-losers.php
+Disallow: /fii-dii.php
+Disallow: /fii-dii-history.php
+Disallow: /contact.php
+Disallow: /data/
+
+# Sitemap location
+Sitemap: https://rootnivesh.in/sitemap.xml
