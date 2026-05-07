@@ -2288,7 +2288,10 @@
     }
     #ipoTable, #ipoTable tbody { display: block; width: 100%; }
     #ipoTable thead { display: none; }
-    #ipoTable table { min-width: 0 !important; }
+    /* #ipoTable IS the <table> — override the inherited min-width:720px
+       from .table-wrap table, otherwise the table forces a horizontal
+       scroll and the card content gets clipped at the right edge. */
+    #ipoTable { min-width: 0 !important; max-width: 100%; }
     #ipoTable tr {
       display: block;
       background: rgba(11,28,52,0.55);
