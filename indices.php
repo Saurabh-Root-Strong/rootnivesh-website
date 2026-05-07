@@ -10,7 +10,7 @@
    so the UI can show "Updated 15:29" exactly when the exchange
    ticked it.
 
-   Cache: 5 min during market hours (Mon–Fri 09:15–15:30 IST),
+   Cache: 1 min during market hours (Mon–Fri 09:15–15:30 IST),
    60 min outside, in data/indices-cache.json.
    ============================================================ */
 
@@ -39,7 +39,7 @@ function is_market_open($istNow) {
 }
 
 $marketOpen = is_market_open($istNow);
-$ttl = $marketOpen ? 300 : 3600;
+$ttl = $marketOpen ? 60 : 3600;
 
 $cache = null;
 if (file_exists($cacheFile)) $cache = json_decode(file_get_contents($cacheFile), true);

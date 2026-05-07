@@ -517,6 +517,34 @@ function buildSampleFiiDiiSeries() {
   return series;
 }
 
+/* Sets the date label on the section header AND on each FII / DII card so
+   the user can always see WHICH trading day the numbers belong to (NSE
+   publishes FII/DII T+1 in the evening, so "today's" data may actually be
+   yesterday's session). `kind` = 'live' | 'stale' | 'sample'. */
+function setFiiDiiDate(dateStr, kind) {
+  const headEl = document.getElementById('fiidiiDate');
+  const fiiEl  = document.getElementById('fiiDate');
+  const diiEl  = document.getElementById('diiDate');
+  const label  = dateStr || 'today';
+  let headTxt, cardTxt;
+  if (kind === 'stale') {
+    headTxt = 'Stale (NSE unreachable) — last good: ' + label + ' • Source: NSE India';
+    cardTxt = 'Stale — ' + label;
+  } else if (kind === 'sample') {
+    headTxt = 'Sample data — ' + label;
+    cardTxt = 'Sample — ' + label;
+  } else {
+    headTxt = 'As of ' + label + ' • Source: NSE India';
+    cardTxt = 'As of ' + label;
+  }
+  if (headEl) headEl.textContent = headTxt;
+  [fiiEl, diiEl].forEach(el => {
+    if (!el) return;
+    el.textContent = cardTxt;
+    el.classList.toggle('stale', kind === 'stale' || kind === 'sample');
+  });
+}
+
 async function fetchFiiDii() {
   // 1. Try the cookie-aware server-side endpoint first.
   try {
@@ -530,13 +558,7 @@ async function fetchFiiDii() {
         const dii = arr.find(r => upper(r.category || r.CATEGORY).includes('DII'));
         if (fii && dii) {
           const dateStr = fii.date || fii.DATE || payload.fetched_date || '';
-          const dateEl = document.getElementById('fiidiiDate');
-          if (dateEl) {
-            const stale = !!payload.stale;
-            dateEl.textContent =
-              (stale ? 'Stale (NSE unreachable) — last good: ' : 'As of ') +
-              (dateStr || 'today') + ' • Source: NSE India';
-          }
+          setFiiDiiDate(dateStr, payload.stale ? 'stale' : 'live');
           applyFiiDii(fii, dii);
           return;
         }
@@ -552,8 +574,7 @@ async function fetchFiiDii() {
   const series = buildSampleFiiDiiSeries();
   const latestDateLabel = (series[0] && series[0].date) || new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'short' });
   const yr = new Date().getFullYear();
-  const dateEl = document.getElementById('fiidiiDate');
-  if (dateEl) dateEl.textContent = 'Sample data — ' + latestDateLabel + ' ' + yr;
+  setFiiDiiDate(latestDateLabel + ' ' + yr, 'sample');
 }
 
 function initFiiDii() {
@@ -563,13 +584,14 @@ function initFiiDii() {
   fetchFiiDiiHistory();
   fetchTopMovers();
   fetchIndices();
-  // Auto-refresh live market widgets every 5 min during NSE hours (Mon–Fri, 09:15–15:30 IST).
-  // Holidays are gated server-side via the market_open flag in each PHP endpoint.
+  // Auto-refresh live market widgets during NSE hours (Mon–Fri, 09:15–15:30 IST).
+  // Indices tick every 1 min; the heavier movers list stays at 5 min to avoid
+  // hammering NSE. Holidays are gated server-side via the market_open flag.
   setInterval(() => {
-    if (isMarketOpenIST()) {
-      fetchTopMovers();
-      fetchIndices();
-    }
+    if (isMarketOpenIST()) fetchIndices();
+  }, 60 * 1000);
+  setInterval(() => {
+    if (isMarketOpenIST()) fetchTopMovers();
   }, 5 * 60 * 1000);
 }
 
@@ -745,13 +767,7 @@ async function fetchFiiDiiHistory() {
           { netValue: latest.fii, buyValue: latest.fiiBuy, sellValue: latest.fiiSell },
           { netValue: latest.dii, buyValue: latest.diiBuy, sellValue: latest.diiSell }
         );
-        const dateEl = document.getElementById('fiidiiDate');
-        if (dateEl) {
-          const stale = !!payload.stale;
-          dateEl.textContent =
-            (stale ? 'Stale — last good: ' : 'As of ') +
-            (latest.date || payload.fetched_date || '');
-        }
+        setFiiDiiDate(latest.date || payload.fetched_date || '', payload.stale ? 'stale' : 'live');
 
         const statusEl = document.getElementById('histLoadStatus');
         if (statusEl) {
