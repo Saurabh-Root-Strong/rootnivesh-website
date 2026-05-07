@@ -37,11 +37,11 @@ function is_market_open($istNow) {
     $h = (int)$istNow->format('G');
     $m = (int)$istNow->format('i');
     $mins = $h * 60 + $m;
-    return $mins >= 555 && $mins <= 930; // 9:15 - 15:30 IST
+    return $mins >= 540 && $mins <= 930; // 9:00 - 15:30 IST (covers pre-open + regular)
 }
 
 $marketOpen = is_market_open($istNow);
-$ttl = $marketOpen ? 300 : 3600; // 5 min during market, 60 min after
+$ttl = $marketOpen ? 60 : 3600; // 60s during market, 60 min after
 
 $cache = null;
 if (file_exists($cacheFile)) $cache = json_decode(file_get_contents($cacheFile), true);

@@ -296,7 +296,7 @@ function isMarketOpen() {
   const ist = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
   const day = ist.getDay();
   const mins = ist.getHours() * 60 + ist.getMinutes();
-  return day >= 1 && day <= 5 && mins >= 555 && mins <= 930; // Mon-Fri, 9:15-15:30 IST
+  return day >= 1 && day <= 5 && mins >= 540 && mins <= 930; // Mon-Fri, 9:00-15:30 IST
 }
 
 function buildTickerHTML(quotes) {
@@ -384,7 +384,11 @@ function showStaticTicker() {
 
 function initLiveTicker() {
   refreshTicker();
-  setInterval(refreshTicker, 60000); // refresh every 60 seconds
+  // 60s refresh during market hours only (Mon-Fri 9:00-15:30 IST). Outside
+  // those hours the previous close stays on screen — no point hammering Yahoo.
+  setInterval(() => {
+    if (isMarketOpen()) refreshTicker();
+  }, 60000);
 }
 
 
@@ -588,15 +592,16 @@ function initFiiDii() {
   fetchFiiDiiHistory();
   fetchTopMovers();
   fetchIndices();
-  // Auto-refresh live market widgets during NSE hours (Mon–Fri, 09:15–15:30 IST).
-  // Indices tick every 1 min; the heavier movers list stays at 5 min to avoid
-  // hammering NSE. Holidays are gated server-side via the market_open flag.
+  // All live widgets refresh every 60s during NSE hours (Mon-Fri, 09:00-15:30 IST).
+  // Server-side caches in each PHP endpoint protect upstream APIs (NSE/BSE/Yahoo)
+  // from being hammered — clients hit our cache, not NSE directly.
+  // Holidays are gated server-side via the market_open flag in each endpoint.
   setInterval(() => {
-    if (isMarketOpenIST()) fetchIndices();
+    if (!isMarketOpenIST()) return;
+    fetchIndices();
+    fetchTopMovers();
+    fetchFiiDiiHistory(); // FII/DII publishes T+1 evening but we still poll so the new day's data appears within 60s of the 7:30 PM cutoff
   }, 60 * 1000);
-  setInterval(() => {
-    if (isMarketOpenIST()) fetchTopMovers();
-  }, 5 * 60 * 1000);
 }
 
 function isMarketOpenIST() {
@@ -604,7 +609,7 @@ function isMarketOpenIST() {
   const day = nowIST.getDay(); // 0 = Sun, 6 = Sat
   if (day === 0 || day === 6) return false;
   const minutes = nowIST.getHours() * 60 + nowIST.getMinutes();
-  return minutes >= (9 * 60 + 15) && minutes <= (15 * 60 + 30);
+  return minutes >= (9 * 60) && minutes <= (15 * 60 + 30); // 9:00-15:30 IST (covers pre-open + regular)
 }
 
 /* ===== Top 5 Gainers / Top 5 Losers (Nifty 50) =====
@@ -1289,9 +1294,14 @@ async function fetchIpo(tab) {
   }
 }
 
+let ipoRefreshTimer = null;
+
 function filterIpo(tab, btn) {
   document.querySelectorAll('#page-ipo .tabs .tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
+
+  // Stop any prior auto-refresh from the previous tab.
+  if (ipoRefreshTimer) { clearInterval(ipoRefreshTimer); ipoRefreshTimer = null; }
 
   // 'allotment' has no public API — every IPO is handled by its registrar's
   // own portal — so we just swap to a static panel of registrar quick-links
@@ -1306,6 +1316,10 @@ function filterIpo(tab, btn) {
   if (tablePanel) tablePanel.style.display = 'block';
   if (allotPanel) allotPanel.style.display = 'none';
   fetchIpo(tab);
+  // Keep the active IPO tab fresh during market hours — 60s refresh.
+  ipoRefreshTimer = setInterval(() => {
+    if (isMarketOpenIST()) fetchIpo(tab);
+  }, 60 * 1000);
 }
 
 /* ================================================================
