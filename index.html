@@ -42,7 +42,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=62">
+<link rel="stylesheet" href="css/style.css?v=63">
 </head>
 <body>
 
@@ -1127,61 +1127,32 @@
       </div>
 
       <!-- Allotment Status panel — shown only when 'Allotment Status' tab is active.
-           No public API exists for IPO allotment; every issue is handled by its
-           registrar (Link Intime, KFin, Bigshare, Cameo) or via BSE's universal
-           lookup. So we redirect users to those official portals. -->
+           No public API exists for IPO allotment; users go to the official BSE
+           or NSE allotment status check pages. -->
       <div id="ipoAllotmentPanel" style="display:none">
         <div class="allot-intro">
           <h3>Check your IPO Allotment Status</h3>
-          <p>Allotment is processed by the IPO's <strong>registrar</strong> (mentioned in your application acknowledgement email and the prospectus). Pick the right registrar below to open their official status-check page in a new tab.</p>
+          <p>Use the official exchange portals below to check whether shares were allotted against your IPO application. Both BSE and NSE accept any major registrar's IPOs.</p>
           <p class="allot-need">You'll need any one: <strong>PAN</strong>, <strong>Application Number</strong>, or <strong>DP/Client ID</strong>.</p>
         </div>
 
         <div class="allot-grid">
           <a class="allot-card primary" href="https://www.bseindia.com/investors/appli_check.aspx" target="_blank" rel="noopener noreferrer">
-            <div class="allot-card-tag">Universal</div>
-            <div class="allot-card-name">BSE Allotment Lookup</div>
-            <div class="allot-card-desc">Works for most mainboard IPOs regardless of registrar. Try this first if you're not sure which registrar your IPO uses.</div>
+            <div class="allot-card-tag">BSE</div>
+            <div class="allot-card-name">BSE Allotment Status</div>
+            <div class="allot-card-desc">Official BSE lookup. Pick the issue, enter PAN or application number, and check allotment instantly.</div>
             <div class="allot-card-cta">Check on BSE &#8594;</div>
           </a>
 
-          <a class="allot-card" href="https://linkintime.co.in/initial_offer/public-issues.html" target="_blank" rel="noopener noreferrer">
-            <div class="allot-card-tag">Registrar</div>
-            <div class="allot-card-name">Link Intime India</div>
-            <div class="allot-card-desc">Handles a large share of mainboard and SME IPOs.</div>
-            <div class="allot-card-cta">Open Link Intime &#8594;</div>
-          </a>
-
-          <a class="allot-card" href="https://kosmic.kfintech.com/ipostatus/" target="_blank" rel="noopener noreferrer">
-            <div class="allot-card-tag">Registrar</div>
-            <div class="allot-card-name">KFin Technologies</div>
-            <div class="allot-card-desc">Common for many large public issues (formerly Karvy Fintech).</div>
-            <div class="allot-card-cta">Open KFin &#8594;</div>
-          </a>
-
-          <a class="allot-card" href="https://www.bigshareonline.com/IPO_Allotment.html" target="_blank" rel="noopener noreferrer">
-            <div class="allot-card-tag">Registrar</div>
-            <div class="allot-card-name">Bigshare Services</div>
-            <div class="allot-card-desc">Frequently used for SME and mid-size IPOs.</div>
-            <div class="allot-card-cta">Open Bigshare &#8594;</div>
-          </a>
-
-          <a class="allot-card" href="https://ipostatus.cameoindia.com/" target="_blank" rel="noopener noreferrer">
-            <div class="allot-card-tag">Registrar</div>
-            <div class="allot-card-name">Cameo Corporate Services</div>
-            <div class="allot-card-desc">Handles a number of mainboard issues from southern-India based companies.</div>
-            <div class="allot-card-cta">Open Cameo &#8594;</div>
-          </a>
-
-          <a class="allot-card" href="https://maashitla.com/allotment-status/public-issues" target="_blank" rel="noopener noreferrer">
-            <div class="allot-card-tag">Registrar</div>
-            <div class="allot-card-name">Maashitla Securities</div>
-            <div class="allot-card-desc">Common for SME IPOs.</div>
-            <div class="allot-card-cta">Open Maashitla &#8594;</div>
+          <a class="allot-card primary" href="https://www.nseindia.com/invest/check-trades-bids-verify-ipo-bids" target="_blank" rel="noopener noreferrer">
+            <div class="allot-card-tag">NSE</div>
+            <div class="allot-card-name">NSE Verify IPO Bids</div>
+            <div class="allot-card-desc">Official NSE portal to verify and check the status of your IPO bids using PAN, application number or DP/Client ID.</div>
+            <div class="allot-card-cta">Check on NSE &#8594;</div>
           </a>
         </div>
 
-        <p class="allot-foot">Don't know your registrar? It's printed on your IPO application acknowledgement email and on the issue's RHP/DRHP — also visible on Chittorgarh.com or the BSE/NSE issue page.</p>
+        <p class="allot-foot">Tip: BSE's lookup is usually the fastest for retail investors — works for most mainboard IPOs regardless of which registrar (Link Intime, KFin, Bigshare, etc.) handled the issue.</p>
       </div>
 
       <div class="disclaimer" style="margin-top:32px">
