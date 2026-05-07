@@ -1745,8 +1745,11 @@
      interactive-looking affordance. */
   .plan-toggle-price {
     font-family: 'Space Mono', monospace; font-size: 11.5px;
-    color: var(--gold); white-space: nowrap;
+    color: var(--gold);
     letter-spacing: 0.5px; text-transform: uppercase;
+    text-align: center; line-height: 1.25;
+    max-width: 140px;
+    word-break: keep-all; /* keep "SMART EQUITY" together — wrap between words */
   }
   /* Small dropdown chevron pill — sits BELOW the label so the whole
      right column reads top-down: "SMART EQUITY PICKS" then a clear
@@ -2015,7 +2018,7 @@
     .plan-card-toggle { padding: 14px 16px; gap: 10px; }
     .plan-toggle-name { font-size: 1.25rem; }
     .plan-toggle-icon { font-size: 22px; }
-    .plan-toggle-price { font-size: 11px; max-width: 96px; text-align: right; line-height: 1.25; }
+    .plan-toggle-price { font-size: 10.5px; max-width: 110px; line-height: 1.2; }
     .plan-card.open .plan-collapse { max-height: 1600px; } /* extra room for stacked content */
   }
 
