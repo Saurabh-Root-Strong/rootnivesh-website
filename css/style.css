@@ -485,8 +485,8 @@
   }
   .idx-card-name {
     font-family: 'DM Sans', sans-serif;
-    font-size: 15px; font-weight: 700; color: #ffffff;
-    letter-spacing: 0.2px;
+    font-size: 18px; font-weight: 700; color: #ffffff;
+    letter-spacing: 0.3px;
   }
   .idx-card-row {
     display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
@@ -527,7 +527,7 @@
     .hero-media.hero-indices { padding: 12px; gap: 10px; }
     .idx-card { padding: 12px 14px 12px; border-radius: 12px; }
     .idx-card-logo { width: 34px; height: 34px; }
-    .idx-card-name { font-size: 14px; }
+    .idx-card-name { font-size: 16px; }
     .idx-card-price { font-size: 1.55rem; }
     .idx-card-change { font-size: 0.95rem; }
     .idx-card-period {
