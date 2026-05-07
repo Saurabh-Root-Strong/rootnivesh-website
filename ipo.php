@@ -50,7 +50,7 @@ function ipo_market_open($istNow) {
     $day = (int)$istNow->format('w'); // 0=Sun, 6=Sat
     if ($day === 0 || $day === 6) return false;
     $mins = (int)$istNow->format('G') * 60 + (int)$istNow->format('i');
-    return $mins >= 540 && $mins <= 930; // 9:00–15:30 IST
+    return $mins >= 540 && $mins <= 945; // 9:00–15:45 IST (incl. post-close auction window)
 }
 
 $marketOpen = ipo_market_open($istNow);

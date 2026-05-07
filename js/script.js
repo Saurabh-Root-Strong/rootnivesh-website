@@ -609,7 +609,11 @@ function isMarketOpenIST() {
   const day = nowIST.getDay(); // 0 = Sun, 6 = Sat
   if (day === 0 || day === 6) return false;
   const minutes = nowIST.getHours() * 60 + nowIST.getMinutes();
-  return minutes >= (9 * 60) && minutes <= (15 * 60 + 30); // 9:00-15:30 IST (covers pre-open + regular)
+  // 9:00-15:30 IST is the live session. We extend the polling window to 15:45
+  // so we can capture the official closing-auction value that NSE/BSE publish
+  // a few minutes AFTER the bell. Without this, the site stays on the last
+  // intraday tick and disagrees with Zerodha/NSE by 5-10 points all evening.
+  return minutes >= (9 * 60) && minutes <= (15 * 60 + 45); // 9:00-15:45 IST
 }
 
 /* ===== Top 5 Gainers / Top 5 Losers (Nifty 50) =====

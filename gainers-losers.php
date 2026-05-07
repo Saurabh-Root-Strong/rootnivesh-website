@@ -37,7 +37,7 @@ function is_market_open($istNow) {
     $h = (int)$istNow->format('G');
     $m = (int)$istNow->format('i');
     $mins = $h * 60 + $m;
-    return $mins >= 540 && $mins <= 930; // 9:00 - 15:30 IST (covers pre-open + regular)
+    return $mins >= 540 && $mins <= 945; // 9:00 - 15:45 IST (incl. post-close auction window)
 }
 
 $marketOpen = is_market_open($istNow);

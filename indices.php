@@ -35,7 +35,11 @@ function is_market_open($istNow) {
     $day = (int)$istNow->format('w'); // 0=Sun, 6=Sat
     if ($day === 0 || $day === 6) return false;
     $mins = (int)$istNow->format('G') * 60 + (int)$istNow->format('i');
-    return $mins >= 540 && $mins <= 930; // 9:00–15:30 IST (covers pre-open + regular)
+    // Extend "live" window to 15:45 to keep refreshing during the post-close
+    // auction (15:30-15:40). Without this, our cache locks at the last
+    // intraday tick (~15:29) and disagrees with Zerodha/NSE all evening
+    // because they show the post-auction official close.
+    return $mins >= 540 && $mins <= 945; // 9:00–15:45 IST
 }
 
 $marketOpen = is_market_open($istNow);
