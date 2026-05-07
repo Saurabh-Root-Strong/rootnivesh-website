@@ -889,6 +889,16 @@ function filterCourses(level, btn) {
   renderCourses(level);
 }
 
+/* ===== BLOG — category filter (cards have data-blog-cat="...") ===== */
+function filterBlogs(cat, btn) {
+  document.querySelectorAll('#blogTabs .tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('#blogGrid .blog-card').forEach(card => {
+    const c = card.getAttribute('data-blog-cat');
+    card.style.display = (cat === 'all' || c === cat) ? '' : 'none';
+  });
+}
+
 /* ===== CALLS — render only (callsData lives in data.js) ===== */
 let currentCallsGroup = 'short';
 

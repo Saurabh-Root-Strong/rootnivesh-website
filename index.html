@@ -183,7 +183,7 @@
 <link rel="dns-prefetch" href="https://www.bseindia.com">
 <link rel="dns-prefetch" href="https://www.nseindia.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=80">
+<link rel="stylesheet" href="css/style.css?v=81">
 </head>
 <body>
 
@@ -322,7 +322,7 @@
 
     <li><a onclick="showPage('reports');closeMegas()">Research Reports</a></li>
 
-    <li><a onclick="showPage('learner');closeMegas()">Learner Club</a></li>
+    <li><a onclick="showPage('blog');closeMegas()">Blog</a></li>
 
     <li><a onclick="showPage('about');closeMegas()">About</a></li>
     <li><a onclick="showPage('contact');closeMegas()" class="nav-cta">Contact</a></li>
@@ -369,7 +369,7 @@
 
   <a class="mob-link" onclick="showPage('reports')"><span class="mob-link-icon">📊</span><span>Research Reports</span></a>
 
-  <a class="mob-link" onclick="showPage('learner')"><span class="mob-link-icon">📚</span><span>Learner Club</span></a>
+  <a class="mob-link" onclick="showPage('blog')"><span class="mob-link-icon">📰</span><span>Blog</span></a>
 
   <a class="mob-link" onclick="showPage('about')"><span class="mob-link-icon">👤</span><span>About</span></a>
   <a class="mob-link mob-link-cta" onclick="showPage('contact')"><span class="mob-link-icon">📧</span><span>Contact</span></a>
@@ -978,7 +978,11 @@
 
 
 <!-- ===================== LEARNER CLUB PAGE ===================== -->
-<div class="page" id="page-learner">
+<!-- ============================================================
+     LEARNER CLUB — temporarily hidden. Replaced by the Blog section.
+     Keep markup intact in case we resurrect courses + webinars later.
+     ============================================================ -->
+<div class="page" id="page-learner" style="display:none !important">
   <div class="page-hero">
     <div class="container">
       <div class="section-tag">Financial Education</div>
@@ -1039,6 +1043,210 @@
           </div>
         </div>
       </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ===================== BLOG PAGE ===================== -->
+<div class="page" id="page-blog">
+  <div class="page-hero">
+    <div class="container">
+      <div class="section-tag">Research Blog</div>
+      <h1>Insights from the <em>Research Desk</em></h1>
+      <div class="gold-line"></div>
+      <p style="margin-top:14px">Practical, SEBI-compliant analysis on Indian markets &mdash; for serious investors who want depth, not tips.</p>
+    </div>
+  </div>
+
+  <section>
+    <div class="container">
+
+      <!-- Filter tabs -->
+      <div class="tabs" id="blogTabs">
+        <button class="tab active" onclick="filterBlogs('all', this)">All</button>
+        <button class="tab" onclick="filterBlogs('education', this)">Education</button>
+        <button class="tab" onclick="filterBlogs('strategy', this)">Strategy</button>
+        <button class="tab" onclick="filterBlogs('markets', this)">Markets</button>
+        <button class="tab" onclick="filterBlogs('quant', this)">Quant Research</button>
+      </div>
+
+      <div class="cards-grid" id="blogGrid">
+
+        <article class="card blog-card" data-blog-cat="education">
+          <div class="card-tag tag-free">EDUCATION</div>
+          <h3>How to Read an IPO Prospectus: 7 Things That Actually Matter</h3>
+          <p>Most IPO prospectuses run 600+ pages. Here's the 90/10 rule for retail investors &mdash; the seven sections that move the needle on whether an issue is worth subscribing to.</p>
+          <div class="card-meta">
+            <div class="meta-item"><span>15 Apr 2026</span>Published</div>
+            <div class="meta-item"><span>8 min</span>Read</div>
+            <div class="meta-item"><span>Beginner</span>Level</div>
+          </div>
+          <div class="card-footer"><button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px" onclick="showPage('contact')">Read Article &rarr;</button></div>
+        </article>
+
+        <article class="card blog-card" data-blog-cat="markets">
+          <div class="card-tag tag-premium">MARKETS</div>
+          <h3>FII vs DII Flows: What They Really Tell You About the Market</h3>
+          <p>Decoding the daily institutional-flow numbers. When FII selling and DII buying offset each other, what do prices actually do? Five years of NSE data, plotted.</p>
+          <div class="card-meta">
+            <div class="meta-item"><span>10 Apr 2026</span>Published</div>
+            <div class="meta-item"><span>11 min</span>Read</div>
+            <div class="meta-item"><span>Intermediate</span>Level</div>
+          </div>
+          <div class="card-footer"><button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px" onclick="showPage('contact')">Read Article &rarr;</button></div>
+        </article>
+
+        <article class="card blog-card" data-blog-cat="markets">
+          <div class="card-tag tag-free">MARKETS</div>
+          <h3>NIFTY 50 Closing Auction: Why the Pre-Close Tick and Official Close Differ</h3>
+          <p>Every evening retail investors notice their broker showing a different close price than what they saw at 3:29 PM. Here's how the closing auction (15:30&ndash;15:40) sets the canonical close.</p>
+          <div class="card-meta">
+            <div class="meta-item"><span>05 Apr 2026</span>Published</div>
+            <div class="meta-item"><span>6 min</span>Read</div>
+            <div class="meta-item"><span>Beginner</span>Level</div>
+          </div>
+          <div class="card-footer"><button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px" onclick="showPage('contact')">Read Article &rarr;</button></div>
+        </article>
+
+        <article class="card blog-card" data-blog-cat="strategy">
+          <div class="card-tag tag-premium">STRATEGY</div>
+          <h3>Position Sizing for Retail Traders: A SEBI-Compliant Framework</h3>
+          <p>The formula every research analyst uses but few share with retail. Why risking more than 1.5&ndash;2% per trade is the single biggest reason retail accounts blow up &mdash; and how to fix it.</p>
+          <div class="card-meta">
+            <div class="meta-item"><span>28 Mar 2026</span>Published</div>
+            <div class="meta-item"><span>12 min</span>Read</div>
+            <div class="meta-item"><span>Intermediate</span>Level</div>
+          </div>
+          <div class="card-footer"><button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px" onclick="showPage('contact')">Read Article &rarr;</button></div>
+        </article>
+
+        <article class="card blog-card" data-blog-cat="quant">
+          <div class="card-tag tag-premium">QUANT RESEARCH</div>
+          <h3>Filtering 4,000+ NSE/BSE Stocks Down to 20: Our Multi-Factor Screener</h3>
+          <p>Behind the curtain on RootNivesh's quant pipeline &mdash; the momentum, quality, and value factors we run weekly across the entire listed universe to surface high-conviction names.</p>
+          <div class="card-meta">
+            <div class="meta-item"><span>20 Mar 2026</span>Published</div>
+            <div class="meta-item"><span>14 min</span>Read</div>
+            <div class="meta-item"><span>Advanced</span>Level</div>
+          </div>
+          <div class="card-footer"><button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px" onclick="showPage('contact')">Read Article &rarr;</button></div>
+        </article>
+
+        <article class="card blog-card" data-blog-cat="education">
+          <div class="card-tag tag-free">EDUCATION</div>
+          <h3>SIP vs Lumpsum: A Decade of Indian Equity Data, Side-by-Side</h3>
+          <p>The classic question, settled with NIFTY data from 2014&ndash;2024. We compare Rs 1 lakh deployed monthly via SIP against the same lumpsum invested at three different entry points.</p>
+          <div class="card-meta">
+            <div class="meta-item"><span>14 Mar 2026</span>Published</div>
+            <div class="meta-item"><span>9 min</span>Read</div>
+            <div class="meta-item"><span>Beginner</span>Level</div>
+          </div>
+          <div class="card-footer"><button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px" onclick="showPage('contact')">Read Article &rarr;</button></div>
+        </article>
+
+        <article class="card blog-card" data-blog-cat="strategy">
+          <div class="card-tag tag-premium">STRATEGY</div>
+          <h3>Decoding F&amp;O Open Interest: Bullish or Bearish?</h3>
+          <p>Long buildup, short covering, short buildup, long unwinding &mdash; the four OI signatures every F&amp;O trader should recognise on Nifty and BankNifty before placing a position.</p>
+          <div class="card-meta">
+            <div class="meta-item"><span>05 Mar 2026</span>Published</div>
+            <div class="meta-item"><span>10 min</span>Read</div>
+            <div class="meta-item"><span>Intermediate</span>Level</div>
+          </div>
+          <div class="card-footer"><button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px" onclick="showPage('contact')">Read Article &rarr;</button></div>
+        </article>
+
+        <article class="card blog-card" data-blog-cat="strategy">
+          <div class="card-tag tag-premium">STRATEGY</div>
+          <h3>Bank Nifty Iron Condor: The Best Strategy for Range-Bound Expiries</h3>
+          <p>An options spread that profits from time decay when Bank Nifty stays inside a defined range &mdash; with strike-selection rules, exit triggers, and three live expiry case studies.</p>
+          <div class="card-meta">
+            <div class="meta-item"><span>26 Feb 2026</span>Published</div>
+            <div class="meta-item"><span>13 min</span>Read</div>
+            <div class="meta-item"><span>Advanced</span>Level</div>
+          </div>
+          <div class="card-footer"><button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px" onclick="showPage('contact')">Read Article &rarr;</button></div>
+        </article>
+
+        <article class="card blog-card" data-blog-cat="markets">
+          <div class="card-tag tag-free">MARKETS</div>
+          <h3>How RBI Repo-Rate Decisions Move Indian Equities</h3>
+          <p>A 15-year analysis of every RBI MPC meeting and the NIFTY's behaviour in the 5 trading days that followed. Which sectors ran, which sectors fell, and what to watch on the next decision day.</p>
+          <div class="card-meta">
+            <div class="meta-item"><span>20 Feb 2026</span>Published</div>
+            <div class="meta-item"><span>10 min</span>Read</div>
+            <div class="meta-item"><span>Intermediate</span>Level</div>
+          </div>
+          <div class="card-footer"><button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px" onclick="showPage('contact')">Read Article &rarr;</button></div>
+        </article>
+
+        <article class="card blog-card" data-blog-cat="education">
+          <div class="card-tag tag-free">EDUCATION</div>
+          <h3>The Psychology of Stop-Loss: Why Most Retail Traders Get It Wrong</h3>
+          <p>Loss aversion, recency bias, and the &ldquo;just one more candle&rdquo; trap. The behavioural reasons retail traders move stops against themselves &mdash; and a three-rule discipline to fix it.</p>
+          <div class="card-meta">
+            <div class="meta-item"><span>12 Feb 2026</span>Published</div>
+            <div class="meta-item"><span>8 min</span>Read</div>
+            <div class="meta-item"><span>Beginner</span>Level</div>
+          </div>
+          <div class="card-footer"><button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px" onclick="showPage('contact')">Read Article &rarr;</button></div>
+        </article>
+
+      </div>
+
+      <!-- Newsletter / WhatsApp CTA -->
+      <div class="card" style="margin-top:48px; text-align:center; background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03))">
+        <h3 style="font-size:1.4rem; margin-bottom:10px">Get new posts on WhatsApp</h3>
+        <p style="max-width:520px; margin:0 auto 20px; font-size:13.5px; color:var(--grey2)">New research notes, IPO breakdowns and market commentary &mdash; delivered to your free daily updates group as soon as they go live.</p>
+        <a class="btn btn-gold"
+           href="https://wa.me/917467094575?text=Hi%20RootNivesh%2C%20please%20add%20me%20to%20your%20daily%20updates%20WhatsApp%20group."
+           target="_blank" rel="noopener noreferrer"
+           style="display:inline-flex; align-items:center; gap:8px; margin:0 auto">Join Free Updates &rarr;</a>
+      </div>
+
+      <!-- Bottom: tabs to other pages -->
+      <div class="page-cross-nav">
+        <h4>Continue exploring</h4>
+        <div class="cross-nav-grid">
+          <a class="cross-nav-card" onclick="showPage('home')">
+            <span class="cross-nav-icon">🏠</span>
+            <span class="cross-nav-name">Home</span>
+            <span class="cross-nav-desc">Live indices, FII/DII, gainers/losers</span>
+          </a>
+          <a class="cross-nav-card" onclick="showPage('reports')">
+            <span class="cross-nav-icon">📊</span>
+            <span class="cross-nav-name">Research Reports</span>
+            <span class="cross-nav-desc">Featured equity reports &amp; analyses</span>
+          </a>
+          <a class="cross-nav-card" onclick="showPage('calls')">
+            <span class="cross-nav-icon">📞</span>
+            <span class="cross-nav-name">Premium Calls</span>
+            <span class="cross-nav-desc">Intraday, swing, F&amp;O subscription plans</span>
+          </a>
+          <a class="cross-nav-card" onclick="showPage('ipo')">
+            <span class="cross-nav-icon">🆕</span>
+            <span class="cross-nav-name">New IPOs</span>
+            <span class="cross-nav-desc">Open / Upcoming / Closed + Allotment</span>
+          </a>
+          <a class="cross-nav-card" onclick="showPage('tools')">
+            <span class="cross-nav-icon">🔧</span>
+            <span class="cross-nav-name">Calculators</span>
+            <span class="cross-nav-desc">EMI, SIP, position sizing</span>
+          </a>
+          <a class="cross-nav-card" onclick="showPage('about')">
+            <span class="cross-nav-icon">👤</span>
+            <span class="cross-nav-name">About</span>
+            <span class="cross-nav-desc">Founder, credentials, methodology</span>
+          </a>
+          <a class="cross-nav-card" onclick="showPage('contact')">
+            <span class="cross-nav-icon">📧</span>
+            <span class="cross-nav-name">Contact</span>
+            <span class="cross-nav-desc">Email, WhatsApp, office</span>
+          </a>
+        </div>
+      </div>
+
     </div>
   </section>
 </div>
@@ -1948,7 +2156,7 @@
       <div>
         <h5>Learn & Tools</h5>
         <ul>
-          <li><a onclick="showPage('learner')">Learner Club</a></li>
+          <li><a onclick="showPage('blog')">Blog</a></li>
           <li><a onclick="showPage('tools');setTool('emi')">EMI Calculator</a></li>
           <li><a onclick="showPage('tools');setTool('sip')">SIP Calculator</a></li>
           <li><a onclick="showPage('tools');setTool('position')">Position Sizing</a></li>
@@ -1995,7 +2203,7 @@
      Bump the ?v= number whenever you change either file to bust
      long-cached copies on visitors' phones. -->
 <script src="js/data.js?v=35"></script>
-<script src="js/script.js?v=45"></script>
+<script src="js/script.js?v=46"></script>
 
 
 <section style="padding:40px 20px; max-width:900px; margin:auto; line-height:1.7;">

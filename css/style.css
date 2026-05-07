@@ -2042,6 +2042,57 @@
     .hero-wa-link { font-size: 12px; }
   }
 
+  /* ====== BLOG cards — slight polish so titles don't crowd the body copy ====== */
+  .blog-card h3 {
+    font-size: 1.18rem; line-height: 1.35;
+    margin: 12px 0 10px;
+  }
+  .blog-card p { font-size: 13.5px; }
+
+  /* ====== Cross-page navigation grid (bottom of pages) ======
+     A 'continue exploring' card grid that helps visitors jump to
+     other sections after they finish reading the current page. */
+  .page-cross-nav {
+    margin-top: 56px;
+    padding-top: 36px;
+    border-top: 1px solid var(--border);
+  }
+  .page-cross-nav h4 {
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: 1.5px;
+    color: var(--gold); text-transform: uppercase;
+    margin: 0 0 22px;
+  }
+  .cross-nav-grid {
+    display: grid; gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+  .cross-nav-card {
+    display: flex; flex-direction: column; gap: 4px;
+    padding: 16px 18px;
+    background: rgba(11,28,52,0.55);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.2s, background 0.2s;
+  }
+  .cross-nav-card:hover {
+    border-color: var(--gold);
+    background: rgba(11,28,52,0.85);
+    transform: translateY(-2px);
+  }
+  .cross-nav-icon { font-size: 22px; line-height: 1; }
+  .cross-nav-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 700; color: #fff;
+    margin-top: 4px;
+  }
+  .cross-nav-desc {
+    font-size: 12px; color: var(--grey2); line-height: 1.5;
+  }
+
   @media (max-width: 768px) {
     .plan-collapse { grid-template-columns: 1fr; }
     .plan-pricing { border-left: none; border-top: 1px solid var(--border); }
