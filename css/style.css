@@ -1259,6 +1259,8 @@
   .fiidii-card {
     background: rgba(11,28,52,0.7); border: 1px solid var(--border);
     border-radius: 14px; padding: 16px 18px; transition: border-color 0.3s;
+    min-width: 0; /* lets grid 1fr columns stay equal even if a child wants to be wider */
+    display: flex; flex-direction: column;
   }
   .fiidii-card:hover { border-color: var(--border2); }
   .fiidii-card-top {
@@ -1299,10 +1301,10 @@
   }
   .fiidii-bs-icon.buy  { background: rgba(46,204,113,0.15); color: var(--green); }
   .fiidii-bs-icon.sell { background: rgba(231,76,60,0.15);  color: var(--red);   }
-  .fiidii-bs-val   { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: var(--white); }
+  .fiidii-bs-val   { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: var(--white); white-space: nowrap; }
   .fiidii-bs-label { font-size: 9.5px; color: var(--grey); }
   .fiidii-card-date {
-    margin-top: 12px;
+    margin-top: auto; /* pin to bottom so both cards line up regardless of content height */
     padding-top: 10px;
     border-top: 1px solid rgba(255,255,255,0.08);
     font-family: 'Space Mono', monospace;
@@ -1310,6 +1312,9 @@
     text-align: center;
     width: 100%;
   }
+  /* The bsrow needs its own top margin now that the date stamp uses
+     margin-top:auto to push to the bottom of the card. */
+  .fiidii-card .fiidii-bsrow { margin-bottom: 12px; }
   .fiidii-card-date.stale { color: var(--gold); }
   .fiidii-vsep {
     display: flex; align-items: center; justify-content: center; padding: 0 12px;

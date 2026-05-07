@@ -402,7 +402,10 @@ function fmtCr(val) {
 }
 function fmtCrAbs(val) {
   const n = Math.abs(parseFloat(val));
-  return '₹' + n.toLocaleString('en-IN', { maximumFractionDigits: 2 }) + ' Cr';
+  // Unit is already in the "Buy (₹Cr)" / "Sell (₹Cr)" label below, so we
+  // omit it here to keep the value compact (was breaking onto two lines on
+  // narrower cards and pushing them to unequal heights).
+  return '₹' + n.toLocaleString('en-IN', { maximumFractionDigits: 2 });
 }
 
 function applyFiiDii(fii, dii) {
