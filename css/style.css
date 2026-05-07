@@ -1737,23 +1737,18 @@
     color: var(--gold); text-transform: uppercase; letter-spacing: 1.2px;
   }
   .plan-toggle-right {
-    display: flex; align-items: center; gap: 14px; flex-shrink: 0;
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
   }
+  /* Plain label — used to be a pill, but visitors mistook it for a button.
+     Now it just hints at the plan focus while the chevron is the only
+     interactive-looking affordance. */
   .plan-toggle-price {
     font-family: 'Space Mono', monospace; font-size: 11.5px;
     color: var(--gold); white-space: nowrap;
-    background: rgba(201,168,76,0.08);
-    border: 1px solid var(--border);
-    padding: 4px 12px;
-    border-radius: 20px;
     letter-spacing: 0.5px; text-transform: uppercase;
   }
   .plan-toggle-chev {
     font-size: 14px; color: var(--gold);
-    width: 28px; height: 28px;
-    display: inline-flex; align-items: center; justify-content: center;
-    border: 1px solid var(--border2); border-radius: 50%;
-    background: rgba(201,168,76,0.06);
     transition: transform 0.3s ease;
   }
   .plan-card.open .plan-toggle-chev { transform: rotate(180deg); }
