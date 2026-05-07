@@ -183,7 +183,7 @@
 <link rel="dns-prefetch" href="https://www.bseindia.com">
 <link rel="dns-prefetch" href="https://www.nseindia.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=75">
+<link rel="stylesheet" href="css/style.css?v=76">
 </head>
 <body>
 
@@ -380,26 +380,26 @@
   </div>
 </div>
 
+<!-- ===== SITE-WIDE LIVE TICKER (sits below nav, fixed across all pages) ===== -->
+<div class="ticker-tape">
+  <div class="ticker-live-bar">
+    <span class="ticker-live-dot">
+      <span class="tlive-pulse"></span>LIVE
+    </span>
+    <span class="ticker-market-status" id="marketStatus">NSE</span>
+  </div>
+  <div class="ticker-scroll-wrap">
+    <div class="ticker-inner" id="tickerInner">
+      <span class="ticker-loading">⟳ Fetching live market data&#8230;</span>
+    </div>
+  </div>
+</div>
+
 <!-- ===================== HOME PAGE ===================== -->
 <div class="page active" id="page-home">
 
   <!-- Hero -->
   <section class="hero">
-    
-    <div class="ticker-tape">
-      <div class="ticker-live-bar">
-        <span class="ticker-live-dot">
-          <span class="tlive-pulse"></span>LIVE
-        </span>
-        <span class="ticker-market-status" id="marketStatus">NSE</span>
-      </div>
-      <div class="ticker-scroll-wrap">
-        <div class="ticker-inner" id="tickerInner">
-          <span class="ticker-loading">⟳ Fetching live market data…</span>
-        </div>
-      </div>
-    </div>
-
     <div class="hero-content">
       <div class="hero-grid">
         <div class="hero-text">

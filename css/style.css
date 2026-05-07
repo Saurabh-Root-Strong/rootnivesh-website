@@ -97,7 +97,7 @@
 
   /* ── MEGA MENU ── */
   .mega-menu {
-    display: none; position: fixed; top: 92px; left: 0; width: 100%;
+    display: none; position: fixed; top: 128px; left: 0; width: 100%;
     background: #07131F; border-bottom: 2px solid var(--border2);
     box-shadow: 0 24px 60px rgba(0,0,0,0.6);
     z-index: 1001; animation: ddFade 0.2s ease;
@@ -197,9 +197,9 @@
   }
   .mobile-menu {
     display: none; position: fixed;
-    top: 92px; left: 0; right: 0;
-    height: calc(100vh - 92px);
-    height: calc(100dvh - 92px); /* dvh handles iOS dynamic toolbar */
+    top: 128px; left: 0; right: 0;
+    height: calc(100vh - 128px);
+    height: calc(100dvh - 128px); /* dvh handles iOS dynamic toolbar */
     background: #07131F;
     border-top: 1px solid var(--border);
     padding: 8px 12px calc(24px + env(safe-area-inset-bottom));
@@ -348,11 +348,16 @@
     position: absolute; inset: 0;
     background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   }
+  /* Fixed ticker that sits below the navbar across the entire site (not just
+     the hero section). z-index 999 keeps it under the nav (1000) but above
+     all page content. Pages get a top offset of 36px (the ticker height) so
+     content doesn't slide under the ticker. */
   .ticker-tape {
-    position: absolute; top: 92px; left: 0; width: 100%;
+    position: fixed; top: 92px; left: 0; width: 100%;
     background: rgba(5,12,22,0.92); border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; height: 36px; overflow: hidden; z-index: 10;
+    display: flex; align-items: center; height: 36px; overflow: hidden; z-index: 999;
   }
+  .page { padding-top: 36px; } /* clears the fixed ticker */
   .ticker-live-bar {
     display: flex; align-items: center; gap: 6px; flex-shrink: 0;
     padding: 0 14px; border-right: 1px solid var(--border);
@@ -1148,7 +1153,7 @@
   .page-split {
     display: grid;
     grid-template-columns: 280px 1fr;
-    min-height: calc(100vh - 92px);
+    min-height: calc(100vh - 128px);
     gap: 0;
   }
   .snav-wrap {
@@ -1156,8 +1161,8 @@
     border-right: 1px solid var(--border);
     padding: 32px 0;
     position: sticky;
-    top: 92px;
-    height: calc(100vh - 92px);
+    top: 128px;
+    height: calc(100vh - 128px);
     overflow-y: auto;
   }
   .snav-wrap::-webkit-scrollbar { width: 4px; }
@@ -2055,6 +2060,7 @@
     .hamburger span { width: 18px; }
     .ticker-tape { top: 40px; height: 26px; }
     .hero { padding-top: 56px; }
+    .page { padding-top: 26px; } /* match mobile ticker height */
 
     h1 { font-size: clamp(2.1rem, 9vw, 2.9rem) !important; line-height: 1.08; }
     .hero-headline { font-size: clamp(1.7rem, 7.5vw, 2.4rem) !important; line-height: 1.18 !important; }
@@ -2447,9 +2453,9 @@
     height: calc(92px + env(safe-area-inset-top, 0px));
   }
   .ticker-tape { top: calc(92px + env(safe-area-inset-top, 0px)); }
-  .mega-menu  { top: calc(92px + env(safe-area-inset-top, 0px)); }
+  .mega-menu  { top: calc(128px + env(safe-area-inset-top, 0px)); }
   .mobile-menu {
-    top: calc(92px + env(safe-area-inset-top, 0px));
+    top: calc(128px + env(safe-area-inset-top, 0px));
     padding-bottom: calc(16px + env(safe-area-inset-bottom));
   }
   footer {
