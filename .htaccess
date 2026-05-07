@@ -30,13 +30,17 @@ RewriteRule ^.*\.md$           - [F,L]
 # ────────────────────────────────────────────────────────────
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_URI} !^/(css|js|images|videos|docs)/
+RewriteCond %{REQUEST_URI} !^/(css|js|images|videos|docs|admin|apk)/
 RewriteCond %{REQUEST_URI} !^/proxy\.php$
 RewriteCond %{REQUEST_URI} !^/contact\.php$
 RewriteCond %{REQUEST_URI} !^/fii-dii\.php$
 RewriteCond %{REQUEST_URI} !^/fii-dii-history\.php$
 RewriteCond %{REQUEST_URI} !^/gainers-losers\.php$
+RewriteCond %{REQUEST_URI} !^/indices\.php$
+RewriteCond %{REQUEST_URI} !^/ipo\.php$
+RewriteCond %{REQUEST_URI} !^/calls\.php$
 RewriteCond %{REQUEST_URI} !^/sitemap\.xml$
+RewriteCond %{REQUEST_URI} !^/robots\.txt$
 RewriteCond %{REQUEST_URI} !^/google[a-z0-9]+\.html$
 RewriteRule ^.*$ /index.html [L]
 

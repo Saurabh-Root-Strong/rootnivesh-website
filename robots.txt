@@ -12,8 +12,13 @@ Disallow: /gainers-losers.php
 Disallow: /fii-dii.php
 Disallow: /fii-dii-history.php
 Disallow: /ipo.php
+Disallow: /calls.php
 Disallow: /contact.php
 Disallow: /data/
+
+# Admin panel and APK build folder — internal, no SEO value
+Disallow: /admin/
+Disallow: /apk/
 
 # Sitemap location
 Sitemap: https://rootnivesh.in/sitemap.xml
