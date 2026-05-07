@@ -1,0 +1,39 @@
+{
+  "appId": "in.rootnivesh.app",
+  "appName": "RootNivesh Research",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "https://rootnivesh.in",
+    "androidScheme": "https",
+    "cleartext": false,
+    "allowNavigation": [
+      "rootnivesh.in",
+      "www.rootnivesh.in",
+      "wa.me",
+      "*.bseindia.com",
+      "*.nseindia.com"
+    ]
+  },
+  "android": {
+    "minWebViewVersion": 80,
+    "captureInput": true,
+    "useLegacyBridge": false,
+    "backgroundColor": "#05101F"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "launchAutoHide": true,
+      "backgroundColor": "#05101F",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "backgroundColor": "#05101F",
+      "style": "DARK",
+      "overlaysWebView": false
+    }
+  }
+}

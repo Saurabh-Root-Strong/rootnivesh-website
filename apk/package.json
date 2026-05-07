@@ -1,0 +1,27 @@
+{
+  "name": "rootnivesh-app",
+  "version": "1.0.0",
+  "description": "RootNivesh Research — Android app shell over rootnivesh.in",
+  "private": true,
+  "scripts": {
+    "init-android": "cap add android",
+    "sync": "cap sync",
+    "open": "cap open android",
+    "build": "cap sync && cap open android",
+    "doctor": "cap doctor"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/splash-screen": "^6.0.2",
+    "@capacitor/status-bar": "^6.0.1",
+    "@capacitor/app": "^6.0.1",
+    "@capacitor/network": "^6.0.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

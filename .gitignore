@@ -11,3 +11,19 @@ desktop.ini
 admin/config.php
 data/
 *.log
+
+# Capacitor / Android build artefacts
+apk/node_modules/
+apk/android/build/
+apk/android/app/build/
+apk/android/.gradle/
+apk/android/.idea/
+apk/android/local.properties
+apk/android/captures/
+apk/android/release/
+apk/android/app/release/
+apk/*.apk
+apk/*.aab
+apk/*.keystore
+apk/*.jks
+apk/keystore.properties

@@ -1,0 +1,19 @@
+# Node / npm
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# Capacitor / Android Studio output
+android/build/
+android/app/build/
+android/.gradle/
+android/.idea/
+android/local.properties
+android/captures/
+android/release/
+android/app/release/
+*.apk
+*.aab
+*.keystore
+*.jks
+keystore.properties
