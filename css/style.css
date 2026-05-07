@@ -1737,7 +1737,8 @@
     color: var(--gold); text-transform: uppercase; letter-spacing: 1.2px;
   }
   .plan-toggle-right {
-    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 6px; flex-shrink: 0;
   }
   /* Plain label — used to be a pill, but visitors mistook it for a button.
      Now it just hints at the plan focus while the chevron is the only
@@ -1747,9 +1748,20 @@
     color: var(--gold); white-space: nowrap;
     letter-spacing: 0.5px; text-transform: uppercase;
   }
+  /* Small dropdown chevron pill — sits BELOW the label so the whole
+     right column reads top-down: "SMART EQUITY PICKS" then a clear
+     little ▾ button hint. */
   .plan-toggle-chev {
-    font-size: 14px; color: var(--gold);
-    transition: transform 0.3s ease;
+    font-size: 11px; color: var(--gold);
+    width: 22px; height: 22px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border2); border-radius: 50%;
+    background: rgba(201,168,76,0.08);
+    transition: transform 0.3s ease, background 0.2s, border-color 0.2s;
+  }
+  .plan-card-toggle:hover .plan-toggle-chev {
+    background: rgba(201,168,76,0.15);
+    border-color: var(--gold);
   }
   .plan-card.open .plan-toggle-chev { transform: rotate(180deg); }
 
