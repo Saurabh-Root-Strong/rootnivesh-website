@@ -1,0 +1,143 @@
+/* admin/admin.css — minimal, on-brand, mobile-friendly */
+
+:root {
+  --navy:  #05101F;
+  --navy2: #0B1E35;
+  --navy3: #0F2744;
+  --gold:  #C9A84C;
+  --grey:  #8A9BB0;
+  --grey2: #B0BEC5;
+  --green: #2ECC71;
+  --red:   #E74C3C;
+  --border:  rgba(255,255,255,0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+.admin-body {
+  margin: 0; padding: 0; min-height: 100vh;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(180deg, var(--navy) 0%, var(--navy2) 100%);
+  color: #fff;
+}
+.admin-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 24px; background: rgba(7,19,31,0.95);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 10;
+}
+.admin-header h1 { font-size: 1.05rem; margin: 0; letter-spacing: 0.3px; }
+.admin-link { color: var(--gold); text-decoration: none; font-size: 13px; }
+.admin-main { max-width: 1100px; margin: 0 auto; padding: 24px 18px 40px; }
+
+.admin-card {
+  background: rgba(11,28,52,0.55);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin-bottom: 20px;
+}
+.admin-card h2 { margin: 0 0 14px; font-size: 1.1rem; color: #fff; }
+.admin-form { display: flex; flex-direction: column; gap: 14px; }
+.admin-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.admin-label, .admin-form label {
+  display: flex; flex-direction: column; gap: 6px;
+  font-size: 12.5px; color: var(--grey2);
+}
+.admin-form input[type="text"],
+.admin-form input[type="number"],
+.admin-form input[type="password"],
+.admin-form select,
+.admin-form textarea {
+  background: rgba(5,16,31,0.7);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #fff;
+  font-family: inherit; font-size: 13.5px;
+  transition: border-color 0.2s;
+}
+.admin-form input:focus,
+.admin-form select:focus,
+.admin-form textarea:focus {
+  outline: none; border-color: var(--gold);
+}
+.admin-check { flex-direction: row !important; align-items: center; gap: 8px; }
+.admin-check input { width: auto !important; }
+
+.admin-btn {
+  align-self: flex-start;
+  background: linear-gradient(135deg, var(--gold), #E8C46A);
+  color: var(--navy); border: none;
+  padding: 10px 20px; border-radius: 8px;
+  font-weight: 700; font-size: 13.5px;
+  cursor: pointer; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: filter 0.2s, transform 0.2s;
+}
+.admin-btn:hover { filter: brightness(1.05); }
+.admin-btn-secondary {
+  background: transparent; color: var(--gold);
+  border: 1px solid var(--border);
+}
+.admin-btn-wa {
+  background: linear-gradient(135deg, #25D366, #1ebf5b);
+  color: #fff;
+}
+
+.admin-error {
+  background: rgba(231,76,60,0.12); border: 1px solid rgba(231,76,60,0.3);
+  color: #ff8a7a; padding: 10px 14px; border-radius: 8px;
+  font-size: 13px; margin-bottom: 14px;
+}
+.admin-flash {
+  background: rgba(46,204,113,0.12); border: 1px solid rgba(46,204,113,0.3);
+  color: #6be39e; padding: 10px 14px; border-radius: 8px;
+  font-size: 13px; margin-bottom: 14px;
+}
+
+/* Login card */
+.admin-login-card {
+  max-width: 380px; margin: 80px auto;
+  background: rgba(11,28,52,0.7);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 28px 26px;
+}
+
+/* Call list */
+.admin-call {
+  background: rgba(7,19,31,0.6); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 16px; margin: 0 0 12px;
+  border-left: 3px solid var(--grey);
+}
+.admin-call.win   { border-left-color: var(--green); }
+.admin-call.loss  { border-left-color: var(--red); }
+.admin-call.closed{ opacity: 0.7; }
+.admin-call-head {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  margin-bottom: 6px; font-size: 13px;
+}
+.admin-call-action {
+  padding: 2px 8px; border-radius: 4px; font-weight: 700;
+  font-size: 11px; letter-spacing: 0.5px;
+}
+.admin-call-action.buy  { background: rgba(46,204,113,0.15); color: var(--green); }
+.admin-call-action.sell { background: rgba(231,76,60,0.15);  color: var(--red);   }
+.admin-call-symbol { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 14px; }
+.admin-call-type { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--gold); letter-spacing: 1px; }
+.admin-call-status { font-size: 10px; padding: 2px 6px; border-radius: 3px; letter-spacing: 0.5px; }
+.status-open  { background: rgba(201,168,76,0.12); color: var(--gold); }
+.status-win   { background: rgba(46,204,113,0.15); color: var(--green); }
+.status-loss  { background: rgba(231,76,60,0.15);  color: var(--red); }
+.status-closed{ background: rgba(255,255,255,0.06); color: var(--grey); }
+.admin-call-date { margin-left: auto; font-size: 11px; color: var(--grey); }
+.admin-call-prices { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--grey2); margin-bottom: 6px; }
+.admin-call-thesis { font-size: 13px; color: var(--grey2); margin-bottom: 10px; line-height: 1.5; }
+.admin-call-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.admin-call-shared { font-size: 11px; color: var(--green); }
+
+.admin-inline-form {
+  display: inline-flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
+  background: rgba(5,16,31,0.5); padding: 8px; border-radius: 6px;
+}
+.admin-inline-form select,
+.admin-inline-form input { font-size: 12px; padding: 6px 8px; }

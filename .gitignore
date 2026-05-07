@@ -6,3 +6,8 @@
 Thumbs.db
 .DS_Store
 desktop.ini
+
+# Admin secrets — must never be committed
+admin/config.php
+data/
+*.log
