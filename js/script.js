@@ -1272,21 +1272,27 @@ async function fetchIpo(tab) {
   const tbody  = document.getElementById('ipoBody');
   if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:var(--grey)">Loading IPO data from NSE…</td></tr>';
 
-  const upstream = IPO_ENDPOINTS[tab];
-  if (!upstream) { renderIpoTable([], tab); return; }
-
+  // Use /ipo.php (cookie-handshake-aware) instead of /proxy.php — the plain
+  // proxy was returning intermittent stale/empty data because NSE's API
+  // requires a session-cookie handshake first. ipo.php replicates the
+  // pattern from indices.php and gainers-losers.php.
+  const url = '/ipo.php?tab=' + encodeURIComponent(tab) + '&cb=' + Date.now();
   try {
-    const url = '/proxy.php?url=' + encodeURIComponent(upstream);
-    const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
-    if (!res.ok) throw new Error('proxy ' + res.status);
-    const data = await res.json();
-    let arr = Array.isArray(data) ? data : (data.data || []);
+    const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) throw new Error('ipo.php ' + res.status);
+    const payload = await res.json();
+    const inner = payload && payload.data ? payload.data : null;
+    let arr = Array.isArray(inner) ? inner : (inner && inner.data) || [];
     if (tab === 'closed') arr = normalizeClosedIpos(arr);
     renderIpoTable(arr, tab);
     autoFillIpoBusinessCells(); // async; updates cells in place when lookups land
     if (status) {
-      const suffix = tab === 'closed' ? 'Showing the last ' + IPO_CLOSED_DAYS + ' days.' : '';
-      status.textContent = suffix;
+      const stale  = !!(payload && payload.stale);
+      const at     = payload && payload.fetched_at
+        ? new Date(payload.fetched_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+        : '';
+      const dayCap = tab === 'closed' ? ' Showing the last ' + IPO_CLOSED_DAYS + ' days.' : '';
+      status.textContent = (stale ? 'Stale — last fetched ' : 'Updated ') + at + ' • Source: NSE India.' + dayCap;
     }
   } catch (e) {
     renderIpoTable([], tab);

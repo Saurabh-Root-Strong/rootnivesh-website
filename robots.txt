@@ -11,6 +11,7 @@ Disallow: /indices.php
 Disallow: /gainers-losers.php
 Disallow: /fii-dii.php
 Disallow: /fii-dii-history.php
+Disallow: /ipo.php
 Disallow: /contact.php
 Disallow: /data/
 
