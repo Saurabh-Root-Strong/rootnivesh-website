@@ -5,6 +5,15 @@ admin_require_login();
 $pdo  = db();
 $flash = '';
 
+// Every state-changing POST must carry a valid CSRF token.
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!csrf_verify()) {
+        http_response_code(403);
+        $flash = 'Security check failed (CSRF). Please reload the page and try again.';
+        $_SERVER['REQUEST_METHOD'] = 'GET'; // skip the handlers below, just re-render
+    }
+}
+
 /* ---------- Handle POST: add new call ---------- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add') {
     try {
@@ -25,13 +34,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
         ]);
         $flash = 'Call posted successfully (#' . $pdo->lastInsertId() . ').';
     } catch (PDOException $e) {
-        $flash = 'Error: ' . $e->getMessage();
+        error_log('admin add call failed: ' . $e->getMessage());
+        $flash = 'Could not post the call. Please try again.';
     }
 }
 
 /* ---------- Handle POST: close / mark a call ---------- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update_status') {
     try {
+        $allowedStatus = ['open','target_hit','stop_hit','closed','cancelled'];
+        $status = in_array($_POST['status'] ?? '', $allowedStatus, true) ? $_POST['status'] : 'open';
         $stmt = $pdo->prepare(
             'UPDATE calls SET status = :status, exit_price = :exit, exit_at = :exit_at, pnl_pct = :pnl
              WHERE id = :id'
@@ -50,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
             }
         }
         $stmt->execute([
-            ':status'  => $_POST['status'],
+            ':status'  => $status,
             ':exit'    => $exit,
             ':exit_at' => $exit !== null ? date('Y-m-d H:i:s') : null,
             ':pnl'     => $pnl,
@@ -58,7 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
         ]);
         $flash = 'Call updated.';
     } catch (PDOException $e) {
-        $flash = 'Error: ' . $e->getMessage();
+        error_log('admin update_status failed: ' . $e->getMessage());
+        $flash = 'Could not update the call. Please try again.';
     }
 }
 
@@ -112,6 +125,7 @@ function build_wa_message($c) {
     <section class="admin-card">
       <h2>Post a new call</h2>
       <form method="post" class="admin-form">
+        <?php echo csrf_field(); ?>
         <input type="hidden" name="action" value="add">
         <div class="admin-row">
           <label>Type
@@ -175,7 +189,7 @@ function build_wa_message($c) {
             <span class="admin-call-action <?php echo strtolower($c['action']); ?>"><?php echo htmlspecialchars($c['action']); ?></span>
             <span class="admin-call-symbol"><?php echo htmlspecialchars($c['symbol']); ?></span>
             <span class="admin-call-type"><?php echo strtoupper(htmlspecialchars($c['call_type'])); ?></span>
-            <span class="admin-call-status status-<?php echo $statusClass; ?>"><?php echo strtoupper(str_replace('_', ' ', $c['status'])); ?></span>
+            <span class="admin-call-status status-<?php echo $statusClass; ?>"><?php echo htmlspecialchars(strtoupper(str_replace('_', ' ', $c['status']))); ?></span>
             <span class="admin-call-date"><?php echo date('d M Y, H:i', strtotime($c['posted_at'])); ?></span>
           </div>
           <div class="admin-call-prices">
@@ -200,6 +214,7 @@ function build_wa_message($c) {
             <details style="display:inline-block; margin-left:8px">
               <summary class="admin-btn admin-btn-secondary">Update status</summary>
               <form method="post" class="admin-inline-form">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="action" value="update_status">
                 <input type="hidden" name="id" value="<?php echo $c['id']; ?>">
                 <select name="status">
@@ -226,11 +241,13 @@ function build_wa_message($c) {
   </form>
 
   <script>
+    const CSRF_TOKEN = <?php echo json_encode(csrf_token()); ?>;
     // When admin clicks Share-to-WA, fire-and-forget mark_shared in the background.
     function markShared(id) {
       const fd = new FormData();
       fd.append('action', 'mark_shared');
       fd.append('id', id);
+      fd.append('csrf', CSRF_TOKEN);
       // Don't block the WhatsApp window from opening — just send.
       fetch(window.location.href, { method: 'POST', body: fd, credentials: 'same-origin' })
         .catch(() => {});

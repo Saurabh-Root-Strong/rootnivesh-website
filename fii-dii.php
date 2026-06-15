@@ -113,7 +113,7 @@ if ($shouldRefresh) {
                 'data'         => $parsed,
                 'stale'        => false,
             ];
-            @file_put_contents($cacheFile, json_encode($cache));
+            @file_put_contents($cacheFile, json_encode($cache), LOCK_EX);
         }
     } else if ($cache) {
         // Mark existing cache as stale rather than discard it

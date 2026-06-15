@@ -110,7 +110,7 @@ if ($shouldRefresh) {
                 'losers'       => $losers,
                 'stale'        => false,
             ];
-            @file_put_contents($cacheFile, json_encode($cache));
+            @file_put_contents($cacheFile, json_encode($cache), LOCK_EX);
         } else if ($cache) {
             $cache['stale'] = true;
         }

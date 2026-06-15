@@ -22,8 +22,11 @@ if ($url === '') {
 
 $allowed_hosts = ['query1.finance.yahoo.com', 'query2.finance.yahoo.com', 'www.nseindia.com', 'www.chittorgarh.com'];
 $parsed = parse_url($url);
-$host = isset($parsed['host']) ? $parsed['host'] : '';
-if (!in_array($host, $allowed_hosts, true)) {
+$scheme = strtolower($parsed['scheme'] ?? '');
+$host   = strtolower($parsed['host'] ?? '');
+// Only https to a whitelisted host. Rejecting non-https here also blocks
+// file://, gopher://, dict://, etc. that could otherwise reach internal targets.
+if ($scheme !== 'https' || !in_array($host, $allowed_hosts, true)) {
     http_response_code(403);
     echo json_encode(['error' => 'host not allowed', 'host' => $host]);
     exit;
@@ -32,7 +35,14 @@ if (!in_array($host, $allowed_hosts, true)) {
 $ch = curl_init($url);
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_FOLLOWLOCATION => true,
+    // SSRF guard: do NOT follow redirects. The whitelist only validates the
+    // initial URL — following a 30x to an attacker-chosen Location (internal
+    // service, 169.254.169.254 metadata, localhost) would bypass it entirely.
+    CURLOPT_FOLLOWLOCATION => false,
+    // Belt-and-suspenders: even if redirects were ever re-enabled, only allow
+    // HTTP(S) — never file/gopher/dict/etc.
+    CURLOPT_PROTOCOLS      => CURLPROTO_HTTPS,
+    CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
     CURLOPT_TIMEOUT => 12,
     CURLOPT_CONNECTTIMEOUT => 5,
     CURLOPT_HTTPHEADER => [

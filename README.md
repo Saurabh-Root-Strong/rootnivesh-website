@@ -39,7 +39,7 @@ Hosted on Hostinger; auto-deploys on push to `main`.
 │   ├── login.php · index.php · logout.php · auth.php · db.php
 │   ├── schema.sql                   one-time DB schema
 │   ├── config.sample.php            template — rename to config.php on Hostinger (gitignored)
-│   ├── hash-password.php            one-time bcrypt helper, delete after use
+│   │   (generate ADMIN_PASS_HASH offline: php -r "echo password_hash('pw', PASSWORD_BCRYPT);")
 │   ├── admin.css                    admin panel styles
 │   └── SETUP.md                     one-time deployment checklist
 │

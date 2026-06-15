@@ -29,11 +29,18 @@ This panel lets you post daily trading calls and broadcast each one to your What
 
 ## Step 4 — Generate your admin password hash
 
-1. Visit: `https://rootnivesh.in/admin/hash-password.php?p=YourStrongPassword`
-   (replace YourStrongPassword with whatever you want — minimum 8 chars)
-2. Copy the bcrypt hash it prints
-3. Paste it into `config.php` as the value of `ADMIN_PASS_HASH`
-4. **Delete `admin/hash-password.php`** afterwards (security — anyone visiting it could generate hashes)
+Generate the hash **on a machine, never over a URL** — passing the password in a
+URL (`?p=...`) writes it in plaintext to the server access logs.
+
+- **Hostinger has SSH / a Terminal?** Run:
+  ```
+  php -r "echo password_hash('YourStrongPassword', PASSWORD_BCRYPT), PHP_EOL;"
+  ```
+- **No shell?** Run the same one-liner on any local PHP install, or use a trusted
+  offline bcrypt generator, then:
+
+1. Copy the bcrypt hash (starts with `$2y$`)
+2. Paste it into `config.php` as the value of `ADMIN_PASS_HASH`
 
 ## Step 5 — Test the admin panel
 
@@ -83,7 +90,7 @@ Frontend integration to display these on the public Calls page is a separate ste
 - **"Configuration missing"** error → you didn't create `admin/config.php` (Step 3)
 - **"Database connection failed"** → wrong DB credentials in `config.php`
 - **Login fails with correct password** → re-check the bcrypt hash you copied (the whole `$2y$10$...` string, no extra spaces)
-- **`hash-password.php` shows error after deletion** → expected, leave it deleted
+- **Forgot your admin password** → re-generate a hash with the `php -r` one-liner in Step 4 and replace `ADMIN_PASS_HASH` in `config.php`
 
 ## SEBI compliance reminder
 

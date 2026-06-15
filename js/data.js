@@ -41,6 +41,22 @@ const PAGE_TITLES = {
   disclaimer: 'Disclaimer | RootNivesh Research'
 };
 
+/* Per-route meta description. Keeps each History-API "page" from sharing the
+   homepage description/canonical, which otherwise collapses deep-link ranking. */
+const PAGE_DESCRIPTIONS = {
+  home:       'SEBI Registered Research Analyst (Mumbai). Quant-backed stock market research, intraday & swing calls, F&O strategies, IPO analysis and portfolio reviews.',
+  ipo:        'Live NSE IPO tracker — Open, Upcoming and recently Closed mainboard & SME IPOs with price bands, dates and company overviews.',
+  learner:    'Learner Club — structured stock market learning from a SEBI Registered Research Analyst.',
+  calls:      'Intraday, swing, positional and value investing calls with clear entry, target and stop-loss levels from a SEBI Registered Research Analyst.',
+  reports:    'In-depth equity research reports with target prices, upside and time horizons — data-driven, no-tip-style analysis.',
+  tools:      'Free smart calculators for Indian investors — brokerage, SIP, position-size and risk-reward tools.',
+  about:      'About RootNivesh Research — a SEBI Registered Research Analyst based in Mumbai providing quant-backed market research.',
+  contact:    'Contact RootNivesh Research for research subscriptions, queries and SEBI-compliant advisory.',
+  privacy:    'How RootNivesh Research collects, uses and protects your personal data.',
+  terms:      'Terms of use governing the RootNivesh Research website and services.',
+  disclaimer: 'Market-risk disclaimer and SEBI Research Analyst disclosures for RootNivesh Research.'
+};
+
 
 /* ----------- Calls page sidebar metadata ---------------------------------- */
 const callsMeta = {

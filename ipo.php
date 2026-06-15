@@ -120,7 +120,7 @@ if ($shouldRefresh) {
             'data'         => $data,
             'stale'        => false,
         ];
-        @file_put_contents($cacheFile, json_encode($cache));
+        @file_put_contents($cacheFile, json_encode($cache), LOCK_EX);
     } else if ($cache) {
         // Upstream failed but we have prior data — mark stale so the
         // frontend can warn the user, but don't break the page.

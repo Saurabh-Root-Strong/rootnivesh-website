@@ -148,6 +148,7 @@ function fetch_groww_history() {
         $seen[$r['iso']] = true;
         $clean[] = [
             'date'    => $r['date'],
+            'iso'     => $r['iso'],   // retained so NSE's latest day can be merged on top
             'fii'     => $r['fii'],
             'dii'     => $r['dii'],
             'fiiBuy'  => $r['fiiBuy'],
@@ -160,18 +161,124 @@ function fetch_groww_history() {
     return $clean;
 }
 
-if ($shouldRefresh) {
-    $rows = fetch_groww_history();
-    if ($rows && count($rows) > 0) {
-        $cache = [
-            'ts'           => $now,
-            'fetched_date' => $todayIST,
-            'fetched_at'   => $istNow->format(DateTime::ATOM),
-            'source'       => 'Groww (FII/DII page)',
-            'rows'         => $rows,
-            'stale'        => false,
+function date_to_iso($d) {
+    // "15-Jun-2026" -> "2026-06-15"
+    if (!is_string($d) || $d === '') return null;
+    $dt = DateTime::createFromFormat('d-M-Y', $d);
+    return $dt ? $dt->format('Y-m-d') : null;
+}
+
+/* Latest 1–2 trading days straight from NSE's official FII/DII report
+   (https://www.nseindia.com/reports/fii-dii). NSE publishes the current day's
+   provisional figures hours before Groww mirrors them, so NSE is treated as the
+   authoritative source for the most recent day. Requires the cookie handshake. */
+function fetch_nse_latest() {
+    $home = 'https://www.nseindia.com/';
+    $api  = 'https://www.nseindia.com/api/fiidiiTradeReact';
+    $headers = [
+        'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept: application/json, text/plain, */*',
+        'Accept-Language: en-US,en;q=0.9',
+        'Connection: keep-alive',
+    ];
+    $get = function ($url, $cookieFile, $referer = null) use ($headers) {
+        $h = $headers;
+        if ($referer) $h[] = 'Referer: ' . $referer;
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT        => 12,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_COOKIEJAR      => $cookieFile,
+            CURLOPT_COOKIEFILE     => $cookieFile,
+            CURLOPT_HTTPHEADER     => $h,
+        ]);
+        $body   = curl_exec($ch);
+        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        return ['body' => $body, 'status' => $status];
+    };
+
+    $cookieFile = tempnam(sys_get_temp_dir(), 'nseh_');
+    $get($home, $cookieFile);                       // step 1: collect session cookie
+    $resp = $get($api, $cookieFile, $home);         // step 2: call API with cookie
+    @unlink($cookieFile);
+    if ($resp['status'] !== 200 || !$resp['body']) return [];
+
+    $arr = json_decode($resp['body'], true);
+    if (!is_array($arr)) return [];
+
+    // NSE returns one object per category per day; fold FII/FPI + DII into one row/day.
+    $byDate = [];
+    foreach ($arr as $row) {
+        if (!is_array($row)) continue;
+        $iso = date_to_iso($row['date'] ?? '');
+        if (!$iso) continue;
+        if (!isset($byDate[$iso])) $byDate[$iso] = ['iso' => $iso, 'date' => format_date($iso)];
+        $cat  = strtoupper($row['category'] ?? '');
+        $net  = isset($row['netValue'])  ? floatval($row['netValue'])  : null;
+        $buy  = isset($row['buyValue'])  ? floatval($row['buyValue'])  : null;
+        $sell = isset($row['sellValue']) ? floatval($row['sellValue']) : null;
+        if (strpos($cat, 'FII') !== false || strpos($cat, 'FPI') !== false) {
+            $byDate[$iso]['fii'] = $net; $byDate[$iso]['fiiBuy'] = $buy; $byDate[$iso]['fiiSell'] = $sell;
+        } elseif (strpos($cat, 'DII') !== false) {
+            $byDate[$iso]['dii'] = $net; $byDate[$iso]['diiBuy'] = $buy; $byDate[$iso]['diiSell'] = $sell;
+        }
+    }
+
+    $out = [];
+    foreach ($byDate as $r) {
+        if (!isset($r['fii']) || !isset($r['dii'])) continue; // need both sides
+        $out[] = [
+            'date'    => $r['date'],   'iso'     => $r['iso'],
+            'fii'     => $r['fii'],    'dii'     => $r['dii'],
+            'fiiBuy'  => $r['fiiBuy']  ?? null, 'fiiSell' => $r['fiiSell'] ?? null,
+            'diiBuy'  => $r['diiBuy']  ?? null, 'diiSell' => $r['diiSell'] ?? null,
         ];
-        @file_put_contents($cacheFile, json_encode($cache));
+    }
+    return $out;
+}
+
+/* Merge two series by ISO date; $overlay (NSE) wins on conflict. Newest first, cap 30. */
+function merge_series($base, $overlay) {
+    $map = [];
+    foreach (array_merge($base, $overlay) as $r) {
+        $iso = $r['iso'] ?? date_to_iso($r['date'] ?? '');
+        if (!$iso) continue;
+        $r['iso'] = $iso;
+        $map[$iso] = $r; // later entries (overlay passed last) override earlier ones
+    }
+    $rows = array_values($map);
+    usort($rows, function ($a, $b) { return strcmp($b['iso'], $a['iso']); });
+    return array_slice($rows, 0, 30);
+}
+
+if ($shouldRefresh) {
+    $growwRows = fetch_groww_history();             // 30-day history (may lag a day or two)
+    $nseRows   = fetch_nse_latest();                // authoritative latest day(s)
+
+    // Prefer fresh Groww as the history base; otherwise reuse cached history so a
+    // Groww hiccup doesn't wipe the table — NSE still refreshes the latest day.
+    $base = ($growwRows && count($growwRows) > 0) ? $growwRows
+          : (($cache && !empty($cache['rows'])) ? $cache['rows'] : []);
+
+    if (count($base) > 0 || count($nseRows) > 0) {
+        $merged   = merge_series($base, $nseRows);
+        $gotFresh = (count($growwRows ?? []) > 0) || (count($nseRows) > 0);
+        $source   = count($nseRows) > 0 ? 'NSE + Groww' : 'Groww';
+        if (count($merged) > 0) {
+            $cache = [
+                'ts'           => $now,
+                'fetched_date' => $todayIST,
+                'fetched_at'   => $istNow->format(DateTime::ATOM),
+                'source'       => $source,
+                'nse_latest'   => count($nseRows) > 0 ? $nseRows[0]['date'] : null,
+                'rows'         => $merged,
+                'stale'        => !$gotFresh,
+            ];
+            @file_put_contents($cacheFile, json_encode($cache), LOCK_EX);
+        }
     } else if ($cache) {
         $cache['stale'] = true;
         $cache['last_attempt'] = $istNow->format(DateTime::ATOM);

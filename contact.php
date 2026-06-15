@@ -34,7 +34,7 @@ if (isset($rate[$ip]) && ($nowTs - $rate[$ip]) < 30) {
     exit;
 }
 $rate[$ip] = $nowTs;
-@file_put_contents($rateFile, json_encode($rate));
+@file_put_contents($rateFile, json_encode($rate), LOCK_EX);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);

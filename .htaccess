@@ -63,8 +63,9 @@ RewriteRule ^.*$ /index.html [L]
   # Disable browser features the site doesn't need
   Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
 
-  # Cross-origin protections — allow same-site, deny everything else by default
-  Header always set X-XSS-Protection "1; mode=block"
+  # Legacy XSS auditor is deprecated and can itself introduce vulnerabilities;
+  # modern guidance is to disable it and rely on the CSP below.
+  Header always set X-XSS-Protection "0"
 
   # Content Security Policy — restrict where scripts, styles, fonts, images,
   # and network calls can come from. 'unsafe-inline' is needed because the

@@ -1,3 +1,19 @@
+/* ===== HTML ESCAPING =====
+   Any value that comes from a remote API (NSE / BSE / Yahoo / Groww /
+   Chittorgarh) or the calls DB must be escaped before it is interpolated
+   into an innerHTML string — a hostile or compromised upstream response
+   could otherwise inject markup / event-handler XSS. Numbers formatted
+   locally are safe; strings from upstream are not. */
+function escapeHtml(value) {
+  if (value === null || value === undefined) return '';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 /* ===== PAGE NAVIGATION + URL ROUTING =====
    Every "page" gets its own URL via the History API so visitors can
    bookmark, share, and use back/forward. .htaccess rewrites unknown
@@ -23,8 +39,10 @@ function showPage(id, fromPopState) {
       history.pushState({ page: id }, '', newPath);
     }
   }
-  // Update document.title so browser tab + share previews are accurate.
+  // Update document.title + canonical + meta/OG so each route is its own
+  // indexable entity (otherwise Google collapses every route into the homepage).
   if (PAGE_TITLES[id]) document.title = PAGE_TITLES[id];
+  updateRouteMeta(id);
 
   // Auto-close the mobile menu on navigation
   const mm = document.getElementById('mobileMenu');
@@ -46,7 +64,29 @@ function resolveInitialPage() {
   const path = window.location.pathname;
   const page = PATH_TO_PAGE[path];
   if (page && page !== 'home') showPage(page, true);
-  else if (PAGE_TITLES.home) document.title = PAGE_TITLES.home;
+  else { if (PAGE_TITLES.home) document.title = PAGE_TITLES.home; updateRouteMeta('home'); }
+}
+
+/* Sync <link rel=canonical>, meta description and OG/Twitter tags to the
+   current route. The base tags in index.html stay as the homepage default. */
+const SITE_ORIGIN = 'https://rootnivesh.in';
+function updateRouteMeta(id) {
+  const path = PAGE_TO_PATH[id] || '/';
+  const url  = SITE_ORIGIN + (path === '/' ? '/' : path);
+  const desc = PAGE_DESCRIPTIONS[id] || PAGE_DESCRIPTIONS.home;
+  const title = PAGE_TITLES[id] || PAGE_TITLES.home;
+
+  const setAttr = (selector, attr, value) => {
+    const el = document.head.querySelector(selector);
+    if (el) el.setAttribute(attr, value);
+  };
+  setAttr('link[rel="canonical"]', 'href', url);
+  setAttr('meta[name="description"]', 'content', desc);
+  setAttr('meta[property="og:url"]', 'content', url);
+  setAttr('meta[property="og:title"]', 'content', title);
+  setAttr('meta[property="og:description"]', 'content', desc);
+  setAttr('meta[name="twitter:title"]', 'content', title);
+  setAttr('meta[name="twitter:description"]', 'content', desc);
 }
 
 /* ===== MEGA MENU ===== */
@@ -707,7 +747,7 @@ function renderMovers(bodyId, rows, direction) {
   }
   const cls = direction === 'up' ? 'mv-pct-up' : 'mv-pct-down';
   tbody.innerHTML = rows.map(r => {
-    const sym = (r.symbol || '?').toString();
+    const sym = escapeHtml((r.symbol || '?').toString());
     const price = r.price != null ? r.price.toLocaleString('en-IN', { maximumFractionDigits: 2 }) : '—';
     const pct = r.pChange != null ? ((r.pChange >= 0 ? '+' : '') + r.pChange.toFixed(2) + '%') : '—';
     return '<tr>' +
@@ -736,7 +776,7 @@ function renderHistTable(rows) {
     const fStr = (fPos ? '+' : '') + (+fv).toLocaleString('en-IN', { maximumFractionDigits: 0 });
     const dStr = (dPos ? '+' : '') + (+dv).toLocaleString('en-IN', { maximumFractionDigits: 0 });
     return `<tr>
-      <td class="td-date">${r.date}</td>
+      <td class="td-date">${escapeHtml(r.date)}</td>
       <td class="${fPos ? 'td-pos' : 'td-neg'}">${fStr}</td>
       <td class="${dPos ? 'td-pos' : 'td-neg'}">${dStr}</td>
       <td>
@@ -786,7 +826,8 @@ async function fetchFiiDiiHistory() {
         const statusEl = document.getElementById('histLoadStatus');
         if (statusEl) {
           const stale = !!payload.stale;
-          statusEl.textContent = stale ? 'Groww data (stale cache)' : 'Groww data';
+          const src = payload.source || 'Live';
+          statusEl.textContent = src + ' data' + (stale ? ' (stale cache)' : '');
         }
         return;
       }
@@ -1056,14 +1097,16 @@ function ipoSubscriptionLabel(item) {
 /* IPO_DESCRIPTIONS lives in data.js. Add a row there to override
    what NSE / Chittorgarh return for a specific IPO symbol. */
 function renderIpoCellFromInfo(sector, about) {
+  // sector/about can originate from scraped third-party HTML (Chittorgarh) —
+  // always escape before injecting into innerHTML.
   return (
     '<div style="max-width:360px; line-height:1.5">' +
       '<div style="font-size:11px; font-family:\'Space Mono\',monospace; color:var(--gold); ' +
                   'text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">' +
-        (sector || '—') +
+        escapeHtml(sector || '—') +
       '</div>' +
       '<div style="font-size:12.5px; color:var(--grey2)">' +
-        (about || '') +
+        escapeHtml(about || '') +
       '</div>' +
     '</div>'
   );
@@ -1071,13 +1114,14 @@ function renderIpoCellFromInfo(sector, about) {
 
 function ipoBusinessCell(item) {
   const sym = (item.symbol || '').toUpperCase();
+  const symAttr = escapeHtml(sym);
   const info = IPO_DESCRIPTIONS[sym];
   if (info) {
-    return '<div data-ipo-business="' + sym + '">' + renderIpoCellFromInfo(info.sector, info.about) + '</div>';
+    return '<div data-ipo-business="' + symAttr + '">' + renderIpoCellFromInfo(info.sector, info.about) + '</div>';
   }
   // No manual entry — render an empty placeholder. Async lookup will populate it.
-  const companyAttr = (item.companyName || item.company || '').replace(/"/g, '&quot;');
-  return '<div data-ipo-business="' + sym + '" data-needs-lookup="1" data-ipo-company="' + companyAttr + '">' +
+  const companyAttr = escapeHtml(item.companyName || item.company || '');
+  return '<div data-ipo-business="' + symAttr + '" data-needs-lookup="1" data-ipo-company="' + companyAttr + '">' +
          '<span style="font-size:12px; color:var(--grey)">Loading…</span>' +
          '</div>';
 }
@@ -1271,11 +1315,11 @@ function renderIpoTable(rows, tab) {
   }
   tbody.innerHTML = rows.map(r => `
     <tr>
-      <td style="color:var(--white); font-weight:600">${r.companyName || r.symbol || '—'}</td>
-      <td><span style="text-transform:capitalize; color:var(--grey2)">${r.series || 'Mainboard'}</span></td>
-      <td>${fmtIpoDate(r.issueStartDate)}</td>
-      <td>${fmtIpoDate(r.issueEndDate)}</td>
-      <td>${fmtIssuePrice(r.issuePrice || r.priceBand)}</td>
+      <td style="color:var(--white); font-weight:600">${escapeHtml(r.companyName || r.symbol || '—')}</td>
+      <td><span style="text-transform:capitalize; color:var(--grey2)">${escapeHtml(r.series || 'Mainboard')}</span></td>
+      <td>${escapeHtml(fmtIpoDate(r.issueStartDate))}</td>
+      <td>${escapeHtml(fmtIpoDate(r.issueEndDate))}</td>
+      <td>${escapeHtml(fmtIssuePrice(r.issuePrice || r.priceBand))}</td>
       <td>${ipoBusinessCell(r)}</td>
     </tr>`).join('');
 }
