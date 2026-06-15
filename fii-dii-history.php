@@ -70,6 +70,14 @@ if (!$cache || empty($cache['ts'])) {
     }
 }
 
+// Manual refresh trigger (e.g. immediately after a deploy, to rebuild the
+// server-side cache without waiting for the TTL). Self-limited to once per 60s
+// so it can't be used to hammer NSE/Groww.
+if (isset($_GET['refresh'])
+    && (!$cache || empty($cache['ts']) || ($now - intval($cache['ts'])) >= 60)) {
+    $shouldRefresh = true;
+}
+
 function format_date($iso) {
     // "2026-04-24" -> "24-Apr-2026"
     if (!is_string($iso)) return '';
