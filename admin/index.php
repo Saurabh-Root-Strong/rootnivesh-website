@@ -87,35 +87,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
 /* ---------- Handle POST: close / mark a call ---------- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update_status') {
     try {
-        $allowedStatus = ['open','target_hit','stop_hit','closed','cancelled'];
-        $status = in_array($_POST['status'] ?? '', $allowedStatus, true) ? $_POST['status'] : 'open';
-        $stmt = $pdo->prepare(
+        $id   = intval($_POST['id']);
+        $prog = $_POST['progress'] ?? 'running';
+        $pub  = isset($_POST['is_public']) ? 1 : 0;
+        $exitInput = ($_POST['exit_price'] ?? '') !== '' ? floatval($_POST['exit_price']) : null;
+
+        // Pull the call so a single "progress" choice can derive status, targets_hit and exit.
+        $row = $pdo->prepare('SELECT action, entry_price, targets, target_price, stop_loss FROM calls WHERE id = :id');
+        $row->execute([':id' => $id]);
+        $r = $row->fetch();
+        $tl = call_targets_list($r ?: []);
+        $N  = count($tl);
+
+        $status = 'open'; $thit = 0; $exit = null;
+        if ($prog === 'running') {
+            $status = 'open'; $thit = 0;
+        } elseif (strpos($prog, 'live_') === 0) {
+            // Nth target achieved but the call is still running → stays in Live.
+            $status = 'open'; $thit = min(max(intval(substr($prog, 5)), 0), max($N, 1));
+        } elseif ($prog === 'all') {
+            $status = 'target_hit'; $thit = $N;
+            $exit = $exitInput !== null ? $exitInput : ($N > 0 ? end($tl) : null);  // default exit = final target
+        } elseif ($prog === 'stop') {
+            $status = 'stop_hit';
+            $exit = $exitInput !== null ? $exitInput : ($r && $r['stop_loss'] !== null ? floatval($r['stop_loss']) : null);
+        } elseif ($prog === 'closed') {
+            $status = 'closed'; $exit = $exitInput;
+        } elseif ($prog === 'cancelled') {
+            $status = 'cancelled';
+        }
+
+        // Auto-compute PnL% from entry vs exit when a closing exit is known.
+        $pnl = null;
+        if ($exit !== null && $r && $r['entry_price'] > 0) {
+            $pnl = $r['action'] === 'BUY'
+                ? round(($exit - $r['entry_price']) / $r['entry_price'] * 100, 2)
+                : round(($r['entry_price'] - $exit) / $r['entry_price'] * 100, 2);
+        }
+
+        $pdo->prepare(
             'UPDATE calls SET status = :status, exit_price = :exit, exit_at = :exit_at, pnl_pct = :pnl, is_public = :pub, targets_hit = :thit
              WHERE id = :id'
-        );
-        $pub  = isset($_POST['is_public']) ? 1 : 0;
-        $thit = max(0, intval($_POST['targets_hit'] ?? 0));
-        $exit = $_POST['exit_price'] !== '' ? floatval($_POST['exit_price']) : null;
-        // Auto-compute PnL% from entry vs exit when both known.
-        $pnl = null;
-        if ($exit !== null) {
-            $row = $pdo->prepare('SELECT action, entry_price FROM calls WHERE id = :id');
-            $row->execute([':id' => intval($_POST['id'])]);
-            $r = $row->fetch();
-            if ($r && $r['entry_price'] > 0) {
-                $pnl = $r['action'] === 'BUY'
-                    ? round(($exit - $r['entry_price']) / $r['entry_price'] * 100, 2)
-                    : round(($r['entry_price'] - $exit) / $r['entry_price'] * 100, 2);
-            }
-        }
-        $stmt->execute([
+        )->execute([
             ':status'  => $status,
             ':exit'    => $exit,
             ':exit_at' => $exit !== null ? date('Y-m-d H:i:s') : null,
             ':pnl'     => $pnl,
             ':pub'     => $pub,
             ':thit'    => $thit,
-            ':id'      => intval($_POST['id']),
+            ':id'      => $id,
         ]);
         $flash = 'Call updated.';
     } catch (PDOException $e) {
@@ -140,6 +160,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
 
 /* ---------- Fetch recent calls ---------- */
 $calls = $pdo->query('SELECT * FROM calls ORDER BY posted_at DESC LIMIT 50')->fetchAll();
+
+/* ---------- Target helpers (parse list, ordinals, progress dropdown) ---------- */
+function call_targets_list($c) {
+    $raw = !empty($c['targets']) ? $c['targets']
+         : (isset($c['target_price']) && $c['target_price'] !== null ? (string) $c['target_price'] : '');
+    preg_match_all('/\d+(?:\.\d+)?/', $raw, $m);
+    return array_map('floatval', $m[0]);
+}
+function ordinal($n) {
+    $suf = ['th','st','nd','rd'];
+    $v = $n % 100;
+    return $n . ($suf[($v - 20) % 10] ?? $suf[$v] ?? $suf[0]);
+}
+/* One plain-language dropdown that encodes both targets_hit and status. */
+function progress_select_html($c) {
+    $tl = call_targets_list($c);
+    $N  = count($tl);
+    $cur = 'running';
+    if ($c['status'] === 'open')             $cur = intval($c['targets_hit']) > 0 ? 'live_' . intval($c['targets_hit']) : 'running';
+    elseif ($c['status'] === 'target_hit')   $cur = 'all';
+    elseif ($c['status'] === 'stop_hit')     $cur = 'stop';
+    elseif ($c['status'] === 'closed')       $cur = 'closed';
+    elseif ($c['status'] === 'cancelled')    $cur = 'cancelled';
+    $sel = function ($v) use ($cur) { return $v === $cur ? ' selected' : ''; };
+
+    $html  = '<select name="progress">';
+    $html .= '<option value="running"' . $sel('running') . '>Still running — no target hit</option>';
+    // Intermediate targets keep the call LIVE (only "All" closes it).
+    for ($k = 1; $k < $N; $k++) {
+        $html .= '<option value="live_' . $k . '"' . $sel('live_' . $k) . '>'
+               . ordinal($k) . ' Target Achieved — still live</option>';
+    }
+    $html .= '<option value="all"' . $sel('all') . '>✅ All ' . ($N > 0 ? $N . ' ' : '') . 'Targets Achieved → Performance</option>';
+    $html .= '<option value="stop"' . $sel('stop') . '>🛑 Stop-loss Hit → Performance</option>';
+    $html .= '<option value="closed"' . $sel('closed') . '>☑️ Closed manually → Performance</option>';
+    $html .= '<option value="cancelled"' . $sel('cancelled') . '>✖ Cancelled (hide)</option>';
+    $html .= '</select>';
+    return $html;
+}
 
 /* ---------- Risk:reward + potential gain% from entry / T1 / stop ---------- */
 function call_rr_gain($c) {
@@ -337,15 +396,8 @@ function build_wa_message($c) {
                 <?php echo csrf_field(); ?>
                 <input type="hidden" name="action" value="update_status">
                 <input type="hidden" name="id" value="<?php echo $c['id']; ?>">
-                <select name="status">
-                  <option value="open"        <?php if ($c['status']==='open')        echo 'selected'; ?>>Open</option>
-                  <option value="target_hit"  <?php if ($c['status']==='target_hit')  echo 'selected'; ?>>Target hit</option>
-                  <option value="stop_hit"    <?php if ($c['status']==='stop_hit')    echo 'selected'; ?>>Stop hit</option>
-                  <option value="closed"      <?php if ($c['status']==='closed')      echo 'selected'; ?>>Closed</option>
-                  <option value="cancelled"   <?php if ($c['status']==='cancelled')   echo 'selected'; ?>>Cancelled</option>
-                </select>
-                <input type="number" min="0" step="1" name="targets_hit" placeholder="Targets hit" title="How many targets achieved so far (e.g. 1 = first target hit, call still running)" style="width:90px" value="<?php echo intval($c['targets_hit'] ?? 0); ?>">
-                <input type="number" step="0.01" name="exit_price" placeholder="Avg exit ₹" title="If you booked partials across targets, enter the blended average exit price" value="<?php echo $c['exit_price'] !== null ? htmlspecialchars($c['exit_price']) : ''; ?>">
+                <?php echo progress_select_html($c); ?>
+                <input type="number" step="0.01" name="exit_price" placeholder="Exit ₹ (optional)" title="Optional — overrides the auto exit (final target for All Achieved, the stop for Stop-loss Hit). Use a blended average if you booked partials." value="<?php echo $c['exit_price'] !== null ? htmlspecialchars($c['exit_price']) : ''; ?>">
                 <label class="admin-check" style="margin:0 6px"><input type="checkbox" name="is_public" <?php echo $c['is_public'] ? 'checked' : ''; ?>><span>Public</span></label>
                 <button type="submit" class="admin-btn admin-btn-secondary">Save</button>
               </form>
