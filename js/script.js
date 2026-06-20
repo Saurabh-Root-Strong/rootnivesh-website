@@ -1003,7 +1003,7 @@ function loadPerformance(type) {
     })
     .catch(() => {
       statsEl.innerHTML = '<div class="perf-loading">Could not load performance right now. Please try again shortly.</div>';
-      bodyEl.innerHTML  = '<tr><td colspan="10" style="text-align:center; color:var(--grey); padding:24px">—</td></tr>';
+      bodyEl.innerHTML  = '<tr><td colspan="9" style="text-align:center; color:var(--grey); padding:24px">—</td></tr>';
     });
 }
 
@@ -1046,7 +1046,7 @@ function renderPerfTable(calls) {
   const body = document.getElementById('perfTableBody');
   if (!body) return;
   if (!calls.length) {
-    body.innerHTML = '<tr><td colspan="10" style="text-align:center; color:var(--grey); padding:24px">No closed calls in this segment yet.</td></tr>';
+    body.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--grey); padding:24px">No closed calls in this segment yet.</td></tr>';
     return;
   }
   const fmtDate = iso => {
@@ -1059,17 +1059,6 @@ function renderPerfTable(calls) {
     const win = pnl != null && pnl >= 0;
     const resultLabel = c.status === 'target_hit' ? 'Target Achieved' : c.status === 'stop_hit' ? 'Stop-loss' : 'Closed';
 
-    // Realized R:R: reward from the actual exit, risk from the stop.
-    const en = parseFloat(c.entry_price), tg = c.target_price == null ? null : parseFloat(c.target_price),
-          sl = c.stop_loss == null ? null : parseFloat(c.stop_loss),
-          ex = c.exit_price == null ? null : parseFloat(c.exit_price), isBuy = c.action === 'BUY';
-    let rrCell = '—';
-    const rewardBase = ex != null ? ex : tg;   // prefer realized exit, fall back to target
-    if (en > 0 && rewardBase != null && sl != null) {
-      const reward = isBuy ? rewardBase - en : en - rewardBase;
-      const risk = isBuy ? en - sl : sl - en;
-      if (risk > 0) rrCell = '1:' + (reward / risk).toFixed(2);
-    }
     return `
     <tr>
       <td>${fmtDate(c.exit_at || c.posted_at)}</td>
@@ -1078,7 +1067,6 @@ function renderPerfTable(calls) {
       <td><span class="perf-side ${c.action === 'BUY' ? 'buy' : 'sell'}">${escapeHtml(c.action)}</span></td>
       <td>${money(c.entry_price)}</td>
       <td>${c.targets ? escapeHtml(c.targets) : (c.target_price != null ? money(c.target_price) : '—')}</td>
-      <td>${rrCell}</td>
       <td>${money(c.exit_price)}</td>
       <td><span class="perf-result ${win ? 'win' : 'loss'}">${resultLabel}</span></td>
       <td class="perf-pnl ${win ? 'pos' : 'neg'}">${pnl == null ? '—' : (pnl >= 0 ? '+' : '') + pnl.toFixed(2) + '%'}</td>
