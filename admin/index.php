@@ -274,31 +274,71 @@ function build_wa_message($c) {
       const set  = (name, val) => { const el = form.elements[name]; if (el && val != null && val !== '') el.value = val; };
       const num  = (s) => { if (!s) return ''; const n = parseFloat(String(s).replace(/[,₹\s]/g, '')); return isNaN(n) ? '' : n; };
 
-      const text = raw.replace(/\s+/g, ' ');
+      // Normalise so one grammar handles both labelled ("Entry -> ₹ 1006")
+      // and inline ("BUY RELIANCE Entry 2450") styles: unify arrows -> ":",
+      // strip markdown/quotes, collapse spaces but KEEP newlines.
+      const text = raw
+        .replace(/[→➤➜➔]/g, '->')   // → ➤ ➜ ➔
+        .replace(/\s*[-=]?>\s*/g, ': ')                 // ->  =>  >   become ": "
+        .replace(/[*_`"]+/g, ' ')                       // markdown + quotes
+        .replace(/[ \t]+/g, ' ');
       const found = [];
 
-      // Action
-      let action = '';
-      if (/\b(sell|short)\b/i.test(text)) action = 'SELL';
-      else if (/\b(buy|long)\b/i.test(text)) action = 'BUY';
-      if (action) { set('call_action', action); found.push('action'); }
+      const firstNum = (s) => { const m = (s || '').match(/\d[\d,]*(?:\.\d+)?/); return m ? num(m[0]) : ''; };
+      // Value on a "Label : value" line. Requires the colon, so headers like
+      // "Stock Analysis (3-4 Weeks)" don't masquerade as the Stock field.
+      const labelled = (labels) => {
+        const m = text.match(new RegExp('^[\\s>*_-]*(?:' + labels + ')\\b\\s*:\\s*([^\\n]+)', 'im'));
+        return m ? m[1].trim() : '';
+      };
+      // Looser fallback for price fields with no colon ("Entry 2450").
+      const loose = (labels) => {
+        const m = text.match(new RegExp('\\b(?:' + labels + ')\\b\\s*:?\\s*([^\\n]*)', 'i'));
+        return m ? m[1].trim() : '';
+      };
 
-      // Entry / Target / Stop-loss (label then number; many label variants)
-      const grab = (re) => { const m = text.match(re); return m ? num(m[1]) : ''; };
-      const entry  = grab(/\b(?:entry|buy(?:\s*above)?|bought|cmp|price|@)\s*[:=]?\s*₹?\s*([\d,]+(?:\.\d+)?)/i);
-      const target = grab(/\b(?:target|tgt|tp|t1)\s*[:=]?\s*₹?\s*([\d,]+(?:\.\d+)?)/i);
-      const stop   = grab(/\b(?:sl|s\/l|stop[-\s]?loss|stoploss)\s*[:=]?\s*₹?\s*([\d,]+(?:\.\d+)?)/i);
+      // Side / action
+      const sideRaw = labelled('side|action|call') || text;
+      let action = /\b(sell|short)\b/i.test(sideRaw) ? 'SELL'
+                 : /\b(buy|long)\b/i.test(sideRaw)   ? 'BUY' : '';
+      if (action) { set('call_action', action); found.push('side'); }
+
+      // Stock / symbol — labelled only (company name, any case, may be multi-word).
+      let stock = labelled('stock|scrip|share|symbol|company|name');
+      stock = stock.replace(/\b(buy|sell|long|short)\b.*$/i, '').trim();
+      if (!stock) {  // fallback: first ALL-CAPS ticker
+        const sw = new Set(['BUY','SELL','LONG','SHORT','ENTRY','TARGET','TGT','TP','SL','CMP','NSE','BSE','CE','PE','FUT','STOCK','SIDE','NOTE','T1','T2']);
+        stock = (text.match(/\b[A-Z][A-Z&]{1,14}\b/g) || []).find(w => !sw.has(w)) || '';
+      }
+      if (stock) {
+        set('symbol', stock.toUpperCase().slice(0, 20));
+        set('company_name', stock);
+        found.push('symbol');
+      }
+
+      // Entry / Target (first of multiple) / Stop-loss
+      const entry  = firstNum(labelled('entry|buy above|buy|bought|cmp|price|@') || loose('entry|cmp|price'));
+      const target = firstNum(labelled('targets?|tgt|tp|t1') || loose('targets?|tgt|tp'));
+      const stop   = firstNum(labelled('stop ?loss|stoploss|sl|s/l') || loose('stop ?loss|stoploss|sl'));
       if (entry  !== '') { set('entry_price',  entry);  found.push('entry'); }
       if (target !== '') { set('target_price', target); found.push('target'); }
       if (stop   !== '') { set('stop_loss',    stop);   found.push('SL'); }
 
-      // Symbol: first ALL-CAPS token (2+ chars) that isn't a known keyword.
-      const stop_words = new Set(['BUY','SELL','LONG','SHORT','ENTRY','TARGET','TGT','TP','SL','CMP','NSE','BSE','CE','PE','FUT','T1','T2']);
-      const symMatch = text.match(/\b([A-Z][A-Z&]{1,14})\b/g) || [];
-      const sym = symMatch.find(w => !stop_words.has(w));
-      if (sym) { set('symbol', sym); found.push('symbol'); }
+      // Timeframe (anywhere) -> call_type dropdown
+      const tfm = text.match(/(\d+\s*(?:[-to]+\s*\d+)?)\s*(day|week|month|year)s?/i);
+      const tfWord = /\b(intraday|btst|swing|positional|long ?term)\b/i.exec(text);
+      let ct = '';
+      if (tfm) {
+        const unit = tfm[2].toLowerCase();
+        ct = unit === 'day' ? 'intraday' : unit === 'week' ? 'swing'
+           : unit === 'month' ? 'positional' : 'longterm';
+      } else if (tfWord) {
+        const w = tfWord[1].toLowerCase().replace(/\s/g, '');
+        ct = w === 'btst' ? 'intraday' : w === 'longterm' ? 'longterm' : w;
+      }
+      if (ct) { set('call_type', ct); found.push('timeframe'); }
 
-      // Anything after parsing that looks like a thesis line -> thesis (the raw paste).
+      // Keep the full original message as the thesis (extra targets, notes, etc.).
       set('thesis', raw);
 
       msg.textContent = found.length
