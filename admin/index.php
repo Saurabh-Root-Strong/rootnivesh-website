@@ -36,16 +36,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
             $slNum = floatval($sm[0]);
         }
 
+        // Outcome: post a FRESH (open) call, or an already-achieved/closed one in
+        // one shot. A non-open status with an exit price computes PnL immediately
+        // and the call shows on the public Performance track record.
+        $postStatus = in_array($_POST['post_status'] ?? 'open', ['open','target_hit','stop_hit','closed'], true)
+                    ? $_POST['post_status'] : 'open';
+        $entryVal = floatval($_POST['entry_price'] ?? 0);
+        $exitVal = null; $exitAt = null; $pnlVal = null;
+        if ($postStatus !== 'open') {
+            if (($_POST['post_exit'] ?? '') !== '' && preg_match('/\d+(?:\.\d+)?/', $_POST['post_exit'], $em)) {
+                $exitVal = floatval($em[0]);
+            }
+            if ($exitVal !== null && $entryVal > 0) {
+                $isBuy  = ($_POST['call_action'] ?? 'BUY') === 'BUY';
+                $pnlVal = $isBuy ? round(($exitVal - $entryVal) / $entryVal * 100, 2)
+                                 : round(($entryVal - $exitVal) / $entryVal * 100, 2);
+                $exitAt = date('Y-m-d H:i:s');
+            }
+        }
+
         $stmt = $pdo->prepare(
-            'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, targets, stop_loss, stop_losses, thesis, is_public, created_by)
-             VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :targets, :stop, :stop_losses, :thesis, :is_public, :created_by)'
+            'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, targets, stop_loss, stop_losses, thesis, is_public, created_by, status, exit_price, exit_at, pnl_pct)
+             VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :targets, :stop, :stop_losses, :thesis, :is_public, :created_by, :status, :exit, :exit_at, :pnl)'
         );
         $stmt->execute([
             ':call_type'    => $_POST['call_type'] ?? 'intraday',
             ':action'       => $_POST['call_action'] ?? 'BUY',
             ':symbol'       => strtoupper(trim($_POST['symbol'] ?? '')),
             ':company_name' => trim($_POST['company_name'] ?? '') ?: null,
-            ':entry'        => floatval($_POST['entry_price'] ?? 0),
+            ':entry'        => $entryVal,
             ':target'       => $targetNum,
             ':targets'      => $targetsText !== '' ? $targetsText : null,
             ':stop'         => $slNum,
@@ -53,6 +72,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
             ':thesis'       => trim($_POST['thesis'] ?? ''),
             ':is_public'    => isset($_POST['is_public']) ? 1 : 0,
             ':created_by'   => admin_user() ?: null,
+            ':status'       => $postStatus,
+            ':exit'         => $exitVal,
+            ':exit_at'      => $exitAt,
+            ':pnl'          => $pnlVal,
         ]);
         $flash = 'Call posted successfully (#' . $pdo->lastInsertId() . ').';
     } catch (PDOException $e) {
@@ -229,6 +252,24 @@ function build_wa_message($c) {
             <span>Show on public site</span>
           </label>
         </div>
+        <div class="admin-row">
+          <label>Outcome
+            <select name="post_status" id="postStatus" onchange="togglePostExit()">
+              <option value="open">🆕 Fresh call (still open)</option>
+              <option value="target_hit">✅ Target achieved (already won)</option>
+              <option value="stop_hit">🛑 Stop-loss hit</option>
+              <option value="closed">☑️ Closed (manual exit)</option>
+            </select>
+          </label>
+          <label id="postExitWrap" style="display:none">Booked / avg exit ₹
+            <input type="number" step="0.01" name="post_exit" placeholder="price you exited at, e.g. 1062">
+          </label>
+        </div>
+        <p style="color:#8A9BB0; font-size:12px; margin:-4px 0 10px">
+          Pick <strong>Fresh</strong> for a new live call (shows on the Calls page). Pick
+          <strong>Target achieved</strong> with the exit price to publish a completed winner
+          straight to the Performance track record.
+        </p>
         <label>Thesis
           <textarea name="thesis" rows="3" placeholder="Why this call — research thesis. Will be included in the WhatsApp share."></textarea>
         </label>
@@ -401,6 +442,16 @@ function build_wa_message($c) {
       }
       if (ct) { set('call_type', ct); found.push('timeframe'); }
 
+      // Outcome detection — an "achieved/booked" message posts a winner directly.
+      if (/\b(achiev|booked|profit\s*booked|target\s*hit|tgt\s*hit|all\s*targets?|sl\s*hit|stop\s*hit)\b/i.test(text)) {
+        const stopHit = /\b(sl\s*hit|stop\s*hit|stopped\s*out)\b/i.test(text);
+        set('post_status', stopHit ? 'stop_hit' : 'target_hit');
+        const exitM = text.match(/\b(?:booked|exit|exited|done|closed?)\s*(?:at|@|:|near)?\s*₹?\s*(\d[\d,]*(?:\.\d+)?)/i);
+        if (exitM) set('post_exit', num(exitM[1]));
+        found.push(stopHit ? 'outcome:SL-hit' : 'outcome:achieved');
+        togglePostExit();
+      }
+
       // Keep the full original message as the thesis (extra targets, notes, etc.).
       set('thesis', raw);
 
@@ -409,6 +460,14 @@ function build_wa_message($c) {
         : 'Could not auto-detect fields — fill the form manually.';
       msg.style.color = found.length ? '#3FB950' : '#E5A50A';
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Show the exit-price field only when the call is being posted as a
+    // completed outcome (target/stop/closed), hide it for a fresh open call.
+    function togglePostExit() {
+      const sel = document.getElementById('postStatus');
+      const wrap = document.getElementById('postExitWrap');
+      if (sel && wrap) wrap.style.display = (sel.value === 'open') ? 'none' : '';
     }
 
     const CSRF_TOKEN = <?php echo json_encode(csrf_token()); ?>;
