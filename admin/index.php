@@ -606,6 +606,17 @@ function build_wa_message($c) {
       if (!sel || !wrap) return;
       const v = sel.value;
       wrap.style.display = (v === 'all' || v === 'stop' || v === 'closed') ? '' : 'none';
+
+      // "All Targets Achieved" → the realized exit is the FINAL target (last
+      // comma value). Auto-fill it so the team doesn't retype; they can still
+      // override with a blended/actual exit. Only fill when the field is empty
+      // so a manually-typed or parsed exit is never clobbered.
+      const exit = document.querySelector('#postExitWrap input[name="post_exit"]');
+      const tIn  = document.getElementById('targetsInput');
+      if (v === 'all' && exit && tIn && exit.value.trim() === '') {
+        const parts = tIn.value.split(',').map(s => { const m = s.match(/\d[\d.]*/); return m ? m[0] : ''; }).filter(Boolean);
+        if (parts.length) exit.value = parts[parts.length - 1];
+      }
     }
 
     // Rebuild the "Where does this call go?" dropdown from the Targets field so
