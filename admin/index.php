@@ -647,6 +647,54 @@ function build_wa_message($c) {
       togglePostExit();
     }
 
+    /* ---- Duplicate-call guard ----
+       The team sometimes re-posts a call they already closed (same stock, same
+       entry/targets/SL) by mistake — that creates a duplicate winner on the
+       Performance page. Before submitting, compare the form against recent calls
+       and, if an identical ALREADY-CLOSED call exists, warn the admin. (Re-posting
+       an OPEN call to advance its target is handled server-side by the upsert, so
+       it is intentionally NOT flagged here.) */
+    const RECENT_CALLS = <?php echo json_encode(array_map(function ($c) {
+        return [
+            'symbol'    => $c['symbol'],
+            'action'    => $c['action'],
+            'entry'     => (float) $c['entry_price'],
+            'targets'   => !empty($c['targets']) ? $c['targets'] : ($c['target_price'] !== null ? (string) $c['target_price'] : ''),
+            'sl'        => !empty($c['stop_losses']) ? $c['stop_losses'] : ($c['stop_loss'] !== null ? (string) $c['stop_loss'] : ''),
+            'status'    => $c['status'],
+            'posted_at' => $c['posted_at'],
+        ];
+    }, $calls)); ?>;
+    (function () {
+      const form = document.getElementById('addCallForm');
+      if (!form) return;
+      const key = s => (String(s || '').match(/\d[\d.]*/g) || []).map(parseFloat).join(',');
+      form.addEventListener('submit', function (e) {
+        const sym   = (form.elements['symbol'].value || '').trim().toUpperCase();
+        const act   = form.elements['call_action'].value;
+        const entry = parseFloat(form.elements['entry_price'].value || '0');
+        const tk = key(form.elements['targets'].value);
+        const sk = key(form.elements['stop_losses'].value);
+        const dup = RECENT_CALLS.find(c =>
+          c.symbol === sym && c.action === act &&
+          Math.abs(c.entry - entry) < 0.005 &&
+          key(c.targets) === tk && key(c.sl) === sk &&
+          (c.status === 'target_hit' || c.status === 'stop_hit' || c.status === 'closed'));
+        if (!dup) return;
+        const d = new Date((dup.posted_at || '').replace(' ', 'T'));
+        const when = isNaN(d) ? dup.posted_at : d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' });
+        const res = dup.status === 'target_hit' ? 'Target Achieved'
+                  : dup.status === 'stop_hit'   ? 'Stop-loss Hit' : 'Closed';
+        const ok = confirm(
+          '⚠️ Looks like a DUPLICATE.\n\n' +
+          sym + ' (' + act + ') — entry ₹' + entry + ', targets ' + (dup.targets || '—') + '\n' +
+          'was already posted on ' + when + ' and is marked "' + res + '".\n\n' +
+          'Posting again will create a duplicate on the Performance page.\n\nPost anyway?'
+        );
+        if (!ok) e.preventDefault();
+      });
+    })();
+
     const CSRF_TOKEN = <?php echo json_encode(csrf_token()); ?>;
     // When admin clicks Share-to-WA, fire-and-forget mark_shared in the background.
     function markShared(id) {
