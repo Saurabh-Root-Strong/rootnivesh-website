@@ -526,18 +526,27 @@ function build_wa_message($c) {
 
       const avg = (arr) => Math.round(arr.reduce((a, b) => a + b, 0) / arr.length * 100) / 100;
 
+      // Pull a list of numbers where COMMA (and range dashes / "to" / & / +) is
+      // the separator — one number per chunk. This keeps every target distinct
+      // ("1030,1045,1062" -> [1030, 1045, 1062]) instead of merging digits when
+      // there are no spaces after the commas.
+      const numList = (s) => (s || '')
+        .split(/\s*(?:,|\/|–|—|\bto\b|&|\+|\s-\s|-)\s*/i)
+        .map(chunk => { const m = String(chunk).match(/\d[\d.]*/); return m ? parseFloat(m[0]) : NaN; })
+        .filter(v => !isNaN(v));
+
       // Entry — average ALL numbers on the line (range, comma-list, "add" etc.).
       const entryRaw = labelled('entry|buy above|buy|bought|cmp|price|@|buy zone|range') || loose('entry|cmp|price');
-      const eList = (entryRaw.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(num).filter(v => v !== '');
+      const eList = numList(entryRaw);
       const entry = eList.length ? avg(eList) : '';
 
-      // Targets — capture ALL.
+      // Targets — capture ALL, comma-separated.
       const tLine = labelled('targets?|tgt|tp|t1|t2|t3') || loose('targets?|tgt|tp');
-      const tList = (tLine.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(num).filter(v => v !== '');
+      const tList = numList(tLine);
 
       // Stop-loss — capture ALL (list, like targets).
       const slLine = labelled('stop ?loss(?:es)?|stoploss|sl|s/l') || loose('stop ?loss|stoploss|sl');
-      const slList = (slLine.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(num).filter(v => v !== '');
+      const slList = numList(slLine);
 
       if (entry !== '') {
         set('entry_price', entry);
@@ -609,7 +618,10 @@ function build_wa_message($c) {
       const sel = document.getElementById('postStatus');
       const tIn = document.getElementById('targetsInput');
       if (!sel || !tIn) return;
-      const nums = (tIn.value.match(/\d[\d,]*(?:\.\d+)?/g) || []).length;
+      // Count targets by COMMA separation (the user's mental model): each
+      // comma-separated chunk that holds a number is one target. Works for any
+      // count — 3, 4, 5… — and with or without spaces after the commas.
+      const nums = tIn.value.split(',').map(s => s.trim()).filter(s => /\d/.test(s)).length;
       const keep = sel.value;
       let html = '<option value="running">🆕 Fresh Call → Calls page (live, nothing hit yet)</option>';
       for (let k = 1; k < nums; k++) {
