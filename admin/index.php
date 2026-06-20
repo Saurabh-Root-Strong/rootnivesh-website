@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
             $status = 'open'; $thit = 0;
         } elseif (strpos($prog, 'live_') === 0) {
             // Nth target achieved but the call is still running → stays in Live.
-            $status = 'open'; $thit = min(max(intval(substr($prog, 5)), 0), max($N, 1));
+            $status = 'open'; $thit = min(max(intval(substr($prog, 5)), 0), $N);
         } elseif ($prog === 'all') {
             $status = 'target_hit'; $thit = $N;
             $exit = $exitInput !== null ? $exitInput : ($N > 0 ? end($tl) : null);  // default exit = final target

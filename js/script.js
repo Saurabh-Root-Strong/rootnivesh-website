@@ -149,7 +149,17 @@ function initPage(id) {
   if (id === 'reports') renderReports('all');
   if (id === 'learner') renderCourses('all');
   if (id === 'calls') { renderPlans(); liveCalls = null; loadLiveCalls().then(() => renderCalls('intraday')); }
-  if (id === 'performance') loadPerformance(currentPerfType);
+  if (id === 'performance') {
+    // Reset to a clean default view (Achieved · All) on every entry.
+    currentPerfType = '';
+    perfMode = 'achieved';
+    document.querySelectorAll('#perfModeTabs .perf-mode').forEach((b, i) => b.classList.toggle('active', i === 0));
+    document.querySelectorAll('#perfTabs .tab').forEach((b, i) => b.classList.toggle('active', i === 0));
+    const aw = document.getElementById('perfAchievedWrap'), lw = document.getElementById('perfLiveWrap');
+    if (aw) aw.style.display = '';
+    if (lw) lw.style.display = 'none';
+    loadPerformance('');
+  }
   if (id === 'ipo') { fetchIpo(currentIpoTab); }
   if (id === 'contact') resetContactForm();
 }
