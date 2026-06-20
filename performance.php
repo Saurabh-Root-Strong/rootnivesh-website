@@ -23,12 +23,19 @@ try {
     $type = $_GET['type'] ?? '';
     $allowedTypes = ['intraday','swing','positional','longterm','fno'];
     $days = isset($_GET['days']) ? max(1, min(3650, intval($_GET['days']))) : 0;
+    // Explicit calendar range (YYYY-MM-DD), matched on the decided date
+    // (exit_at, falling back to posted_at) so "Today"/"This Week" mean the day
+    // the call was achieved/closed, not when it was first posted.
+    $from = preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['from'] ?? '') ? $_GET['from'] : '';
+    $to   = preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['to'] ?? '')   ? $_GET['to']   : '';
 
     // "Decided" = the call has a final outcome we can score.
     $where = "is_public = 1 AND status IN ('target_hit','stop_hit','closed') AND pnl_pct IS NOT NULL";
     $args  = [];
     if (in_array($type, $allowedTypes, true)) { $where .= ' AND call_type = :t'; $args[':t'] = $type; }
     if ($days > 0) { $where .= ' AND posted_at >= (NOW() - INTERVAL :d DAY)'; $args[':d'] = $days; }
+    if ($from) { $where .= ' AND DATE(COALESCE(exit_at, posted_at)) >= :from'; $args[':from'] = $from; }
+    if ($to)   { $where .= ' AND DATE(COALESCE(exit_at, posted_at)) <= :to';   $args[':to']   = $to; }
 
     $sql = "SELECT id, posted_at, exit_at, call_type, action, symbol, company_name,
                    entry_price, target_price, targets, stop_loss, stop_losses, exit_price, pnl_pct, status

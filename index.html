@@ -183,7 +183,7 @@
 <link rel="dns-prefetch" href="https://www.bseindia.com">
 <link rel="dns-prefetch" href="https://www.nseindia.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=87">
+<link rel="stylesheet" href="css/style.css?v=88">
 </head>
 <body>
 
@@ -1007,6 +1007,19 @@
         <button class="tab" onclick="filterPerformance('swing', this)">Swing</button>
         <button class="tab" onclick="filterPerformance('positional', this)">Positional</button>
         <button class="tab" onclick="filterPerformance('fno', this)">F&amp;O</button>
+      </div>
+
+      <!-- Date-range filter -->
+      <div class="perf-date-bar" id="perfDateBar" style="margin-top:14px">
+        <button class="perf-date active" onclick="setPerfRange('all', this)">All Dates</button>
+        <button class="perf-date" onclick="setPerfRange('today', this)">Today</button>
+        <button class="perf-date" onclick="setPerfRange('week', this)">This Week</button>
+        <button class="perf-date" onclick="setPerfRange('custom', this)">Custom</button>
+        <span class="perf-date-custom" id="perfCustomWrap" style="display:none">
+          <input type="date" id="perfFrom" onchange="applyPerfCustom()">
+          <span style="color:var(--grey)">to</span>
+          <input type="date" id="perfTo" onchange="applyPerfCustom()">
+        </span>
       </div>
 
       <!-- Closed-trade log (Achieved mode) -->
@@ -2274,7 +2287,7 @@
      Bump the ?v= number whenever you change either file to bust
      long-cached copies on visitors' phones. -->
 <script src="js/data.js?v=38"></script>
-<script src="js/script.js?v=62"></script>
+<script src="js/script.js?v=63"></script>
 
 
 <section style="padding:40px 20px; max-width:900px; margin:auto; line-height:1.7;">

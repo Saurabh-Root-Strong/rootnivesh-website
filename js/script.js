@@ -150,11 +150,14 @@ function initPage(id) {
   if (id === 'learner') renderCourses('all');
   if (id === 'calls') { renderPlans(); liveCalls = null; loadLiveCalls().then(() => renderCalls('intraday')); }
   if (id === 'performance') {
-    // Reset to a clean default view (Achieved · All) on every entry.
+    // Reset to a clean default view (Achieved · All · All Dates) on every entry.
     currentPerfType = '';
     perfMode = 'achieved';
+    perfDateFrom = ''; perfDateTo = '';
     document.querySelectorAll('#perfModeTabs .perf-mode').forEach((b, i) => b.classList.toggle('active', i === 0));
     document.querySelectorAll('#perfTabs .tab').forEach((b, i) => b.classList.toggle('active', i === 0));
+    document.querySelectorAll('#perfDateBar .perf-date').forEach((b, i) => b.classList.toggle('active', i === 0));
+    const cw = document.getElementById('perfCustomWrap'); if (cw) cw.style.display = 'none';
     const aw = document.getElementById('perfAchievedWrap'), lw = document.getElementById('perfLiveWrap');
     if (aw) aw.style.display = '';
     if (lw) lw.style.display = 'none';
@@ -990,7 +993,54 @@ function switchCallsGroup(group) {
    live ongoing calls (calls.php), gated behind a WhatsApp CTA. ===== */
 let currentPerfType = '';
 let perfMode = 'achieved';                 // 'achieved' | 'live'
+let perfDateFrom = '';                     // 'YYYY-MM-DD' or '' (no bound)
+let perfDateTo = '';
 const PERF_WA_NUMBER = '917467094575';     // RootNivesh WhatsApp
+
+// Local YYYY-MM-DD (avoid toISOString UTC off-by-one in IST).
+function perfYmd(d) {
+  const z = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+  return z.toISOString().slice(0, 10);
+}
+function perfReloadActive() {
+  (perfMode === 'achieved' ? loadPerformance : loadLivePerf)(currentPerfType);
+}
+// Date-range chip handler: All / Today / This Week / Custom.
+function setPerfRange(range, btn) {
+  document.querySelectorAll('#perfDateBar .perf-date').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const custom = document.getElementById('perfCustomWrap');
+  if (custom) custom.style.display = (range === 'custom') ? '' : 'none';
+  const today = new Date();
+  if (range === 'all') {
+    perfDateFrom = ''; perfDateTo = '';
+  } else if (range === 'today') {
+    perfDateFrom = perfDateTo = perfYmd(today);
+  } else if (range === 'week') {
+    const dow = (today.getDay() + 6) % 7;            // Mon=0 … Sun=6
+    const mon = new Date(today); mon.setDate(today.getDate() - dow);
+    perfDateFrom = perfYmd(mon); perfDateTo = perfYmd(today);
+  } else if (range === 'custom') {
+    // Wait for both inputs via applyPerfCustom(); don't reload yet.
+    return;
+  }
+  perfReloadActive();
+}
+function applyPerfCustom() {
+  const f = document.getElementById('perfFrom');
+  const t = document.getElementById('perfTo');
+  perfDateFrom = (f && f.value) ? f.value : '';
+  perfDateTo   = (t && t.value) ? t.value : '';
+  perfReloadActive();
+}
+// Client-side date-in-range test (used for Live calls, by posted date).
+function inPerfRange(iso) {
+  if (!perfDateFrom && !perfDateTo) return true;
+  const d = (iso || '').slice(0, 10);
+  if (perfDateFrom && d < perfDateFrom) return false;
+  if (perfDateTo && d > perfDateTo) return false;
+  return true;
+}
 
 function setPerfMode(mode, btn) {
   perfMode = mode;
@@ -1016,7 +1066,12 @@ function loadPerformance(type) {
   const bodyEl = document.getElementById('perfTableBody');
   if (!bodyEl) return;
 
-  fetch('/performance.php' + (type ? ('?type=' + encodeURIComponent(type)) : ''), { credentials: 'same-origin' })
+  const qs = [];
+  if (type) qs.push('type=' + encodeURIComponent(type));
+  if (perfDateFrom) qs.push('from=' + perfDateFrom);
+  if (perfDateTo) qs.push('to=' + perfDateTo);
+  // cache:'no-store' so a freshly updated call shows immediately (no stale 30s copy).
+  fetch('/performance.php' + (qs.length ? '?' + qs.join('&') : ''), { credentials: 'same-origin', cache: 'no-store' })
     .then(r => r.json())
     .then(d => { renderPerfTable(d.calls || []); })
     .catch(() => {
@@ -1035,9 +1090,9 @@ function loadLivePerf(type) {
   if (!bodyEl) return;
   bodyEl.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--grey); padding:24px">Loading…</td></tr>';
 
-  fetch('/calls.php?limit=100' + (type ? ('&type=' + encodeURIComponent(type)) : ''), { credentials: 'same-origin' })
+  fetch('/calls.php?limit=100' + (type ? ('&type=' + encodeURIComponent(type)) : ''), { credentials: 'same-origin', cache: 'no-store' })
     .then(r => r.json())
-    .then(d => { renderLivePerf((d.calls || []).filter(c => c.status === 'open')); })
+    .then(d => { renderLivePerf((d.calls || []).filter(c => c.status === 'open' && inPerfRange(c.posted_at))); })
     .catch(() => {
       bodyEl.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--grey); padding:24px">Could not load live calls right now. Please try again shortly.</td></tr>';
     });
