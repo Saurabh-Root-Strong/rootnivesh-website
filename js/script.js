@@ -1063,7 +1063,7 @@ function renderLivePerf(calls) {
       const g = parseFloat(c.booked_pct);
       progress = `<span class="perf-result win">✅ ${hit} target${hit > 1 ? 's' : ''} hit · ${(g >= 0 ? '+' : '') + g.toFixed(2)}%</span>`;
     } else {
-      progress = `<span class="perf-running">🔴 Running</span>`;
+      progress = `<span class="perf-running">🟢 Active</span>`;
     }
 
     // Targets cell: achieved targets shown as proof, remaining ones locked behind WhatsApp.
