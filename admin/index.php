@@ -70,7 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
             $exitAt = date('Y-m-d H:i:s');
         }
 
-        $symbolUp  = strtoupper(trim($_POST['symbol'] ?? ''));
+        // Normalise the symbol: trim + collapse internal whitespace so
+        // "AKUM  DRUGS" and "AKUM DRUGS" are the same key (defeats space-typo dupes).
+        $symbolUp  = strtoupper(preg_replace('/\s+/', ' ', trim($_POST['symbol'] ?? '')));
         $actionVal = $_POST['call_action'] ?? 'BUY';
 
         // UPSERT — don't create a duplicate row when the team re-pastes the SAME
@@ -119,11 +121,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
             )->execute($vals);
             $flash = 'Same call advanced (#' . $existingId . ') — updated existing row, no duplicate.';
         } else {
-            $pdo->prepare(
-                'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, targets, targets_hit, stop_loss, stop_losses, thesis, is_public, created_by, status, exit_price, exit_at, pnl_pct)
-                 VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :targets, :thit, :stop, :stop_losses, :thesis, :is_public, :created_by, :status, :exit, :exit_at, :pnl)'
-            )->execute($vals);
-            $flash = 'Call posted successfully (#' . $pdo->lastInsertId() . ').';
+            // No OPEN call to advance → this would be a NEW row. Authoritative,
+            // server-side duplicate guard (the JS confirm is only a friendly
+            // pre-warning and is bypassable / stale on double-click). Block when an
+            // identical ALREADY-CLOSED call exists — same symbol+side, entry within
+            // a paisa, and the SAME target SET and stop SET (order-insensitive).
+            // The team can still force a genuine re-post (dup_force=1), which the JS
+            // sets when the user explicitly clicks "Post anyway".
+            $force = ($_POST['dup_force'] ?? '') === '1';
+            $dupId = null; $dupAt = null; $dupStatus = null;
+            if (!$force) {
+                $tkey = num_set_key($targetsText !== '' ? $targetsText : (string) $targetNum);
+                $skey = num_set_key($slText);
+                $cand = $pdo->prepare(
+                    "SELECT id, entry_price, targets, target_price, stop_losses, stop_loss, status, posted_at
+                     FROM calls WHERE symbol = :s AND action = :a
+                       AND status IN ('target_hit','stop_hit','closed')
+                     ORDER BY posted_at DESC LIMIT 30"
+                );
+                $cand->execute([':s' => $symbolUp, ':a' => $actionVal]);
+                foreach ($cand->fetchAll() as $d) {
+                    $dT = num_set_key(!empty($d['targets']) ? $d['targets'] : (string) $d['target_price']);
+                    $dS = num_set_key(!empty($d['stop_losses']) ? $d['stop_losses'] : (string) $d['stop_loss']);
+                    if (abs(floatval($d['entry_price']) - $entryVal) < 0.005 && $dT === $tkey && $dS === $skey) {
+                        $dupId = $d['id']; $dupAt = $d['posted_at']; $dupStatus = $d['status']; break;
+                    }
+                }
+            }
+            if ($dupId) {
+                $when = date('d M Y', strtotime($dupAt));
+                $res  = $dupStatus === 'target_hit' ? 'Target Achieved'
+                      : ($dupStatus === 'stop_hit' ? 'Stop-loss Hit' : 'Closed');
+                $flash = '⚠️ Already recorded (#' . $dupId . ', ' . $res . ' on ' . $when . ') — '
+                       . 'same entry, targets and stop-loss. NOT posted again to avoid a duplicate. '
+                       . 'If it really is a fresh trade, change a price or use “Post anyway”.';
+            } else {
+                $pdo->prepare(
+                    'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, targets, targets_hit, stop_loss, stop_losses, thesis, is_public, created_by, status, exit_price, exit_at, pnl_pct)
+                     VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :targets, :thit, :stop, :stop_losses, :thesis, :is_public, :created_by, :status, :exit, :exit_at, :pnl)'
+                )->execute($vals);
+                $flash = 'Call posted successfully (#' . $pdo->lastInsertId() . ').';
+            }
         }
     } catch (PDOException $e) {
         error_log('admin add call failed: ' . $e->getMessage());
@@ -214,6 +252,15 @@ function call_targets_list($c) {
          : (isset($c['target_price']) && $c['target_price'] !== null ? (string) $c['target_price'] : '');
     preg_match_all('/\d+(?:\.\d+)?/', $raw, $m);
     return array_map('floatval', $m[0]);
+}
+/* Order-insensitive numeric SET key — "535, 550, 562" and "562,550,535" and
+   "535,  550 , 562" all collapse to the same "535,550,562". Used to detect a
+   duplicate call regardless of how the targets/stops were typed or ordered. */
+function num_set_key($s) {
+    preg_match_all('/\d+(?:\.\d+)?/', (string) $s, $m);
+    $n = array_map('floatval', $m[0]);
+    sort($n, SORT_NUMERIC);
+    return implode(',', $n);
 }
 function ordinal($n) {
     $suf = ['th','st','nd','rd'];
@@ -333,6 +380,7 @@ function build_wa_message($c) {
       <form id="addCallForm" method="post" class="admin-form">
         <?php echo csrf_field(); ?>
         <input type="hidden" name="action" value="add">
+        <input type="hidden" name="dup_force" id="dupForce" value="0">
         <div class="admin-row">
           <label>Type
             <select name="call_type">
@@ -668,39 +716,66 @@ function build_wa_message($c) {
     (function () {
       const form = document.getElementById('addCallForm');
       if (!form) return;
-      const key = s => (String(s || '').match(/\d[\d.]*/g) || []).map(parseFloat).join(',');
+      // Order-insensitive numeric SET key (sorted) so reversed/respaced lists match.
+      const key = s => (String(s || '').match(/\d[\d.]*/g) || []).map(parseFloat).sort((a, b) => a - b).join(',');
+      const relAge = iso => {
+        const d = new Date((iso || '').replace(' ', 'T'));
+        if (isNaN(d)) return { ago: '', when: iso };
+        const when = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' });
+        const days = Math.floor((Date.now() - d.getTime()) / 86400000);
+        return { ago: days <= 0 ? 'today' : days === 1 ? 'yesterday' : days + ' days back', when };
+      };
       form.addEventListener('submit', function (e) {
-        const sym   = (form.elements['symbol'].value || '').trim().toUpperCase();
+        const forceEl = document.getElementById('dupForce');
+        if (forceEl) forceEl.value = '0';            // reset every attempt
+        const sym   = (form.elements['symbol'].value || '').replace(/\s+/g, ' ').trim().toUpperCase();
         const act   = form.elements['call_action'].value;
         const entry = parseFloat(form.elements['entry_price'].value || '0');
         const tk = key(form.elements['targets'].value);
         const sk = key(form.elements['stop_losses'].value);
+
+        // (A) DUPLICATE of an already-closed call → warn, allow explicit override.
         const dup = RECENT_CALLS.find(c =>
           c.symbol === sym && c.action === act &&
           Math.abs(c.entry - entry) < 0.005 &&
           key(c.targets) === tk && key(c.sl) === sk &&
           (c.status === 'target_hit' || c.status === 'stop_hit' || c.status === 'closed'));
-        if (!dup) return;
-        const d = new Date((dup.posted_at || '').replace(' ', 'T'));
-        const when = isNaN(d) ? dup.posted_at : d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' });
-        // Relative age — "today / yesterday / N days back" — so it's obvious this
-        // exact call was already recorded recently.
-        let ago = '';
-        if (!isNaN(d)) {
-          const days = Math.floor((Date.now() - d.getTime()) / 86400000);
-          ago = days <= 0 ? 'today' : days === 1 ? 'yesterday' : days + ' days back';
+        if (dup) {
+          const { ago, when } = relAge(dup.posted_at);
+          const res = dup.status === 'target_hit' ? 'Target Achieved'
+                    : dup.status === 'stop_hit'   ? 'Stop-loss Hit' : 'Closed';
+          const ok = confirm(
+            '⚠️ Already recorded — looks like a DUPLICATE.\n\n' +
+            sym + ' (' + act + ') — entry ₹' + entry + ', targets ' + (dup.targets || '—') + '\n' +
+            'was already posted ' + (ago ? ago + ' (' + when + ')' : 'on ' + when) +
+            ' and is marked "' + res + '".\n\n' +
+            'Same entry, targets and stop-loss are already in the database. ' +
+            'Posting again will create a duplicate on the Performance page.\n\nPost anyway?'
+          );
+          if (!ok) { e.preventDefault(); return; }
+          if (forceEl) forceEl.value = '1';          // user confirmed → bypass server block
+        } else {
+          // (B) An OPEN call on the same stock+side exists with DIFFERENT levels:
+          // posting will UPDATE (overwrite) that running call, not create a new one.
+          // Heads-up so a genuine second idea / fat-finger doesn't silently clobber it.
+          const open = RECENT_CALLS.find(c =>
+            c.symbol === sym && c.action === act && c.status === 'open' &&
+            (Math.abs(c.entry - entry) >= 0.005 || key(c.targets) !== tk || key(c.sl) !== sk));
+          if (open) {
+            const ok = confirm(
+              'ℹ️ A LIVE ' + act + ' call on ' + sym + ' is already running ' +
+              '(entry ₹' + open.entry + ', targets ' + (open.targets || '—') + ').\n\n' +
+              'Posting will UPDATE that same running call to these new values, ' +
+              'not create a second one.\n\nContinue?'
+            );
+            if (!ok) { e.preventDefault(); return; }
+          }
         }
-        const res = dup.status === 'target_hit' ? 'Target Achieved'
-                  : dup.status === 'stop_hit'   ? 'Stop-loss Hit' : 'Closed';
-        const ok = confirm(
-          '⚠️ Already recorded — looks like a DUPLICATE.\n\n' +
-          sym + ' (' + act + ') — entry ₹' + entry + ', targets ' + (dup.targets || '—') + '\n' +
-          'was already posted ' + (ago ? ago + ' (' + when + ')' : 'on ' + when) +
-          ' and is marked "' + res + '".\n\n' +
-          'Same entry, targets and stop-loss are already in the database. ' +
-          'Posting again will create a duplicate on the Performance page.\n\nPost anyway?'
-        );
-        if (!ok) e.preventDefault();
+
+        // Passed the gates → submitting. Disable the button so a double-click
+        // can't fire a second identical POST. (Deferred so the form still submits.)
+        const btn = form.querySelector('button[type="submit"]');
+        if (btn) setTimeout(() => { btn.disabled = true; btn.textContent = 'Posting…'; }, 0);
       });
     })();
 
