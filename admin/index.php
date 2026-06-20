@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
         if ($existingId) {
             $vals[':id'] = $existingId;
             $pdo->prepare(
-                'UPDATE calls SET call_type=:call_type, action=:action, company_name=:company_name,
+                'UPDATE calls SET call_type=:call_type, action=:action, symbol=:symbol, company_name=:company_name,
                         entry_price=:entry, target_price=:target, targets=:targets, targets_hit=:thit,
                         stop_loss=:stop, stop_losses=:stop_losses, thesis=:thesis, is_public=:is_public,
                         created_by=:created_by, status=:status, exit_price=:exit, exit_at=:exit_at,
