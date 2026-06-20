@@ -107,6 +107,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'mark_
 /* ---------- Fetch recent calls ---------- */
 $calls = $pdo->query('SELECT * FROM calls ORDER BY posted_at DESC LIMIT 50')->fetchAll();
 
+/* ---------- Risk:reward + potential gain% from entry / T1 / stop ---------- */
+function call_rr_gain($c) {
+    $entry = floatval($c['entry_price']);
+    $t  = $c['target_price'] !== null ? floatval($c['target_price']) : null;
+    $sl = $c['stop_loss']    !== null ? floatval($c['stop_loss'])    : null;
+    if ($entry <= 0 || $t === null) return [null, null];
+    $isBuy  = $c['action'] === 'BUY';
+    $reward = $isBuy ? ($t - $entry) : ($entry - $t);
+    $gain   = $reward / $entry * 100;
+    $rr = null;
+    if ($sl !== null) {
+        $risk = $isBuy ? ($entry - $sl) : ($sl - $entry);
+        if ($risk > 0) $rr = $reward / $risk;
+    }
+    return [$rr, $gain];
+}
+
 /* ---------- Build a pre-filled WhatsApp share message for a call ---------- */
 function build_wa_message($c) {
     $arrow = $c['action'] === 'BUY' ? '🟢' : '🔴';
@@ -241,6 +258,9 @@ function build_wa_message($c) {
             Entry ₹<?php echo number_format($c['entry_price'], 2); ?>
             <?php if (!empty($c['targets'])): ?>· Targets <?php echo htmlspecialchars($c['targets']); ?><?php elseif ($c['target_price'] !== null): ?>· Target ₹<?php echo number_format($c['target_price'], 2); ?><?php endif; ?>
             <?php if (!empty($c['stop_losses'])): ?>· SL <?php echo htmlspecialchars($c['stop_losses']); ?><?php elseif ($c['stop_loss'] !== null): ?>· SL ₹<?php echo number_format($c['stop_loss'], 2); ?><?php endif; ?>
+            <?php list($rr, $gain) = call_rr_gain($c); ?>
+            <?php if ($rr   !== null): ?>· R:R 1:<?php echo number_format($rr, 2); ?><?php endif; ?>
+            <?php if ($gain !== null): ?>· Tgt <?php echo ($gain >= 0 ? '+' : '') . number_format($gain, 2); ?>%<?php endif; ?>
             <?php if ($c['exit_price']   !== null): ?>· Exit ₹<?php echo number_format($c['exit_price'], 2); ?><?php endif; ?>
             <?php if ($c['pnl_pct']      !== null): ?>· PnL <strong><?php echo ($c['pnl_pct'] >= 0 ? '+' : '') . number_format($c['pnl_pct'], 2); ?>%</strong><?php endif; ?>
           </div>
