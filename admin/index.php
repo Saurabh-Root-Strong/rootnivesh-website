@@ -90,9 +90,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
         $allowedStatus = ['open','target_hit','stop_hit','closed','cancelled'];
         $status = in_array($_POST['status'] ?? '', $allowedStatus, true) ? $_POST['status'] : 'open';
         $stmt = $pdo->prepare(
-            'UPDATE calls SET status = :status, exit_price = :exit, exit_at = :exit_at, pnl_pct = :pnl
+            'UPDATE calls SET status = :status, exit_price = :exit, exit_at = :exit_at, pnl_pct = :pnl, is_public = :pub
              WHERE id = :id'
         );
+        $pub  = isset($_POST['is_public']) ? 1 : 0;
         $exit = $_POST['exit_price'] !== '' ? floatval($_POST['exit_price']) : null;
         // Auto-compute PnL% from entry vs exit when both known.
         $pnl = null;
@@ -111,6 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
             ':exit'    => $exit,
             ':exit_at' => $exit !== null ? date('Y-m-d H:i:s') : null,
             ':pnl'     => $pnl,
+            ':pub'     => $pub,
             ':id'      => intval($_POST['id']),
         ]);
         $flash = 'Call updated.';
@@ -293,6 +295,7 @@ function build_wa_message($c) {
             <span class="admin-call-symbol"><?php echo htmlspecialchars($c['symbol']); ?></span>
             <span class="admin-call-type"><?php echo strtoupper(htmlspecialchars($c['call_type'])); ?></span>
             <span class="admin-call-status status-<?php echo $statusClass; ?>"><?php echo htmlspecialchars(strtoupper(str_replace('_', ' ', $c['status']))); ?></span>
+            <?php if (!$c['is_public']): ?><span class="admin-call-status status-loss" title="Hidden from the public site">🔒 PRIVATE</span><?php endif; ?>
             <span class="admin-call-date"><?php echo date('d M Y, H:i', strtotime($c['posted_at'])); ?><?php if (!empty($c['created_by'])): ?> · by <?php echo htmlspecialchars($c['created_by']); ?><?php endif; ?></span>
           </div>
           <div class="admin-call-prices">
@@ -331,6 +334,7 @@ function build_wa_message($c) {
                   <option value="cancelled"   <?php if ($c['status']==='cancelled')   echo 'selected'; ?>>Cancelled</option>
                 </select>
                 <input type="number" step="0.01" name="exit_price" placeholder="Avg exit ₹" title="If you booked partials across targets, enter the blended average exit price" value="<?php echo $c['exit_price'] !== null ? htmlspecialchars($c['exit_price']) : ''; ?>">
+                <label class="admin-check" style="margin:0 6px"><input type="checkbox" name="is_public" <?php echo $c['is_public'] ? 'checked' : ''; ?>><span>Public</span></label>
                 <button type="submit" class="admin-btn admin-btn-secondary">Save</button>
               </form>
             </details>
