@@ -1051,20 +1051,16 @@ function renderLivePerf(calls) {
     return;
   }
   const fmtDate = iso => { const dt = new Date((iso || '').replace(' ', 'T')); return isNaN(dt) ? '' : dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }); };
-  const money = v => '₹' + Number(v).toLocaleString('en-IN', { maximumFractionDigits: 2 });
   body.innerHTML = calls.map(c => {
     const wa = perfWaUrl(c);
-    const en = parseFloat(c.entry_price);
-    const isBuy = c.action === 'BUY';
-    // Parse the target list and how many are already achieved.
-    const tlist = String(c.targets || '').split(',').map(s => parseFloat(String(s).replace(/[^\d.]/g, ''))).filter(v => !isNaN(v));
-    const hit = Math.max(0, Math.min(parseInt(c.targets_hit || 0, 10) || 0, tlist.length));
+    // Server already redacts the raw levels; we only get achieved targets + booked %.
+    const hit = parseInt(c.targets_hit || 0, 10) || 0;
+    const total = parseInt(c.targets_total || 0, 10) || 0;
 
-    // Progress cell: show booked % to the last achieved target — the proof hook.
+    // Progress cell: booked % to the last achieved target — the proof hook.
     let progress;
-    if (hit > 0 && tlist.length) {
-      const lvl = tlist[hit - 1];
-      const g = en > 0 ? (isBuy ? (lvl - en) / en * 100 : (en - lvl) / en * 100) : 0;
+    if (c.booked_pct != null) {
+      const g = parseFloat(c.booked_pct);
       progress = `<span class="perf-result win">✅ ${hit} target${hit > 1 ? 's' : ''} hit · ${(g >= 0 ? '+' : '') + g.toFixed(2)}%</span>`;
     } else {
       progress = `<span class="perf-running">🔴 Running</span>`;
@@ -1072,13 +1068,12 @@ function renderLivePerf(calls) {
 
     // Targets cell: achieved targets shown as proof, remaining ones locked behind WhatsApp.
     let targetsCell;
-    if (hit > 0) {
-      const achieved = tlist.slice(0, hit).map(v => money(v) + ' ✅').join(', ');
-      const remaining = tlist.length - hit;
+    if (hit > 0 && c.targets_achieved) {
+      const remaining = Math.max(0, total - hit);
       const lock = remaining > 0
         ? ` <span class="perf-locked" onclick="window.open('${wa}','_blank')" title="Get the remaining targets on WhatsApp"><span class="perf-blur">+${remaining} more</span><span class="perf-lock-wa">💬</span></span>`
         : '';
-      targetsCell = `<td><span style="color:var(--green)">${achieved}</span>${lock}</td>`;
+      targetsCell = `<td><span style="color:var(--green)">${escapeHtml(c.targets_achieved)} ✅</span>${lock}</td>`;
     } else {
       targetsCell = `<td class="perf-locked" onclick="window.open('${wa}','_blank')" title="Get the targets on WhatsApp"><span class="perf-blur">₹₹₹₹</span><span class="perf-lock-wa">💬</span></td>`;
     }
@@ -1155,35 +1150,23 @@ function renderCalls(type) {
     return;
   }
   const fmtDate = iso => { const dt = new Date((iso || '').replace(' ', 'T')); return isNaN(dt) ? '' : dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }); };
-  const visibleCount = 1; // first card open as proof; rest blurred behind subscribe.
-  grid.innerHTML = data.map((c, i) => {
+  const waUrl = c => 'https://wa.me/' + PERF_WA_NUMBER + '?text=' +
+    encodeURIComponent(`Hi RootNivesh, I want the entry & target levels for your LIVE ${c.symbol} ${String(c.call_type).toUpperCase()} call. Please add me.`);
+  grid.innerHTML = data.map((c) => {
     const isBuy = c.action === 'BUY';
-    const en = parseFloat(c.entry_price);
-    const tg = c.target_price == null ? null : parseFloat(c.target_price);
-    const sl = c.stop_loss == null ? null : parseFloat(c.stop_loss);
-    let rr = '—', ret = '—', retPos = true;
-    if (en > 0 && tg != null) {
-      const reward = isBuy ? tg - en : en - tg;
-      const g = reward / en * 100; retPos = g >= 0;
-      ret = (g >= 0 ? '+' : '') + g.toFixed(2) + '%';
-      if (sl != null) { const risk = isBuy ? en - sl : sl - en; if (risk > 0) rr = '1:' + (reward / risk).toFixed(2); }
-    }
-    const money = v => '₹' + Number(v).toLocaleString('en-IN', { maximumFractionDigits: 2 });
-    const targetDisp = c.targets ? escapeHtml(c.targets) : (tg != null ? money(tg) : '—');
-    const slDisp = c.stop_losses ? escapeHtml(c.stop_losses) : (sl != null ? money(sl) : '—');
-    const locked = i >= visibleCount;
-    const wrapperAttrs = locked
-      ? ' class="call-card call-card-locked" role="button" tabindex="0" onclick="scrollToPlans()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();scrollToPlans();}"'
-      : ' class="call-card"';
-    const lockOverlay = locked
-      ? `<div class="call-lock-overlay">
-           <span class="call-lock-icon">🔒</span>
-           <span class="call-lock-title">Subscribe to view stock name</span>
-           <span class="call-lock-cta">View Plans →</span>
-         </div>`
-      : '';
+    // Levels are redacted server-side; only achieved targets + booked % arrive.
+    const hit = parseInt(c.targets_hit || 0, 10) || 0;
+    const total = parseInt(c.targets_total || 0, 10) || 0;
+    const bookedPct = c.booked_pct == null ? null : parseFloat(c.booked_pct);
+    const wa = waUrl(c);
+
+    const targetCell = (hit > 0 && c.targets_achieved)
+      ? `<span style="color:var(--green)">${escapeHtml(c.targets_achieved)} ✅</span>${total - hit > 0 ? ` <span class="call-wa-lock" onclick="window.open('${wa}','_blank')">🔒 +${total - hit} more 💬</span>` : ''}`
+      : `<span class="call-wa-lock" onclick="window.open('${wa}','_blank')">🔒 on WhatsApp 💬</span>`;
+    const ret = bookedPct != null ? (bookedPct >= 0 ? '+' : '') + bookedPct.toFixed(2) + '%' : 'LIVE';
+
     return `
-    <div${wrapperAttrs}>
+    <div class="call-card">
       <div class="call-card-inner">
         <div>
           <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap">
@@ -1193,19 +1176,18 @@ function renderCalls(type) {
           <div class="call-stock">${escapeHtml(c.symbol)}</div>
           <div class="call-name">${escapeHtml(c.company_name || '')}</div>
           <div class="call-details">
-            <div class="call-detail">Entry: <span>${money(en)}</span></div>
-            <div class="call-detail">Target: <span style="color:var(--green)">${targetDisp}</span></div>
-            <div class="call-detail">SL: <span style="color:var(--red)">${slDisp}</span></div>
-            <div class="call-detail">R:R <span>${rr}</span></div>
+            <div class="call-detail">Entry: <span class="call-wa-lock" onclick="window.open('${wa}','_blank')">🔒 💬</span></div>
+            <div class="call-detail">Target: <span>${targetCell}</span></div>
+            <div class="call-detail">SL: <span class="call-wa-lock" onclick="window.open('${wa}','_blank')">🔒 💬</span></div>
             <div class="call-detail">Date: <span>${fmtDate(c.posted_at)}</span></div>
           </div>
         </div>
         <div class="call-return">
-          <div class="r ${retPos ? 'badge-pos' : 'badge-neg'}">${ret}</div>
-          <small>To Target</small>
+          <div class="r ${bookedPct == null || bookedPct >= 0 ? 'badge-pos' : 'badge-neg'}">${ret}</div>
+          <small>${bookedPct != null ? 'Booked' : 'Status'}</small>
         </div>
       </div>
-      ${lockOverlay}
+      <a class="call-wa-btn" href="${wa}" target="_blank" rel="noopener">💬 Get entry &amp; targets on WhatsApp</a>
     </div>`;
   }).join('');
 }

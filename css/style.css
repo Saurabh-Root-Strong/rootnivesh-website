@@ -2825,3 +2825,13 @@
 .perf-wa-btn:hover { background: #1FBE5A; }
 
 .perf-running { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; color: #E5A50A; background: rgba(229,165,10,0.12); }
+
+/* Calls page — WhatsApp-gated levels */
+.call-wa-lock { color: #25D366; cursor: pointer; font-weight: 600; white-space: nowrap; }
+.call-wa-lock:hover { text-decoration: underline; }
+.call-wa-btn {
+  display: block; margin-top: 12px; text-align: center;
+  background: #25D366; color: #07310F; font-weight: 700;
+  padding: 9px; border-radius: 8px; text-decoration: none; font-size: 13px;
+}
+.call-wa-btn:hover { background: #1FBE5A; }
