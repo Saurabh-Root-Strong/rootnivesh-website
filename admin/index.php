@@ -70,14 +70,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
             $exitAt = date('Y-m-d H:i:s');
         }
 
-        $stmt = $pdo->prepare(
-            'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, targets, targets_hit, stop_loss, stop_losses, thesis, is_public, created_by, status, exit_price, exit_at, pnl_pct)
-             VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :targets, :thit, :stop, :stop_losses, :thesis, :is_public, :created_by, :status, :exit, :exit_at, :pnl)'
+        $symbolUp  = strtoupper(trim($_POST['symbol'] ?? ''));
+        $actionVal = $_POST['call_action'] ?? 'BUY';
+
+        // UPSERT — don't create a duplicate row when the team re-pastes the SAME
+        // running call to advance its progress (1st target → 2nd target → …).
+        // If an OPEN call already exists for this symbol+side, update THAT row
+        // (advance targets, refresh levels) and float it to the top via posted_at.
+        // A genuinely new position is only created when no open call exists; once
+        // a call closes (target_hit / stop_hit / closed) it's locked as track
+        // record, so a fresh paste of the same symbol then starts a new row.
+        $look = $pdo->prepare(
+            "SELECT id FROM calls WHERE symbol = :s AND action = :a AND status = 'open'
+             ORDER BY posted_at DESC LIMIT 1"
         );
-        $stmt->execute([
+        $look->execute([':s' => $symbolUp, ':a' => $actionVal]);
+        $existingId = $look->fetchColumn();
+
+        $vals = [
             ':call_type'    => $_POST['call_type'] ?? 'intraday',
-            ':action'       => $_POST['call_action'] ?? 'BUY',
-            ':symbol'       => strtoupper(trim($_POST['symbol'] ?? '')),
+            ':action'       => $actionVal,
+            ':symbol'       => $symbolUp,
             ':company_name' => trim($_POST['company_name'] ?? '') ?: null,
             ':entry'        => $entryVal,
             ':target'       => $targetNum,
@@ -92,8 +105,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
             ':exit'         => $exitVal,
             ':exit_at'      => $exitAt,
             ':pnl'          => $pnlVal,
-        ]);
-        $flash = 'Call posted successfully (#' . $pdo->lastInsertId() . ').';
+        ];
+
+        if ($existingId) {
+            $vals[':id'] = $existingId;
+            $pdo->prepare(
+                'UPDATE calls SET call_type=:call_type, action=:action, company_name=:company_name,
+                        entry_price=:entry, target_price=:target, targets=:targets, targets_hit=:thit,
+                        stop_loss=:stop, stop_losses=:stop_losses, thesis=:thesis, is_public=:is_public,
+                        created_by=:created_by, status=:status, exit_price=:exit, exit_at=:exit_at,
+                        pnl_pct=:pnl, posted_at=NOW()
+                 WHERE id=:id'
+            )->execute($vals);
+            $flash = 'Same call advanced (#' . $existingId . ') — updated existing row, no duplicate.';
+        } else {
+            $pdo->prepare(
+                'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, targets, targets_hit, stop_loss, stop_losses, thesis, is_public, created_by, status, exit_price, exit_at, pnl_pct)
+                 VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :targets, :thit, :stop, :stop_losses, :thesis, :is_public, :created_by, :status, :exit, :exit_at, :pnl)'
+            )->execute($vals);
+            $flash = 'Call posted successfully (#' . $pdo->lastInsertId() . ').';
+        }
     } catch (PDOException $e) {
         error_log('admin add call failed: ' . $e->getMessage());
         $flash = 'Could not post the call. Please try again.';
