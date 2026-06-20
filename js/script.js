@@ -989,58 +989,17 @@ function filterPerformance(type, btn) {
 
 function loadPerformance(type) {
   type = type || '';
-  const statsEl = document.getElementById('perfStats');
-  const bodyEl  = document.getElementById('perfTableBody');
-  if (!statsEl || !bodyEl) return;
-  if (!perfLoadedOnce) statsEl.innerHTML = '<div class="perf-loading">⟳ Loading performance…</div>';
+  const bodyEl = document.getElementById('perfTableBody');
+  if (!bodyEl) return;
 
   fetch('/performance.php' + (type ? ('?type=' + encodeURIComponent(type)) : ''), { credentials: 'same-origin' })
     .then(r => r.json())
-    .then(d => {
-      perfLoadedOnce = true;
-      renderPerfStats(d.stats || {});
-      renderPerfTable(d.calls || []);
-    })
+    .then(d => { renderPerfTable(d.calls || []); })
     .catch(() => {
-      statsEl.innerHTML = '<div class="perf-loading">Could not load performance right now. Please try again shortly.</div>';
-      bodyEl.innerHTML  = '<tr><td colspan="9" style="text-align:center; color:var(--grey); padding:24px">—</td></tr>';
+      bodyEl.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--grey); padding:24px">Could not load performance right now. Please try again shortly.</td></tr>';
     });
 }
 
-function renderPerfStats(s) {
-  const el = document.getElementById('perfStats');
-  if (!el) return;
-  if (!s || !s.decided_calls) {
-    el.innerHTML = '<div class="perf-loading">No closed calls to report yet. Check back soon.</div>';
-    return;
-  }
-  const signClass = v => v == null ? '' : (parseFloat(v) >= 0 ? 'pos' : 'neg');
-  const pct = v => (v == null ? '—' : (parseFloat(v) >= 0 ? '+' : '') + v + '%');
-  const best = s.best_call
-    ? '+' + s.best_call.pnl_pct + '% · ' + escapeHtml(s.best_call.symbol)
-    : '—';
-  el.innerHTML = `
-    <div class="perf-card">
-      <div class="perf-card-value">${s.win_rate == null ? '—' : s.win_rate + '%'}</div>
-      <div class="perf-card-label">Win Rate</div>
-      <div class="perf-card-sub">${s.wins}W · ${s.losses}L</div>
-    </div>
-    <div class="perf-card">
-      <div class="perf-card-value ${signClass(s.avg_return)}">${pct(s.avg_return)}</div>
-      <div class="perf-card-label">Avg Return / Call</div>
-      <div class="perf-card-sub">across ${s.decided_calls} closed calls</div>
-    </div>
-    <div class="perf-card">
-      <div class="perf-card-value pos">${pct(s.avg_win)}</div>
-      <div class="perf-card-label">Avg Winning Call</div>
-      <div class="perf-card-sub">Avg loss ${pct(s.avg_loss)}</div>
-    </div>
-    <div class="perf-card">
-      <div class="perf-card-value pos">${best.startsWith('+') ? best : escapeHtml(best)}</div>
-      <div class="perf-card-label">Best Call</div>
-      <div class="perf-card-sub">${s.decided_calls} total · public</div>
-    </div>`;
-}
 
 function renderPerfTable(calls) {
   const body = document.getElementById('perfTableBody');
