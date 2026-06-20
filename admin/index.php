@@ -28,9 +28,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
             if ($targetsText === '') $targetsText = (string) $targetNum;
         }
 
+        // Stop-loss: same shape as targets — a free list, first number is the
+        // primary stop for R:R, the full string is display-only.
+        $slText = trim($_POST['stop_losses'] ?? '');
+        $slNum  = null;
+        if ($slText !== '' && preg_match('/\d+(?:\.\d+)?/', $slText, $sm)) {
+            $slNum = floatval($sm[0]);
+        }
+
         $stmt = $pdo->prepare(
-            'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, targets, stop_loss, thesis, is_public, created_by)
-             VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :targets, :stop, :thesis, :is_public, :created_by)'
+            'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, targets, stop_loss, stop_losses, thesis, is_public, created_by)
+             VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :targets, :stop, :stop_losses, :thesis, :is_public, :created_by)'
         );
         $stmt->execute([
             ':call_type'    => $_POST['call_type'] ?? 'intraday',
@@ -40,7 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
             ':entry'        => floatval($_POST['entry_price'] ?? 0),
             ':target'       => $targetNum,
             ':targets'      => $targetsText !== '' ? $targetsText : null,
-            ':stop'         => $_POST['stop_loss']    !== '' ? floatval($_POST['stop_loss'])    : null,
+            ':stop'         => $slNum,
+            ':stop_losses'  => $slText !== '' ? $slText : null,
             ':thesis'       => trim($_POST['thesis'] ?? ''),
             ':is_public'    => isset($_POST['is_public']) ? 1 : 0,
             ':created_by'   => admin_user() ?: null,
@@ -108,7 +117,8 @@ function build_wa_message($c) {
     $msg .= 'Entry: ₹' . number_format(floatval($c['entry_price']), 2) . "\n";
     if (!empty($c['targets']))            $msg .= 'Targets: ' . $c['targets'] . "\n";
     elseif ($c['target_price'] !== null)  $msg .= 'Target: ₹' . number_format(floatval($c['target_price']), 2) . "\n";
-    if ($c['stop_loss']    !== null) $msg .= 'Stop-Loss: ₹' . number_format(floatval($c['stop_loss']), 2) . "\n";
+    if (!empty($c['stop_losses']))        $msg .= 'Stop-Loss: ' . $c['stop_losses'] . "\n";
+    elseif ($c['stop_loss'] !== null)     $msg .= 'Stop-Loss: ₹' . number_format(floatval($c['stop_loss']), 2) . "\n";
     if (!empty($c['thesis']))        $msg .= "\nThesis: " . $c['thesis'] . "\n";
     $msg .= "\n— RootNivesh Research\nSEBI Reg. No. " . SEBI_REG;
     $msg .= "\n*Investments are subject to market risk. Past performance is not indicative of future results.*";
@@ -194,8 +204,8 @@ function build_wa_message($c) {
           <label>Targets (T1, T2, T3…)
             <input type="text" name="targets" placeholder="e.g. 1030, 1045, 1062">
           </label>
-          <label>Stop-Loss
-            <input type="number" step="0.01" name="stop_loss">
+          <label>Stop-Loss(es)
+            <input type="text" name="stop_losses" placeholder="e.g. 987  or  987, 980">
           </label>
           <label class="admin-check">
             <input type="checkbox" name="is_public" checked>
@@ -230,7 +240,7 @@ function build_wa_message($c) {
           <div class="admin-call-prices">
             Entry ₹<?php echo number_format($c['entry_price'], 2); ?>
             <?php if (!empty($c['targets'])): ?>· Targets <?php echo htmlspecialchars($c['targets']); ?><?php elseif ($c['target_price'] !== null): ?>· Target ₹<?php echo number_format($c['target_price'], 2); ?><?php endif; ?>
-            <?php if ($c['stop_loss']    !== null): ?>· SL ₹<?php echo number_format($c['stop_loss'], 2); ?><?php endif; ?>
+            <?php if (!empty($c['stop_losses'])): ?>· SL <?php echo htmlspecialchars($c['stop_losses']); ?><?php elseif ($c['stop_loss'] !== null): ?>· SL ₹<?php echo number_format($c['stop_loss'], 2); ?><?php endif; ?>
             <?php if ($c['exit_price']   !== null): ?>· Exit ₹<?php echo number_format($c['exit_price'], 2); ?><?php endif; ?>
             <?php if ($c['pnl_pct']      !== null): ?>· PnL <strong><?php echo ($c['pnl_pct'] >= 0 ? '+' : '') . number_format($c['pnl_pct'], 2); ?>%</strong><?php endif; ?>
           </div>
@@ -329,26 +339,33 @@ function build_wa_message($c) {
         found.push('symbol');
       }
 
-      // Entry — average a range ("1006-1010" -> 1008), else first number.
+      const avg = (arr) => Math.round(arr.reduce((a, b) => a + b, 0) / arr.length * 100) / 100;
+
+      // Entry — average ALL numbers on the line (range, comma-list, "add" etc.).
       const entryRaw = labelled('entry|buy above|buy|bought|cmp|price|@|buy zone|range') || loose('entry|cmp|price');
-      const rangeM = entryRaw.match(/(\d[\d,]*(?:\.\d+)?)\s*(?:-|–|—|to)\s*(\d[\d,]*(?:\.\d+)?)/i);
-      let entry = '';
-      if (rangeM) {
-        const a = num(rangeM[1]), b = num(rangeM[2]);
-        if (a !== '' && b !== '') entry = Math.round(((a + b) / 2) * 100) / 100;
-      } else {
-        entry = firstNum(entryRaw);
+      const eList = (entryRaw.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(num).filter(v => v !== '');
+      const entry = eList.length ? avg(eList) : '';
+
+      // Targets — capture ALL.
+      const tLine = labelled('targets?|tgt|tp|t1|t2|t3') || loose('targets?|tgt|tp');
+      const tList = (tLine.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(num).filter(v => v !== '');
+
+      // Stop-loss — capture ALL (list, like targets).
+      const slLine = labelled('stop ?loss(?:es)?|stoploss|sl|s/l') || loose('stop ?loss|stoploss|sl');
+      const slList = (slLine.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(num).filter(v => v !== '');
+
+      if (entry !== '') {
+        set('entry_price', entry);
+        found.push(eList.length > 1 ? 'entry(avg)' : 'entry');
       }
-      // Targets (capture ALL) / Stop-loss
-      const tLine  = labelled('targets?|tgt|tp|t1|t2|t3') || loose('targets?|tgt|tp');
-      const tList  = (tLine.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(num).filter(v => v !== '');
-      const stop   = firstNum(labelled('stop ?loss|stoploss|sl|s/l') || loose('stop ?loss|stoploss|sl'));
-      if (entry !== '') { set('entry_price', entry); found.push('entry'); }
       if (tList.length) {
         set('targets', tList.join(', '));
         found.push(tList.length > 1 ? 'targets(' + tList.length + ')' : 'target');
       }
-      if (stop !== '') { set('stop_loss', stop); found.push('SL'); }
+      if (slList.length) {
+        set('stop_losses', slList.join(', '));
+        found.push(slList.length > 1 ? 'SL(' + slList.length + ')' : 'SL');
+      }
 
       // Timeframe (anywhere) -> call_type dropdown
       const tfm = text.match(/(\d+\s*(?:[-to]+\s*\d+)?)\s*(day|week|month|year)s?/i);
