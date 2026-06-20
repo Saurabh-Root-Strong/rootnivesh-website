@@ -976,15 +976,29 @@ function switchCallsGroup(group) {
   renderCalls(defaultType);
 }
 
-/* ===== PERFORMANCE — live track record from performance.php ===== */
+/* ===== PERFORMANCE — closed track record (performance.php) +
+   live ongoing calls (calls.php), gated behind a WhatsApp CTA. ===== */
 let currentPerfType = '';
-let perfLoadedOnce  = false;
+let perfMode = 'achieved';                 // 'achieved' | 'live'
+const PERF_WA_NUMBER = '917467094575';     // RootNivesh WhatsApp
+
+function setPerfMode(mode, btn) {
+  perfMode = mode;
+  document.querySelectorAll('#perfModeTabs .perf-mode').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const achievedWrap = document.getElementById('perfAchievedWrap');
+  const liveWrap = document.getElementById('perfLiveWrap');
+  if (achievedWrap) achievedWrap.style.display = (mode === 'achieved') ? '' : 'none';
+  if (liveWrap) liveWrap.style.display = (mode === 'live') ? '' : 'none';
+  // Re-run the active segment filter for the new mode.
+  (mode === 'achieved' ? loadPerformance : loadLivePerf)(currentPerfType);
+}
 
 function filterPerformance(type, btn) {
   currentPerfType = type;
   document.querySelectorAll('#perfTabs .tab').forEach(t => t.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  loadPerformance(type);
+  (perfMode === 'achieved' ? loadPerformance : loadLivePerf)(type);
 }
 
 function loadPerformance(type) {
@@ -998,6 +1012,50 @@ function loadPerformance(type) {
     .catch(() => {
       bodyEl.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--grey); padding:24px">Could not load performance right now. Please try again shortly.</td></tr>';
     });
+}
+
+function perfWaUrl(c) {
+  const msg = `Hi RootNivesh, I want the entry & target levels for your LIVE ${c.symbol} ${String(c.call_type).toUpperCase()} call. Please add me.`;
+  return 'https://wa.me/' + PERF_WA_NUMBER + '?text=' + encodeURIComponent(msg);
+}
+
+function loadLivePerf(type) {
+  type = type || '';
+  const bodyEl = document.getElementById('perfLiveBody');
+  if (!bodyEl) return;
+  bodyEl.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--grey); padding:24px">Loading…</td></tr>';
+
+  fetch('/calls.php?limit=100' + (type ? ('&type=' + encodeURIComponent(type)) : ''), { credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(d => { renderLivePerf((d.calls || []).filter(c => c.status === 'open')); })
+    .catch(() => {
+      bodyEl.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--grey); padding:24px">Could not load live calls right now. Please try again shortly.</td></tr>';
+    });
+}
+
+function renderLivePerf(calls) {
+  const body = document.getElementById('perfLiveBody');
+  if (!body) return;
+  if (!calls.length) {
+    body.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--grey); padding:24px">No live calls running in this segment right now. <a href="https://wa.me/' + PERF_WA_NUMBER + '" target="_blank" rel="noopener" style="color:var(--gold)">Join on WhatsApp →</a></td></tr>';
+    return;
+  }
+  const fmtDate = iso => { const dt = new Date((iso || '').replace(' ', 'T')); return isNaN(dt) ? '' : dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }); };
+  body.innerHTML = calls.map(c => {
+    const wa = perfWaUrl(c);
+    // Entry & targets blurred behind a tap-to-WhatsApp lock — convert the viewer.
+    const lockedCell = inner => `<td class="perf-locked" onclick="window.open('${wa}','_blank')" title="Get this level on WhatsApp"><span class="perf-blur">${inner}</span><span class="perf-lock-wa">💬</span></td>`;
+    return `
+    <tr>
+      <td>${fmtDate(c.posted_at)}</td>
+      <td><span class="perf-stock">${escapeHtml(c.symbol)}</span></td>
+      <td style="text-transform:capitalize">${escapeHtml(c.call_type)}</td>
+      <td><span class="perf-side ${c.action === 'BUY' ? 'buy' : 'sell'}">${escapeHtml(c.action)}</span></td>
+      ${lockedCell('₹' + Number(c.entry_price).toLocaleString('en-IN'))}
+      ${lockedCell(c.targets ? escapeHtml(c.targets) : '₹₹₹')}
+      <td><a class="perf-wa-btn" href="${wa}" target="_blank" rel="noopener">💬 Get on WhatsApp</a></td>
+    </tr>`;
+  }).join('');
 }
 
 
