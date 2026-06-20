@@ -1003,7 +1003,7 @@ function loadPerformance(type) {
     })
     .catch(() => {
       statsEl.innerHTML = '<div class="perf-loading">Could not load performance right now. Please try again shortly.</div>';
-      bodyEl.innerHTML  = '<tr><td colspan="8" style="text-align:center; color:var(--grey); padding:24px">—</td></tr>';
+      bodyEl.innerHTML  = '<tr><td colspan="9" style="text-align:center; color:var(--grey); padding:24px">—</td></tr>';
     });
 }
 
@@ -1046,7 +1046,7 @@ function renderPerfTable(calls) {
   const body = document.getElementById('perfTableBody');
   if (!body) return;
   if (!calls.length) {
-    body.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--grey); padding:24px">No closed calls in this segment yet.</td></tr>';
+    body.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--grey); padding:24px">No closed calls in this segment yet.</td></tr>';
     return;
   }
   const fmtDate = iso => {
@@ -1065,6 +1065,7 @@ function renderPerfTable(calls) {
       <td style="text-transform:capitalize">${escapeHtml(c.call_type)}</td>
       <td><span class="perf-side ${c.action === 'BUY' ? 'buy' : 'sell'}">${escapeHtml(c.action)}</span></td>
       <td>${money(c.entry_price)}</td>
+      <td>${c.targets ? escapeHtml(c.targets) : (c.target_price != null ? money(c.target_price) : '—')}</td>
       <td>${money(c.exit_price)}</td>
       <td><span class="perf-result ${win ? 'win' : 'loss'}">${resultLabel}</span></td>
       <td class="perf-pnl ${win ? 'pos' : 'neg'}">${pnl == null ? '—' : (pnl >= 0 ? '+' : '') + pnl.toFixed(2) + '%'}</td>

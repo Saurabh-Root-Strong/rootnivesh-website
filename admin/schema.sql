@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS calls (
   symbol          VARCHAR(20) NOT NULL,
   company_name    VARCHAR(200) DEFAULT NULL,
   entry_price     DECIMAL(12,2) NOT NULL,
-  target_price    DECIMAL(12,2) DEFAULT NULL,
+  target_price    DECIMAL(12,2) DEFAULT NULL,   -- primary target (T1) for R:R math
+  targets         VARCHAR(120)  DEFAULT NULL,   -- full list as posted, e.g. "1030, 1045, 1062"
   stop_loss       DECIMAL(12,2) DEFAULT NULL,
   thesis          TEXT,
   status          ENUM('open','target_hit','stop_hit','closed','cancelled') NOT NULL DEFAULT 'open',
@@ -38,9 +39,9 @@ CREATE TABLE IF NOT EXISTS calls (
   INDEX idx_call_type (call_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- For EXISTING installs that already created `calls` before created_by existed,
--- run this once (ignore the "duplicate column" error if it already applied):
+-- For EXISTING installs, run these once (ignore "duplicate column" if applied):
 --   ALTER TABLE calls ADD COLUMN created_by VARCHAR(50) DEFAULT NULL AFTER notes;
+--   ALTER TABLE calls ADD COLUMN targets VARCHAR(120) DEFAULT NULL AFTER target_price;
 
 -- =============================================================
 -- Team accounts. Each analyst gets their own login so the

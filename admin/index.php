@@ -17,9 +17,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 /* ---------- Handle POST: add new call ---------- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add') {
     try {
+        // Targets: a free-form list ("1030, 1045, 1062"). The first number is
+        // stored as target_price (T1) for R:R; the full string goes to `targets`.
+        $targetsText = trim($_POST['targets'] ?? '');
+        $targetNum   = null;
+        if ($targetsText !== '' && preg_match('/\d+(?:\.\d+)?/', $targetsText, $tm)) {
+            $targetNum = floatval($tm[0]);
+        } elseif (($_POST['target_price'] ?? '') !== '') {
+            $targetNum = floatval($_POST['target_price']);
+            if ($targetsText === '') $targetsText = (string) $targetNum;
+        }
+
         $stmt = $pdo->prepare(
-            'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, stop_loss, thesis, is_public, created_by)
-             VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :stop, :thesis, :is_public, :created_by)'
+            'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, targets, stop_loss, thesis, is_public, created_by)
+             VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :targets, :stop, :thesis, :is_public, :created_by)'
         );
         $stmt->execute([
             ':call_type'    => $_POST['call_type'] ?? 'intraday',
@@ -27,7 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
             ':symbol'       => strtoupper(trim($_POST['symbol'] ?? '')),
             ':company_name' => trim($_POST['company_name'] ?? '') ?: null,
             ':entry'        => floatval($_POST['entry_price'] ?? 0),
-            ':target'       => $_POST['target_price'] !== '' ? floatval($_POST['target_price']) : null,
+            ':target'       => $targetNum,
+            ':targets'      => $targetsText !== '' ? $targetsText : null,
             ':stop'         => $_POST['stop_loss']    !== '' ? floatval($_POST['stop_loss'])    : null,
             ':thesis'       => trim($_POST['thesis'] ?? ''),
             ':is_public'    => isset($_POST['is_public']) ? 1 : 0,
@@ -94,7 +106,8 @@ function build_wa_message($c) {
     if (!empty($c['company_name'])) $msg .= ' (' . $c['company_name'] . ')';
     $msg .= "\n";
     $msg .= 'Entry: ₹' . number_format(floatval($c['entry_price']), 2) . "\n";
-    if ($c['target_price'] !== null) $msg .= 'Target: ₹' . number_format(floatval($c['target_price']), 2) . "\n";
+    if (!empty($c['targets']))            $msg .= 'Targets: ' . $c['targets'] . "\n";
+    elseif ($c['target_price'] !== null)  $msg .= 'Target: ₹' . number_format(floatval($c['target_price']), 2) . "\n";
     if ($c['stop_loss']    !== null) $msg .= 'Stop-Loss: ₹' . number_format(floatval($c['stop_loss']), 2) . "\n";
     if (!empty($c['thesis']))        $msg .= "\nThesis: " . $c['thesis'] . "\n";
     $msg .= "\n— RootNivesh Research\nSEBI Reg. No. " . SEBI_REG;
@@ -178,8 +191,8 @@ function build_wa_message($c) {
           </label>
         </div>
         <div class="admin-row">
-          <label>Target
-            <input type="number" step="0.01" name="target_price">
+          <label>Targets (T1, T2, T3…)
+            <input type="text" name="targets" placeholder="e.g. 1030, 1045, 1062">
           </label>
           <label>Stop-Loss
             <input type="number" step="0.01" name="stop_loss">
@@ -216,7 +229,7 @@ function build_wa_message($c) {
           </div>
           <div class="admin-call-prices">
             Entry ₹<?php echo number_format($c['entry_price'], 2); ?>
-            <?php if ($c['target_price'] !== null): ?>· Target ₹<?php echo number_format($c['target_price'], 2); ?><?php endif; ?>
+            <?php if (!empty($c['targets'])): ?>· Targets <?php echo htmlspecialchars($c['targets']); ?><?php elseif ($c['target_price'] !== null): ?>· Target ₹<?php echo number_format($c['target_price'], 2); ?><?php endif; ?>
             <?php if ($c['stop_loss']    !== null): ?>· SL ₹<?php echo number_format($c['stop_loss'], 2); ?><?php endif; ?>
             <?php if ($c['exit_price']   !== null): ?>· Exit ₹<?php echo number_format($c['exit_price'], 2); ?><?php endif; ?>
             <?php if ($c['pnl_pct']      !== null): ?>· PnL <strong><?php echo ($c['pnl_pct'] >= 0 ? '+' : '') . number_format($c['pnl_pct'], 2); ?>%</strong><?php endif; ?>
@@ -246,7 +259,7 @@ function build_wa_message($c) {
                   <option value="closed"      <?php if ($c['status']==='closed')      echo 'selected'; ?>>Closed</option>
                   <option value="cancelled"   <?php if ($c['status']==='cancelled')   echo 'selected'; ?>>Cancelled</option>
                 </select>
-                <input type="number" step="0.01" name="exit_price" placeholder="Exit ₹" value="<?php echo $c['exit_price'] !== null ? htmlspecialchars($c['exit_price']) : ''; ?>">
+                <input type="number" step="0.01" name="exit_price" placeholder="Avg exit ₹" title="If you booked partials across targets, enter the blended average exit price" value="<?php echo $c['exit_price'] !== null ? htmlspecialchars($c['exit_price']) : ''; ?>">
                 <button type="submit" class="admin-btn admin-btn-secondary">Save</button>
               </form>
             </details>
@@ -316,13 +329,26 @@ function build_wa_message($c) {
         found.push('symbol');
       }
 
-      // Entry / Target (first of multiple) / Stop-loss
-      const entry  = firstNum(labelled('entry|buy above|buy|bought|cmp|price|@') || loose('entry|cmp|price'));
-      const target = firstNum(labelled('targets?|tgt|tp|t1') || loose('targets?|tgt|tp'));
+      // Entry — average a range ("1006-1010" -> 1008), else first number.
+      const entryRaw = labelled('entry|buy above|buy|bought|cmp|price|@|buy zone|range') || loose('entry|cmp|price');
+      const rangeM = entryRaw.match(/(\d[\d,]*(?:\.\d+)?)\s*(?:-|–|—|to)\s*(\d[\d,]*(?:\.\d+)?)/i);
+      let entry = '';
+      if (rangeM) {
+        const a = num(rangeM[1]), b = num(rangeM[2]);
+        if (a !== '' && b !== '') entry = Math.round(((a + b) / 2) * 100) / 100;
+      } else {
+        entry = firstNum(entryRaw);
+      }
+      // Targets (capture ALL) / Stop-loss
+      const tLine  = labelled('targets?|tgt|tp|t1|t2|t3') || loose('targets?|tgt|tp');
+      const tList  = (tLine.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(num).filter(v => v !== '');
       const stop   = firstNum(labelled('stop ?loss|stoploss|sl|s/l') || loose('stop ?loss|stoploss|sl'));
-      if (entry  !== '') { set('entry_price',  entry);  found.push('entry'); }
-      if (target !== '') { set('target_price', target); found.push('target'); }
-      if (stop   !== '') { set('stop_loss',    stop);   found.push('SL'); }
+      if (entry !== '') { set('entry_price', entry); found.push('entry'); }
+      if (tList.length) {
+        set('targets', tList.join(', '));
+        found.push(tList.length > 1 ? 'targets(' + tList.length + ')' : 'target');
+      }
+      if (stop !== '') { set('stop_loss', stop); found.push('SL'); }
 
       // Timeframe (anywhere) -> call_type dropdown
       const tfm = text.match(/(\d+\s*(?:[-to]+\s*\d+)?)\s*(day|week|month|year)s?/i);

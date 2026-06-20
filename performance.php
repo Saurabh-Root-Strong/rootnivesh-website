@@ -31,7 +31,7 @@ try {
     if ($days > 0) { $where .= ' AND posted_at >= (NOW() - INTERVAL :d DAY)'; $args[':d'] = $days; }
 
     $sql = "SELECT id, posted_at, exit_at, call_type, action, symbol, company_name,
-                   entry_price, target_price, stop_loss, exit_price, pnl_pct, status
+                   entry_price, target_price, targets, stop_loss, exit_price, pnl_pct, status
             FROM calls WHERE $where
             ORDER BY COALESCE(exit_at, posted_at) DESC
             LIMIT 500";
