@@ -25,7 +25,7 @@ try {
     $allowedTypes = ['intraday','swing','positional','longterm','fno'];
 
     $sql  = 'SELECT id, posted_at, call_type, action, symbol, company_name,
-                    entry_price, target_price, targets, stop_loss, stop_losses, thesis, status,
+                    entry_price, target_price, targets, targets_hit, stop_loss, stop_losses, thesis, status,
                     exit_price, exit_at, pnl_pct
              FROM calls WHERE is_public = 1';
     $args = [];

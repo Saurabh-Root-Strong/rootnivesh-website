@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS calls (
   entry_price     DECIMAL(12,2) NOT NULL,
   target_price    DECIMAL(12,2) DEFAULT NULL,   -- primary target (T1) for R:R math
   targets         VARCHAR(120)  DEFAULT NULL,   -- full list as posted, e.g. "1030, 1045, 1062"
+  targets_hit     INT NOT NULL  DEFAULT 0,       -- how many targets achieved so far (partial progress)
   stop_loss       DECIMAL(12,2) DEFAULT NULL,   -- primary stop (first) for R:R math
   stop_losses     VARCHAR(120)  DEFAULT NULL,   -- full SL list as posted; display-only
   thesis          TEXT,
@@ -44,6 +45,7 @@ CREATE TABLE IF NOT EXISTS calls (
 --   ALTER TABLE calls ADD COLUMN created_by VARCHAR(50) DEFAULT NULL AFTER notes;
 --   ALTER TABLE calls ADD COLUMN targets VARCHAR(120) DEFAULT NULL AFTER target_price;
 --   ALTER TABLE calls ADD COLUMN stop_losses VARCHAR(120) DEFAULT NULL AFTER stop_loss;
+--   ALTER TABLE calls ADD COLUMN targets_hit INT NOT NULL DEFAULT 0 AFTER targets;
 
 -- =============================================================
 -- Team accounts. Each analyst gets their own login so the

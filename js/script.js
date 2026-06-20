@@ -1041,18 +1041,46 @@ function renderLivePerf(calls) {
     return;
   }
   const fmtDate = iso => { const dt = new Date((iso || '').replace(' ', 'T')); return isNaN(dt) ? '' : dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }); };
+  const money = v => '₹' + Number(v).toLocaleString('en-IN', { maximumFractionDigits: 2 });
   body.innerHTML = calls.map(c => {
     const wa = perfWaUrl(c);
-    // Entry & targets blurred behind a tap-to-WhatsApp lock — convert the viewer.
-    const lockedCell = inner => `<td class="perf-locked" onclick="window.open('${wa}','_blank')" title="Get this level on WhatsApp"><span class="perf-blur">${inner}</span><span class="perf-lock-wa">💬</span></td>`;
+    const en = parseFloat(c.entry_price);
+    const isBuy = c.action === 'BUY';
+    // Parse the target list and how many are already achieved.
+    const tlist = String(c.targets || '').split(',').map(s => parseFloat(String(s).replace(/[^\d.]/g, ''))).filter(v => !isNaN(v));
+    const hit = Math.max(0, Math.min(parseInt(c.targets_hit || 0, 10) || 0, tlist.length));
+
+    // Progress cell: show booked % to the last achieved target — the proof hook.
+    let progress;
+    if (hit > 0 && tlist.length) {
+      const lvl = tlist[hit - 1];
+      const g = en > 0 ? (isBuy ? (lvl - en) / en * 100 : (en - lvl) / en * 100) : 0;
+      progress = `<span class="perf-result win">✅ ${hit} target${hit > 1 ? 's' : ''} hit · ${(g >= 0 ? '+' : '') + g.toFixed(2)}%</span>`;
+    } else {
+      progress = `<span class="perf-running">🔴 Running</span>`;
+    }
+
+    // Targets cell: achieved targets shown as proof, remaining ones locked behind WhatsApp.
+    let targetsCell;
+    if (hit > 0) {
+      const achieved = tlist.slice(0, hit).map(v => money(v) + ' ✅').join(', ');
+      const remaining = tlist.length - hit;
+      const lock = remaining > 0
+        ? ` <span class="perf-locked" onclick="window.open('${wa}','_blank')" title="Get the remaining targets on WhatsApp"><span class="perf-blur">+${remaining} more</span><span class="perf-lock-wa">💬</span></span>`
+        : '';
+      targetsCell = `<td><span style="color:var(--green)">${achieved}</span>${lock}</td>`;
+    } else {
+      targetsCell = `<td class="perf-locked" onclick="window.open('${wa}','_blank')" title="Get the targets on WhatsApp"><span class="perf-blur">₹₹₹₹</span><span class="perf-lock-wa">💬</span></td>`;
+    }
+
     return `
     <tr>
       <td>${fmtDate(c.posted_at)}</td>
       <td><span class="perf-stock">${escapeHtml(c.symbol)}</span></td>
       <td style="text-transform:capitalize">${escapeHtml(c.call_type)}</td>
-      <td><span class="perf-side ${c.action === 'BUY' ? 'buy' : 'sell'}">${escapeHtml(c.action)}</span></td>
-      ${lockedCell('₹' + Number(c.entry_price).toLocaleString('en-IN'))}
-      ${lockedCell(c.targets ? escapeHtml(c.targets) : '₹₹₹')}
+      <td><span class="perf-side ${isBuy ? 'buy' : 'sell'}">${escapeHtml(c.action)}</span></td>
+      <td>${progress}</td>
+      ${targetsCell}
       <td><a class="perf-wa-btn" href="${wa}" target="_blank" rel="noopener">💬 Get on WhatsApp</a></td>
     </tr>`;
   }).join('');

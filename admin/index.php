@@ -90,10 +90,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
         $allowedStatus = ['open','target_hit','stop_hit','closed','cancelled'];
         $status = in_array($_POST['status'] ?? '', $allowedStatus, true) ? $_POST['status'] : 'open';
         $stmt = $pdo->prepare(
-            'UPDATE calls SET status = :status, exit_price = :exit, exit_at = :exit_at, pnl_pct = :pnl, is_public = :pub
+            'UPDATE calls SET status = :status, exit_price = :exit, exit_at = :exit_at, pnl_pct = :pnl, is_public = :pub, targets_hit = :thit
              WHERE id = :id'
         );
         $pub  = isset($_POST['is_public']) ? 1 : 0;
+        $thit = max(0, intval($_POST['targets_hit'] ?? 0));
         $exit = $_POST['exit_price'] !== '' ? floatval($_POST['exit_price']) : null;
         // Auto-compute PnL% from entry vs exit when both known.
         $pnl = null;
@@ -113,6 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
             ':exit_at' => $exit !== null ? date('Y-m-d H:i:s') : null,
             ':pnl'     => $pnl,
             ':pub'     => $pub,
+            ':thit'    => $thit,
             ':id'      => intval($_POST['id']),
         ]);
         $flash = 'Call updated.';
@@ -310,6 +312,7 @@ function build_wa_message($c) {
             Entry ₹<?php echo number_format($c['entry_price'], 2); ?>
             <?php if (!empty($c['targets'])): ?>· Targets <?php echo htmlspecialchars($c['targets']); ?><?php elseif ($c['target_price'] !== null): ?>· Target ₹<?php echo number_format($c['target_price'], 2); ?><?php endif; ?>
             <?php if (!empty($c['stop_losses'])): ?>· SL <?php echo htmlspecialchars($c['stop_losses']); ?><?php elseif ($c['stop_loss'] !== null): ?>· SL ₹<?php echo number_format($c['stop_loss'], 2); ?><?php endif; ?>
+            <?php if (!empty($c['targets_hit']) && $c['status'] === 'open'): ?>· <strong style="color:#3FB950"><?php echo intval($c['targets_hit']); ?> target<?php echo intval($c['targets_hit']) > 1 ? 's' : ''; ?> hit</strong><?php endif; ?>
             <?php list($rr, $gain) = call_rr_gain($c); ?>
             <?php if ($rr   !== null): ?>· R:R 1:<?php echo number_format($rr, 2); ?><?php endif; ?>
             <?php if ($gain !== null): ?>· Tgt <?php echo ($gain >= 0 ? '+' : '') . number_format($gain, 2); ?>%<?php endif; ?>
@@ -341,6 +344,7 @@ function build_wa_message($c) {
                   <option value="closed"      <?php if ($c['status']==='closed')      echo 'selected'; ?>>Closed</option>
                   <option value="cancelled"   <?php if ($c['status']==='cancelled')   echo 'selected'; ?>>Cancelled</option>
                 </select>
+                <input type="number" min="0" step="1" name="targets_hit" placeholder="Targets hit" title="How many targets achieved so far (e.g. 1 = first target hit, call still running)" style="width:90px" value="<?php echo intval($c['targets_hit'] ?? 0); ?>">
                 <input type="number" step="0.01" name="exit_price" placeholder="Avg exit ₹" title="If you booked partials across targets, enter the blended average exit price" value="<?php echo $c['exit_price'] !== null ? htmlspecialchars($c['exit_price']) : ''; ?>">
                 <label class="admin-check" style="margin:0 6px"><input type="checkbox" name="is_public" <?php echo $c['is_public'] ? 'checked' : ''; ?>><span>Public</span></label>
                 <button type="submit" class="admin-btn admin-btn-secondary">Save</button>
