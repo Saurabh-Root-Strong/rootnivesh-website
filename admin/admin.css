@@ -141,3 +141,17 @@
 }
 .admin-inline-form select,
 .admin-inline-form input { font-size: 12px; padding: 6px 8px; }
+
+/* WhatsApp quick-paste box */
+.admin-paste {
+  width: 100%;
+  box-sizing: border-box;
+  font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #2A3A4F;
+  background: #0E1726;
+  color: #E6EDF3;
+  resize: vertical;
+}
+.admin-paste:focus { outline: none; border-color: #C9A227; }

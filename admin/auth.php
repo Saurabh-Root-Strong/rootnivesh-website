@@ -53,15 +53,62 @@ function csrf_verify() {
     return is_string($sent) && !empty($_SESSION['csrf']) && hash_equals($_SESSION['csrf'], $sent);
 }
 
-function admin_login($username, $password) {
-    if ($username !== ADMIN_USER) return false;
-    if (!password_verify($password, ADMIN_PASS_HASH)) return false;
+/* Start an authenticated session for a given user identity. */
+function _admin_begin_session($username, $displayName, $role) {
     session_regenerate_id(true);
-    $_SESSION['admin_logged_in']   = true;
-    $_SESSION['admin_login_at']    = time();
-    $_SESSION['admin_last_seen_at'] = time();
+    $_SESSION['admin_logged_in']    = true;
+    $_SESSION['admin_login_at']     = time();
+    $_SESSION['admin_last_seen_at']  = time();
+    $_SESSION['admin_user']         = $username;
+    $_SESSION['admin_display']      = $displayName ?: $username;
+    $_SESSION['admin_role']         = $role; // 'owner' | 'analyst'
     $_SESSION['csrf'] = bin2hex(random_bytes(32)); // fresh token per login
-    return true;
+}
+
+/* Identity helpers for use inside admin pages. */
+function admin_user()     { return $_SESSION['admin_user']    ?? ''; }
+function admin_display()  { return $_SESSION['admin_display'] ?? ''; }
+function admin_role()     { return $_SESSION['admin_role']    ?? 'analyst'; }
+function admin_is_owner() { return admin_role() === 'owner'; }
+
+function admin_require_owner() {
+    admin_require_login();
+    if (!admin_is_owner()) { http_response_code(403); echo 'Forbidden — owner access only.'; exit; }
+}
+
+function admin_login($username, $password) {
+    $username = trim($username);
+    if ($username === '' || $password === '') return false;
+
+    // 1) Team account in the users table (preferred).
+    try {
+        $stmt = db()->prepare(
+            'SELECT id, username, pass_hash, display_name, role, is_active
+             FROM users WHERE username = :u LIMIT 1'
+        );
+        $stmt->execute([':u' => $username]);
+        $u = $stmt->fetch();
+        if ($u && intval($u['is_active']) === 1 && password_verify($password, $u['pass_hash'])) {
+            _admin_begin_session($u['username'], $u['display_name'], $u['role']);
+            try { db()->prepare('UPDATE users SET last_login_at = NOW() WHERE id = :id')
+                     ->execute([':id' => $u['id']]); } catch (PDOException $e) {}
+            return true;
+        }
+        // Username exists in users table but bad/inactive -> do NOT fall through
+        // to the config owner (avoids a deactivated user reusing the bootstrap).
+        if ($u) return false;
+    } catch (PDOException $e) {
+        // users table may not exist yet on a fresh install — fall through to bootstrap.
+    }
+
+    // 2) Bootstrap owner from admin/config.php. Always available so the panel
+    //    is reachable before any team accounts are created.
+    if (defined('ADMIN_USER') && hash_equals(ADMIN_USER, $username)
+        && password_verify($password, ADMIN_PASS_HASH)) {
+        _admin_begin_session(ADMIN_USER, ADMIN_USER, 'owner');
+        return true;
+    }
+    return false;
 }
 
 function admin_logout() {

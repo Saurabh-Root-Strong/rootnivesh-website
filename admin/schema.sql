@@ -32,7 +32,30 @@ CREATE TABLE IF NOT EXISTS calls (
   is_public       TINYINT(1) NOT NULL DEFAULT 1,
   shared_to_wa_at DATETIME DEFAULT NULL,
   notes           TEXT,
+  created_by      VARCHAR(50) DEFAULT NULL,
   INDEX idx_posted_at (posted_at DESC),
   INDEX idx_status (status),
   INDEX idx_call_type (call_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- For EXISTING installs that already created `calls` before created_by existed,
+-- run this once (ignore the "duplicate column" error if it already applied):
+--   ALTER TABLE calls ADD COLUMN created_by VARCHAR(50) DEFAULT NULL AFTER notes;
+
+-- =============================================================
+-- Team accounts. Each analyst gets their own login so the
+-- Performance tab / calls record who posted what. The `owner`
+-- role can create and deactivate other users via /admin/users.php.
+-- The bootstrap owner in admin/config.php (ADMIN_USER) always
+-- works even before this table has any rows.
+-- =============================================================
+CREATE TABLE IF NOT EXISTS users (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  username      VARCHAR(50)  NOT NULL UNIQUE,
+  pass_hash     VARCHAR(255) NOT NULL,
+  display_name  VARCHAR(100) DEFAULT NULL,
+  role          ENUM('owner','analyst') NOT NULL DEFAULT 'analyst',
+  is_active     TINYINT(1)   NOT NULL DEFAULT 1,
+  created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_login_at DATETIME     DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

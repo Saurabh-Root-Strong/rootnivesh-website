@@ -2733,3 +2733,42 @@
     [style*="max-width:920px"] { max-width: 100% !important; }
     .container { padding-left: 14px; padding-right: 14px; }
   }
+
+/* ===================== PERFORMANCE PAGE ===================== */
+.perf-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+.perf-loading { grid-column: 1 / -1; text-align: center; color: var(--grey); padding: 30px; }
+.perf-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 20px;
+  text-align: center;
+}
+.perf-card-value { font-size: 30px; font-weight: 800; line-height: 1.1; color: #fff; }
+.perf-card-value.pos { color: var(--green); }
+.perf-card-value.neg { color: var(--red); }
+.perf-card-label { margin-top: 6px; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--grey); }
+.perf-card-sub { margin-top: 4px; font-size: 12px; color: var(--grey); }
+
+.perf-table-wrap { margin-top: 22px; overflow-x: auto; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); }
+.perf-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 640px; }
+.perf-table thead th {
+  text-align: left; padding: 12px 14px; background: rgba(255,255,255,0.04);
+  color: var(--grey); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .03em;
+  white-space: nowrap;
+}
+.perf-table tbody td { padding: 12px 14px; border-top: 1px solid rgba(255,255,255,0.06); color: #D7DEE6; white-space: nowrap; }
+.perf-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+.perf-stock { font-weight: 700; color: #fff; }
+.perf-side { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; }
+.perf-side.buy  { color: var(--green); background: rgba(63,185,80,0.12); }
+.perf-side.sell { color: var(--red);   background: rgba(248,81,73,0.12); }
+.perf-result { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; }
+.perf-result.win  { color: var(--green); background: rgba(63,185,80,0.12); }
+.perf-result.loss { color: var(--red);   background: rgba(248,81,73,0.12); }
+.perf-pnl.pos { color: var(--green); font-weight: 700; }
+.perf-pnl.neg { color: var(--red);   font-weight: 700; }

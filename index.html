@@ -183,7 +183,7 @@
 <link rel="dns-prefetch" href="https://www.bseindia.com">
 <link rel="dns-prefetch" href="https://www.nseindia.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=81">
+<link rel="stylesheet" href="css/style.css?v=82">
 </head>
 <body>
 
@@ -320,6 +320,8 @@
       </div>
     </li>
 
+    <li><a onclick="showPage('performance');closeMegas()">Performance</a></li>
+
     <li><a onclick="showPage('reports');closeMegas()">Research Reports</a></li>
 
     <li><a onclick="showPage('blog');closeMegas()">Blogs</a></li>
@@ -366,6 +368,8 @@
       <a class="mob-sub" onclick="megaGoCall('monthly')"><span>📅</span><span>Monthly Based</span></a>
     </div>
   </div>
+
+  <a class="mob-link" onclick="showPage('performance')"><span class="mob-link-icon">🏆</span><span>Performance</span></a>
 
   <a class="mob-link" onclick="showPage('reports')"><span class="mob-link-icon">📊</span><span>Research Reports</span></a>
 
@@ -971,6 +975,57 @@
       <div class="disclaimer" style="margin-top:40px">
         <h4>⚠️ Disclaimer</h4>
         <p>These reports are for educational and informational purposes only. RootNivesh Research is a SEBI Registered Research Analyst. Please read the full disclaimer before acting on any recommendation. Investment in securities is subject to market risk.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ===================== PERFORMANCE PAGE ===================== -->
+<div class="page" id="page-performance">
+  <div class="page-hero">
+    <div class="container">
+      <div class="section-tag">Track Record</div>
+      <h1>Calls <em>Performance</em></h1>
+      <div class="gold-line"></div>
+      <p style="margin-top:14px">Every closed public call — win-rate, average return and the full trade log. Backed by data, not screenshots.</p>
+    </div>
+  </div>
+  <section>
+    <div class="container">
+
+      <!-- Headline stat cards -->
+      <div class="perf-stats" id="perfStats">
+        <div class="perf-loading">⟳ Loading performance…</div>
+      </div>
+
+      <!-- Segment filter -->
+      <div class="tabs" id="perfTabs" style="margin-top:28px">
+        <button class="tab active" onclick="filterPerformance('', this)">All</button>
+        <button class="tab" onclick="filterPerformance('intraday', this)">Intraday</button>
+        <button class="tab" onclick="filterPerformance('swing', this)">Swing</button>
+        <button class="tab" onclick="filterPerformance('positional', this)">Positional</button>
+        <button class="tab" onclick="filterPerformance('fno', this)">F&amp;O</button>
+      </div>
+
+      <!-- Closed-trade log -->
+      <div class="perf-table-wrap">
+        <table class="perf-table" id="perfTable">
+          <thead>
+            <tr>
+              <th>Date</th><th>Stock</th><th>Type</th><th>Side</th>
+              <th>Entry</th><th>Exit</th><th>Result</th><th>P&amp;L</th>
+            </tr>
+          </thead>
+          <tbody id="perfTableBody">
+            <tr><td colspan="8" style="text-align:center; color:var(--grey); padding:24px">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="disclaimer" style="margin-top:40px">
+        <h4>⚠️ Disclaimer</h4>
+        <p>Track record reflects calls broadcast to RootNivesh subscribers and is shown for transparency only. <strong>Past performance is not indicative of future results.</strong> RootNivesh Research is a SEBI Registered Research Analyst. Investment in securities is subject to market risk — read the full disclaimer before acting on any call.</p>
       </div>
     </div>
   </section>
@@ -2202,8 +2257,8 @@
      Order matters — data must load first.
      Bump the ?v= number whenever you change either file to bust
      long-cached copies on visitors' phones. -->
-<script src="js/data.js?v=36"></script>
-<script src="js/script.js?v=48"></script>
+<script src="js/data.js?v=37"></script>
+<script src="js/script.js?v=49"></script>
 
 
 <section style="padding:40px 20px; max-width:900px; margin:auto; line-height:1.7;">

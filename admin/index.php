@@ -18,8 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add') {
     try {
         $stmt = $pdo->prepare(
-            'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, stop_loss, thesis, is_public)
-             VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :stop, :thesis, :is_public)'
+            'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, stop_loss, thesis, is_public, created_by)
+             VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :stop, :thesis, :is_public, :created_by)'
         );
         $stmt->execute([
             ':call_type'    => $_POST['call_type'] ?? 'intraday',
@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
             ':stop'         => $_POST['stop_loss']    !== '' ? floatval($_POST['stop_loss'])    : null,
             ':thesis'       => trim($_POST['thesis'] ?? ''),
             ':is_public'    => isset($_POST['is_public']) ? 1 : 0,
+            ':created_by'   => admin_user() ?: null,
         ]);
         $flash = 'Call posted successfully (#' . $pdo->lastInsertId() . ').';
     } catch (PDOException $e) {
@@ -112,7 +113,12 @@ function build_wa_message($c) {
 <body class="admin-body">
   <header class="admin-header">
     <h1>RootNivesh Admin</h1>
-    <a href="logout.php" class="admin-link">Logout</a>
+    <span class="admin-link">
+      Signed in as <strong><?php echo htmlspecialchars(admin_display()); ?></strong> (<?php echo htmlspecialchars(admin_role()); ?>)
+      &nbsp;·&nbsp;
+      <?php if (admin_is_owner()): ?><a href="users.php" class="admin-link">Team</a> &nbsp;·&nbsp; <?php endif; ?>
+      <a href="logout.php" class="admin-link">Logout</a>
+    </span>
   </header>
 
   <main class="admin-main">
@@ -121,10 +127,26 @@ function build_wa_message($c) {
       <div class="admin-flash"><?php echo htmlspecialchars($flash); ?></div>
     <?php endif; ?>
 
+    <!-- ===== QUICK PASTE FROM WHATSAPP ===== -->
+    <section class="admin-card">
+      <h2>Quick add from WhatsApp</h2>
+      <p style="color:#8A9BB0; font-size:13px; margin:0 0 10px">
+        Paste the message you sent to the group, hit <strong>Parse</strong>, then check the
+        fields below before posting. Recognises lines like
+        <em>“BUY RELIANCE Entry 2450 Target 2500 SL 2420”</em>.
+      </p>
+      <textarea id="pasteBox" rows="4" class="admin-paste"
+                placeholder="BUY RELIANCE&#10;Entry 2450&#10;Target 2500&#10;SL 2420"></textarea>
+      <div style="margin-top:8px; display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+        <button type="button" class="admin-btn" onclick="parsePaste()">⤓ Parse into form</button>
+        <span id="parseMsg" style="font-size:13px; color:#8A9BB0"></span>
+      </div>
+    </section>
+
     <!-- ===== ADD NEW CALL ===== -->
     <section class="admin-card">
       <h2>Post a new call</h2>
-      <form method="post" class="admin-form">
+      <form id="addCallForm" method="post" class="admin-form">
         <?php echo csrf_field(); ?>
         <input type="hidden" name="action" value="add">
         <div class="admin-row">
@@ -190,7 +212,7 @@ function build_wa_message($c) {
             <span class="admin-call-symbol"><?php echo htmlspecialchars($c['symbol']); ?></span>
             <span class="admin-call-type"><?php echo strtoupper(htmlspecialchars($c['call_type'])); ?></span>
             <span class="admin-call-status status-<?php echo $statusClass; ?>"><?php echo htmlspecialchars(strtoupper(str_replace('_', ' ', $c['status']))); ?></span>
-            <span class="admin-call-date"><?php echo date('d M Y, H:i', strtotime($c['posted_at'])); ?></span>
+            <span class="admin-call-date"><?php echo date('d M Y, H:i', strtotime($c['posted_at'])); ?><?php if (!empty($c['created_by'])): ?> · by <?php echo htmlspecialchars($c['created_by']); ?><?php endif; ?></span>
           </div>
           <div class="admin-call-prices">
             Entry ₹<?php echo number_format($c['entry_price'], 2); ?>
@@ -241,6 +263,51 @@ function build_wa_message($c) {
   </form>
 
   <script>
+    /* ---- WhatsApp message -> form fields ----
+       Heuristic, never auto-submits. Pulls action, symbol, entry, target, SL
+       from free-form text. The user always reviews the form before posting. */
+    function parsePaste() {
+      const raw = (document.getElementById('pasteBox').value || '').trim();
+      const msg = document.getElementById('parseMsg');
+      if (!raw) { msg.textContent = 'Nothing to parse — paste a message first.'; return; }
+      const form = document.getElementById('addCallForm');
+      const set  = (name, val) => { const el = form.elements[name]; if (el && val != null && val !== '') el.value = val; };
+      const num  = (s) => { if (!s) return ''; const n = parseFloat(String(s).replace(/[,₹\s]/g, '')); return isNaN(n) ? '' : n; };
+
+      const text = raw.replace(/\s+/g, ' ');
+      const found = [];
+
+      // Action
+      let action = '';
+      if (/\b(sell|short)\b/i.test(text)) action = 'SELL';
+      else if (/\b(buy|long)\b/i.test(text)) action = 'BUY';
+      if (action) { set('call_action', action); found.push('action'); }
+
+      // Entry / Target / Stop-loss (label then number; many label variants)
+      const grab = (re) => { const m = text.match(re); return m ? num(m[1]) : ''; };
+      const entry  = grab(/\b(?:entry|buy(?:\s*above)?|bought|cmp|price|@)\s*[:=]?\s*₹?\s*([\d,]+(?:\.\d+)?)/i);
+      const target = grab(/\b(?:target|tgt|tp|t1)\s*[:=]?\s*₹?\s*([\d,]+(?:\.\d+)?)/i);
+      const stop   = grab(/\b(?:sl|s\/l|stop[-\s]?loss|stoploss)\s*[:=]?\s*₹?\s*([\d,]+(?:\.\d+)?)/i);
+      if (entry  !== '') { set('entry_price',  entry);  found.push('entry'); }
+      if (target !== '') { set('target_price', target); found.push('target'); }
+      if (stop   !== '') { set('stop_loss',    stop);   found.push('SL'); }
+
+      // Symbol: first ALL-CAPS token (2+ chars) that isn't a known keyword.
+      const stop_words = new Set(['BUY','SELL','LONG','SHORT','ENTRY','TARGET','TGT','TP','SL','CMP','NSE','BSE','CE','PE','FUT','T1','T2']);
+      const symMatch = text.match(/\b([A-Z][A-Z&]{1,14})\b/g) || [];
+      const sym = symMatch.find(w => !stop_words.has(w));
+      if (sym) { set('symbol', sym); found.push('symbol'); }
+
+      // Anything after parsing that looks like a thesis line -> thesis (the raw paste).
+      set('thesis', raw);
+
+      msg.textContent = found.length
+        ? '✓ Filled: ' + found.join(', ') + '. Review the fields, then Post call.'
+        : 'Could not auto-detect fields — fill the form manually.';
+      msg.style.color = found.length ? '#3FB950' : '#E5A50A';
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     const CSRF_TOKEN = <?php echo json_encode(csrf_token()); ?>;
     // When admin clicks Share-to-WA, fire-and-forget mark_shared in the background.
     function markShared(id) {
