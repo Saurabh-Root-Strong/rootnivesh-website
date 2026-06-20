@@ -683,12 +683,21 @@ function build_wa_message($c) {
         if (!dup) return;
         const d = new Date((dup.posted_at || '').replace(' ', 'T'));
         const when = isNaN(d) ? dup.posted_at : d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' });
+        // Relative age — "today / yesterday / N days back" — so it's obvious this
+        // exact call was already recorded recently.
+        let ago = '';
+        if (!isNaN(d)) {
+          const days = Math.floor((Date.now() - d.getTime()) / 86400000);
+          ago = days <= 0 ? 'today' : days === 1 ? 'yesterday' : days + ' days back';
+        }
         const res = dup.status === 'target_hit' ? 'Target Achieved'
                   : dup.status === 'stop_hit'   ? 'Stop-loss Hit' : 'Closed';
         const ok = confirm(
-          '⚠️ Looks like a DUPLICATE.\n\n' +
+          '⚠️ Already recorded — looks like a DUPLICATE.\n\n' +
           sym + ' (' + act + ') — entry ₹' + entry + ', targets ' + (dup.targets || '—') + '\n' +
-          'was already posted on ' + when + ' and is marked "' + res + '".\n\n' +
+          'was already posted ' + (ago ? ago + ' (' + when + ')' : 'on ' + when) +
+          ' and is marked "' + res + '".\n\n' +
+          'Same entry, targets and stop-loss are already in the database. ' +
           'Posting again will create a duplicate on the Performance page.\n\nPost anyway?'
         );
         if (!ok) e.preventDefault();
