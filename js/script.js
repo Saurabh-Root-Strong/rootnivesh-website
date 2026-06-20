@@ -1059,12 +1059,14 @@ function renderPerfTable(calls) {
     const win = pnl != null && pnl >= 0;
     const resultLabel = c.status === 'target_hit' ? 'Target Achieved' : c.status === 'stop_hit' ? 'Stop-loss' : 'Closed';
 
-    // R:R from entry / target / stop.
+    // Realized R:R: reward from the actual exit, risk from the stop.
     const en = parseFloat(c.entry_price), tg = c.target_price == null ? null : parseFloat(c.target_price),
-          sl = c.stop_loss == null ? null : parseFloat(c.stop_loss), isBuy = c.action === 'BUY';
+          sl = c.stop_loss == null ? null : parseFloat(c.stop_loss),
+          ex = c.exit_price == null ? null : parseFloat(c.exit_price), isBuy = c.action === 'BUY';
     let rrCell = '—';
-    if (en > 0 && tg != null && sl != null) {
-      const reward = isBuy ? tg - en : en - tg;
+    const rewardBase = ex != null ? ex : tg;   // prefer realized exit, fall back to target
+    if (en > 0 && rewardBase != null && sl != null) {
+      const reward = isBuy ? rewardBase - en : en - rewardBase;
       const risk = isBuy ? en - sl : sl - en;
       if (risk > 0) rrCell = '1:' + (reward / risk).toFixed(2);
     }

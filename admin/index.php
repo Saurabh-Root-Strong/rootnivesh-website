@@ -144,13 +144,17 @@ function call_rr_gain($c) {
     $entry = floatval($c['entry_price']);
     $t  = $c['target_price'] !== null ? floatval($c['target_price']) : null;
     $sl = $c['stop_loss']    !== null ? floatval($c['stop_loss'])    : null;
-    if ($entry <= 0 || $t === null) return [null, null];
-    $isBuy  = $c['action'] === 'BUY';
-    $reward = $isBuy ? ($t - $entry) : ($entry - $t);
-    $gain   = $reward / $entry * 100;
+    $ex = $c['exit_price']   !== null ? floatval($c['exit_price'])   : null;
+    if ($entry <= 0) return [null, null];
+    $isBuy = $c['action'] === 'BUY';
+    // Planned target gain% (potential to T1).
+    $gain = $t !== null ? ($isBuy ? ($t - $entry) : ($entry - $t)) / $entry * 100 : null;
+    // R:R: reward from the realized exit if the call is closed, else the planned target.
+    $rewardBase = $ex !== null ? $ex : $t;
     $rr = null;
-    if ($sl !== null) {
-        $risk = $isBuy ? ($entry - $sl) : ($sl - $entry);
+    if ($rewardBase !== null && $sl !== null) {
+        $reward = $isBuy ? ($rewardBase - $entry) : ($entry - $rewardBase);
+        $risk   = $isBuy ? ($entry - $sl) : ($sl - $entry);
         if ($risk > 0) $rr = $reward / $risk;
     }
     return [$rr, $gain];
