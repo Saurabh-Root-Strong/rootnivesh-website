@@ -39,25 +39,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
         // Outcome: post a FRESH (open) call, or an already-achieved/closed one in
         // one shot. A non-open status with an exit price computes PnL immediately
         // and the call shows on the public Performance track record.
-        $postStatus = in_array($_POST['post_status'] ?? 'open', ['open','target_hit','stop_hit','closed'], true)
-                    ? $_POST['post_status'] : 'open';
+        // Same progress vocabulary as Update status: running / live_N / all /
+        // stop / closed. Partial (live_N) stays open with N targets hit; "all"
+        // closes to Performance with exit defaulting to the final target.
+        $prog = $_POST['post_status'] ?? 'running';
         $entryVal = floatval($_POST['entry_price'] ?? 0);
-        $exitVal = null; $exitAt = null; $pnlVal = null;
-        if ($postStatus !== 'open') {
-            if (($_POST['post_exit'] ?? '') !== '' && preg_match('/\d+(?:\.\d+)?/', $_POST['post_exit'], $em)) {
-                $exitVal = floatval($em[0]);
-            }
-            if ($exitVal !== null && $entryVal > 0) {
-                $isBuy  = ($_POST['call_action'] ?? 'BUY') === 'BUY';
-                $pnlVal = $isBuy ? round(($exitVal - $entryVal) / $entryVal * 100, 2)
-                                 : round(($entryVal - $exitVal) / $entryVal * 100, 2);
-                $exitAt = date('Y-m-d H:i:s');
-            }
+        $isBuy = ($_POST['call_action'] ?? 'BUY') === 'BUY';
+        preg_match_all('/\d+(?:\.\d+)?/', $targetsText, $ptm);
+        $tlPost = array_map('floatval', $ptm[0]);
+        $Np = count($tlPost);
+        $exitInput = ($_POST['post_exit'] ?? '') !== '' && preg_match('/\d+(?:\.\d+)?/', $_POST['post_exit'], $em)
+                   ? floatval($em[0]) : null;
+
+        $postStatus = 'open'; $thitPost = 0; $exitVal = null; $exitAt = null; $pnlVal = null;
+        if ($prog === 'running') {
+            $postStatus = 'open'; $thitPost = 0;
+        } elseif (strpos($prog, 'live_') === 0) {
+            $postStatus = 'open'; $thitPost = min(max(intval(substr($prog, 5)), 0), $Np);
+        } elseif ($prog === 'all') {
+            $postStatus = 'target_hit'; $thitPost = $Np;
+            $exitVal = $exitInput !== null ? $exitInput : ($Np > 0 ? end($tlPost) : null);
+        } elseif ($prog === 'stop') {
+            $postStatus = 'stop_hit'; $exitVal = $exitInput !== null ? $exitInput : $slNum;
+        } elseif ($prog === 'closed') {
+            $postStatus = 'closed'; $exitVal = $exitInput;
+        }
+        if ($exitVal !== null && $entryVal > 0) {
+            $pnlVal = $isBuy ? round(($exitVal - $entryVal) / $entryVal * 100, 2)
+                             : round(($entryVal - $exitVal) / $entryVal * 100, 2);
+            $exitAt = date('Y-m-d H:i:s');
         }
 
         $stmt = $pdo->prepare(
-            'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, targets, stop_loss, stop_losses, thesis, is_public, created_by, status, exit_price, exit_at, pnl_pct)
-             VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :targets, :stop, :stop_losses, :thesis, :is_public, :created_by, :status, :exit, :exit_at, :pnl)'
+            'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, targets, targets_hit, stop_loss, stop_losses, thesis, is_public, created_by, status, exit_price, exit_at, pnl_pct)
+             VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :targets, :thit, :stop, :stop_losses, :thesis, :is_public, :created_by, :status, :exit, :exit_at, :pnl)'
         );
         $stmt->execute([
             ':call_type'    => $_POST['call_type'] ?? 'intraday',
@@ -67,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
             ':entry'        => $entryVal,
             ':target'       => $targetNum,
             ':targets'      => $targetsText !== '' ? $targetsText : null,
+            ':thit'         => $thitPost,
             ':stop'         => $slNum,
             ':stop_losses'  => $slText !== '' ? $slText : null,
             ':thesis'       => trim($_POST['thesis'] ?? ''),
@@ -316,7 +332,7 @@ function build_wa_message($c) {
         </div>
         <div class="admin-row">
           <label>Targets (T1, T2, T3…)
-            <input type="text" name="targets" placeholder="e.g. 1030, 1045, 1062">
+            <input type="text" name="targets" id="targetsInput" placeholder="e.g. 1030, 1045, 1062" oninput="rebuildPostStatus()">
           </label>
           <label>Stop-Loss(es)
             <input type="text" name="stop_losses" placeholder="e.g. 987  or  987, 980">
@@ -325,10 +341,11 @@ function build_wa_message($c) {
         <div class="admin-row">
           <label>Where does this call go? *
             <select name="post_status" id="postStatus" onchange="togglePostExit()">
-              <option value="open">🆕 Fresh Call → shows on the Calls page (live)</option>
-              <option value="target_hit">✅ Target Achieved → shows on Performance (win)</option>
-              <option value="stop_hit">🛑 Stop-loss Hit → shows on Performance (loss)</option>
-              <option value="closed">☑️ Closed manually → shows on Performance</option>
+              <!-- Partial "Nth Target Achieved" options are injected by JS from the Targets field. -->
+              <option value="running">🆕 Fresh Call → Calls page (live, nothing hit yet)</option>
+              <option value="all">✅ All Targets Achieved → Performance (win)</option>
+              <option value="stop">🛑 Stop-loss Hit → Performance (loss)</option>
+              <option value="closed">☑️ Closed manually → Performance</option>
             </select>
           </label>
           <label id="postExitWrap" style="display:none">Booked / avg exit ₹
@@ -518,10 +535,13 @@ function build_wa_message($c) {
       }
       if (ct) { set('call_type', ct); found.push('timeframe'); }
 
+      // Rebuild the outcome dropdown from the now-filled targets (adds live_N options).
+      rebuildPostStatus();
+
       // Outcome detection — an "achieved/booked" message posts a winner directly.
       if (/\b(achiev|booked|profit\s*booked|target\s*hit|tgt\s*hit|all\s*targets?|sl\s*hit|stop\s*hit)\b/i.test(text)) {
         const stopHit = /\b(sl\s*hit|stop\s*hit|stopped\s*out)\b/i.test(text);
-        set('post_status', stopHit ? 'stop_hit' : 'target_hit');
+        set('post_status', stopHit ? 'stop' : 'all');
         const exitM = text.match(/\b(?:booked|exit|exited|done|closed?)\s*(?:at|@|:|near)?\s*₹?\s*(\d[\d,]*(?:\.\d+)?)/i);
         if (exitM) set('post_exit', num(exitM[1]));
         found.push(stopHit ? 'outcome:SL-hit' : 'outcome:achieved');
@@ -538,12 +558,39 @@ function build_wa_message($c) {
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // Show the exit-price field only when the call is being posted as a
-    // completed outcome (target/stop/closed), hide it for a fresh open call.
+    // Exit price only matters for a CLOSING outcome (all / stop / closed);
+    // hide it for fresh or partial-live calls.
     function togglePostExit() {
       const sel = document.getElementById('postStatus');
       const wrap = document.getElementById('postExitWrap');
-      if (sel && wrap) wrap.style.display = (sel.value === 'open') ? 'none' : '';
+      if (!sel || !wrap) return;
+      const v = sel.value;
+      wrap.style.display = (v === 'all' || v === 'stop' || v === 'closed') ? '' : 'none';
+    }
+
+    // Rebuild the "Where does this call go?" dropdown from the Targets field so
+    // the team can post a call that has ALREADY hit its 1st/2nd/… target.
+    function ordinalJs(n) {
+      const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
+      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+    }
+    function rebuildPostStatus() {
+      const sel = document.getElementById('postStatus');
+      const tIn = document.getElementById('targetsInput');
+      if (!sel || !tIn) return;
+      const nums = (tIn.value.match(/\d[\d,]*(?:\.\d+)?/g) || []).length;
+      const keep = sel.value;
+      let html = '<option value="running">🆕 Fresh Call → Calls page (live, nothing hit yet)</option>';
+      for (let k = 1; k < nums; k++) {
+        html += `<option value="live_${k}">${ordinalJs(k)} Target Achieved → stays on Live Calls</option>`;
+      }
+      html += '<option value="all">✅ All ' + (nums > 0 ? nums + ' ' : '') + 'Targets Achieved → Performance (win)</option>';
+      html += '<option value="stop">🛑 Stop-loss Hit → Performance (loss)</option>';
+      html += '<option value="closed">☑️ Closed manually → Performance</option>';
+      sel.innerHTML = html;
+      // Restore prior selection if it still exists.
+      if ([...sel.options].some(o => o.value === keep)) sel.value = keep;
+      togglePostExit();
     }
 
     const CSRF_TOKEN = <?php echo json_encode(csrf_token()); ?>;
