@@ -1083,7 +1083,7 @@ function renderLivePerf(calls) {
       <td>${fmtDate(c.posted_at)}</td>
       <td><span class="perf-stock">${escapeHtml(c.symbol)}</span></td>
       <td style="text-transform:capitalize">${escapeHtml(c.call_type)}</td>
-      <td><span class="perf-side ${isBuy ? 'buy' : 'sell'}">${escapeHtml(c.action)}</span></td>
+      <td><span class="perf-side ${c.action === 'BUY' ? 'buy' : 'sell'}">${escapeHtml(c.action)}</span></td>
       <td>${progress}</td>
       ${targetsCell}
       <td><a class="perf-wa-btn" href="${wa}" target="_blank" rel="noopener">💬 Get on WhatsApp</a></td>
