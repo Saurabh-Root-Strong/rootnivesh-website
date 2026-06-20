@@ -148,7 +148,7 @@ function megaGoTool(type) {
 function initPage(id) {
   if (id === 'reports') renderReports('all');
   if (id === 'learner') renderCourses('all');
-  if (id === 'calls') { renderPlans(); renderCalls('intraday'); }
+  if (id === 'calls') { renderPlans(); liveCalls = null; loadLiveCalls().then(() => renderCalls('intraday')); }
   if (id === 'performance') loadPerformance(currentPerfType);
   if (id === 'ipo') { fetchIpo(currentIpoTab); }
   if (id === 'contact') resetContactForm();
@@ -1088,13 +1088,48 @@ function renderPerfTable(calls) {
   }).join('');
 }
 
+/* Live OPEN calls from the DB (calls.php). Fetched once per Calls-page visit. */
+let liveCalls = null;
+function loadLiveCalls() {
+  return fetch('/calls.php?limit=100', { credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(d => { liveCalls = (d.calls || []).filter(c => c.status === 'open'); })
+    .catch(() => { liveCalls = []; });
+}
+
 function renderCalls(type) {
-  const data = callsData[type] || [];
-  // Reveal the first call so visitors can see proof of track record;
-  // gate every subsequent call behind a "blur + Subscribe to View" overlay
-  // that scrolls to the plans section on click. Conversion teaser pattern.
-  const visibleCount = 1;
-  document.getElementById('callsGrid').innerHTML = data.map((c, i) => {
+  const grid = document.getElementById('callsGrid');
+  if (!grid) return;
+  // Fetch on first need (e.g. a tab clicked before the page-level load finished).
+  if (liveCalls === null) {
+    grid.innerHTML = '<div class="call-empty">⟳ Loading live calls…</div>';
+    loadLiveCalls().then(() => renderCalls(type));
+    return;
+  }
+  const dbtypes = (typeof SNAV_TO_DBTYPES !== 'undefined' && SNAV_TO_DBTYPES[type]) || [type];
+  const data = liveCalls.filter(c => dbtypes.includes(c.call_type));
+  if (!data.length) {
+    grid.innerHTML = `<div class="call-empty">No active ${escapeHtml(type)} calls right now.
+      <span class="call-empty-cta" onclick="scrollToPlans()">Subscribe to get them live →</span></div>`;
+    return;
+  }
+  const fmtDate = iso => { const dt = new Date((iso || '').replace(' ', 'T')); return isNaN(dt) ? '' : dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }); };
+  const visibleCount = 1; // first card open as proof; rest blurred behind subscribe.
+  grid.innerHTML = data.map((c, i) => {
+    const isBuy = c.action === 'BUY';
+    const en = parseFloat(c.entry_price);
+    const tg = c.target_price == null ? null : parseFloat(c.target_price);
+    const sl = c.stop_loss == null ? null : parseFloat(c.stop_loss);
+    let rr = '—', ret = '—', retPos = true;
+    if (en > 0 && tg != null) {
+      const reward = isBuy ? tg - en : en - tg;
+      const g = reward / en * 100; retPos = g >= 0;
+      ret = (g >= 0 ? '+' : '') + g.toFixed(2) + '%';
+      if (sl != null) { const risk = isBuy ? en - sl : sl - en; if (risk > 0) rr = '1:' + (reward / risk).toFixed(2); }
+    }
+    const money = v => '₹' + Number(v).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+    const targetDisp = c.targets ? escapeHtml(c.targets) : (tg != null ? money(tg) : '—');
+    const slDisp = c.stop_losses ? escapeHtml(c.stop_losses) : (sl != null ? money(sl) : '—');
     const locked = i >= visibleCount;
     const wrapperAttrs = locked
       ? ' class="call-card call-card-locked" role="button" tabindex="0" onclick="scrollToPlans()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();scrollToPlans();}"'
@@ -1111,23 +1146,22 @@ function renderCalls(type) {
       <div class="call-card-inner">
         <div>
           <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap">
-            <span class="${c.action === 'buy' ? 'badge-buy' : 'badge-sell'}">${c.action.toUpperCase()}</span>
-            <span style="font-size:11px; color:var(--grey); text-transform:capitalize">${type}</span>
-            <span style="font-size:11px; color:var(--grey); background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:10px;">⏱ ${c.horizon}</span>
+            <span class="${isBuy ? 'badge-buy' : 'badge-sell'}">${escapeHtml(c.action)}</span>
+            <span style="font-size:11px; color:var(--grey); text-transform:capitalize">${escapeHtml(c.call_type)}</span>
           </div>
-          <div class="call-stock">${c.stock}</div>
-          <div class="call-name">${c.name}</div>
+          <div class="call-stock">${escapeHtml(c.symbol)}</div>
+          <div class="call-name">${escapeHtml(c.company_name || '')}</div>
           <div class="call-details">
-            <div class="call-detail">Entry: <span>${c.entry}</span></div>
-            <div class="call-detail">Target: <span style="color:var(--green)">${c.target}</span></div>
-            <div class="call-detail">SL: <span style="color:var(--red)">${c.sl}</span></div>
-            <div class="call-detail">R:R <span>${c.rr}</span></div>
-            <div class="call-detail">Date: <span>${c.date}</span></div>
+            <div class="call-detail">Entry: <span>${money(en)}</span></div>
+            <div class="call-detail">Target: <span style="color:var(--green)">${targetDisp}</span></div>
+            <div class="call-detail">SL: <span style="color:var(--red)">${slDisp}</span></div>
+            <div class="call-detail">R:R <span>${rr}</span></div>
+            <div class="call-detail">Date: <span>${fmtDate(c.posted_at)}</span></div>
           </div>
         </div>
         <div class="call-return">
-          <div class="r ${parseFloat(c.ret) >= 0 ? 'badge-pos' : 'badge-neg'}">${c.ret}</div>
-          <small>Return</small>
+          <div class="r ${retPos ? 'badge-pos' : 'badge-neg'}">${ret}</div>
+          <small>To Target</small>
         </div>
       </div>
       ${lockOverlay}

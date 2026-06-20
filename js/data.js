@@ -61,6 +61,17 @@ const PAGE_DESCRIPTIONS = {
 };
 
 
+/* Maps a Calls-page sidebar bucket to the DB call_type(s) it should show.
+   DB enum: intraday | swing | positional | longterm | fno. */
+const SNAV_TO_DBTYPES = {
+  intraday:   ['intraday'],
+  swing:      ['swing'],
+  positional: ['positional', 'fno'],
+  value:      ['longterm'],
+  monthly:    ['longterm'],
+};
+
+
 /* ----------- Calls page sidebar metadata ---------------------------------- */
 const callsMeta = {
   intraday:   { title:'📈 Intraday Calls',          crumb:'INTRADAY',   desc:'Same-day trades with precise entry, target & stop-loss levels.' },

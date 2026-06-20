@@ -2772,3 +2772,20 @@
 .perf-result.loss { color: var(--red);   background: rgba(248,81,73,0.12); }
 .perf-pnl.pos { color: var(--green); font-weight: 700; }
 .perf-pnl.neg { color: var(--red);   font-weight: 700; }
+
+/* Live-calls empty state on the Calls page */
+.call-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--grey);
+  padding: 40px 20px;
+  font-size: 15px;
+}
+.call-empty-cta {
+  display: inline-block;
+  margin-top: 10px;
+  color: var(--gold);
+  cursor: pointer;
+  font-weight: 600;
+}
+.call-empty-cta:hover { text-decoration: underline; }
