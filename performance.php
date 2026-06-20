@@ -15,7 +15,7 @@ if (in_array($origin, $allowedOrigins, true)) {
     header('Vary: Origin');
 }
 header('Content-Type: application/json; charset=utf-8');
-header('Cache-Control: public, max-age=120');
+header('Cache-Control: public, max-age=30');
 
 require_once __DIR__ . '/admin/db.php';
 

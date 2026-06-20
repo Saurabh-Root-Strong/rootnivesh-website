@@ -155,3 +155,11 @@
   resize: vertical;
 }
 .admin-paste:focus { outline: none; border-color: #C9A227; }
+
+/* Delete button */
+.admin-btn-danger {
+  background: rgba(248,81,73,0.12);
+  color: #F85149;
+  border: 1px solid rgba(248,81,73,0.4);
+}
+.admin-btn-danger:hover { background: rgba(248,81,73,0.22); }

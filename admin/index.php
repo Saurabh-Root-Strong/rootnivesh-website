@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
             ':stop'         => $slNum,
             ':stop_losses'  => $slText !== '' ? $slText : null,
             ':thesis'       => trim($_POST['thesis'] ?? ''),
-            ':is_public'    => isset($_POST['is_public']) ? 1 : 0,
+            ':is_public'    => 1,   // every posted call publishes — no hidden-by-accident trap
             ':created_by'   => admin_user() ?: null,
             ':status'       => $postStatus,
             ':exit'         => $exitVal,
@@ -127,6 +127,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'mark_
     $pdo->prepare('UPDATE calls SET shared_to_wa_at = NOW() WHERE id = :id')
         ->execute([':id' => intval($_POST['id'])]);
     $flash = 'Marked as shared.';
+}
+
+/* ---------- Handle POST: delete a call ---------- */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {
+    $pdo->prepare('DELETE FROM calls WHERE id = :id')
+        ->execute([':id' => intval($_POST['id'])]);
+    $flash = 'Call deleted.';
 }
 
 /* ---------- Fetch recent calls ---------- */
@@ -249,18 +256,14 @@ function build_wa_message($c) {
           <label>Stop-Loss(es)
             <input type="text" name="stop_losses" placeholder="e.g. 987  or  987, 980">
           </label>
-          <label class="admin-check">
-            <input type="checkbox" name="is_public" checked>
-            <span>Show on public site</span>
-          </label>
         </div>
         <div class="admin-row">
-          <label>Outcome
+          <label>Where does this call go? *
             <select name="post_status" id="postStatus" onchange="togglePostExit()">
-              <option value="open">🆕 Fresh call (still open)</option>
-              <option value="target_hit">✅ Target achieved (already won)</option>
-              <option value="stop_hit">🛑 Stop-loss hit</option>
-              <option value="closed">☑️ Closed (manual exit)</option>
+              <option value="open">🆕 Fresh Call → shows on the Calls page (live)</option>
+              <option value="target_hit">✅ Target Achieved → shows on Performance (win)</option>
+              <option value="stop_hit">🛑 Stop-loss Hit → shows on Performance (loss)</option>
+              <option value="closed">☑️ Closed manually → shows on Performance</option>
             </select>
           </label>
           <label id="postExitWrap" style="display:none">Booked / avg exit ₹
@@ -268,9 +271,10 @@ function build_wa_message($c) {
           </label>
         </div>
         <p style="color:#8A9BB0; font-size:12px; margin:-4px 0 10px">
-          Pick <strong>Fresh</strong> for a new live call (shows on the Calls page). Pick
-          <strong>Target achieved</strong> with the exit price to publish a completed winner
-          straight to the Performance track record.
+          Every call you post is <strong>published automatically</strong>. Just pick where it
+          goes: <strong>Fresh Call</strong> for a new running trade, or <strong>Target
+          Achieved</strong> (with the exit price) to publish a completed winner to the
+          Performance track record.
         </p>
         <label>Thesis
           <textarea name="thesis" rows="3" placeholder="Why this call — research thesis. Will be included in the WhatsApp share."></textarea>
@@ -338,6 +342,14 @@ function build_wa_message($c) {
                 <button type="submit" class="admin-btn admin-btn-secondary">Save</button>
               </form>
             </details>
+
+            <form method="post" style="display:inline-block; margin-left:8px"
+                  onsubmit="return confirm('Delete this call permanently? This cannot be undone.');">
+              <?php echo csrf_field(); ?>
+              <input type="hidden" name="action" value="delete">
+              <input type="hidden" name="id" value="<?php echo $c['id']; ?>">
+              <button type="submit" class="admin-btn admin-btn-danger">🗑 Delete</button>
+            </form>
           </div>
         </div>
       <?php endforeach; endif; ?>
