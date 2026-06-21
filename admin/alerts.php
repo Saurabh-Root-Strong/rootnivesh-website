@@ -41,6 +41,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'alert
     $flash = 'Cleared all new alerts.';
 }
 
+/* ---- POST: fix a "can't price" alert by setting the call's Yahoo ticker ---- */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'alert_set_ticker') {
+    require_once __DIR__ . '/price_source.php';
+    $cid    = intval($_POST['call_id']);
+    $ticker = rn_norm_ticker($_POST['ticker'] ?? '');
+    if ($cid <= 0 || $ticker === null) {
+        $flash = 'Enter the NSE trading symbol (e.g. JUBLINGREA).';
+    } elseif (rn_fetch_price_by_ticker($ticker) === null) {
+        $flash = "Couldn't get a price for {$ticker}. Check the symbol and try again.";
+    } else {
+        // Save the confirmed ticker on the call, then clear the no_price alerts
+        // for it so a future failure can re-raise.
+        $pdo->prepare('UPDATE calls SET yahoo_symbol = :t WHERE id = :id')
+            ->execute([':t' => $ticker, ':id' => $cid]);
+        $pdo->prepare("DELETE FROM call_alerts WHERE call_id = :id AND kind = 'no_price'")
+            ->execute([':id' => $cid]);
+        $flash = "Ticker set to {$ticker}. The engine will price this call from now on.";
+    }
+}
+
 /* ---- which bucket to show: new (default) | all ---- */
 $view = ($_GET['view'] ?? 'new') === 'all' ? 'all' : 'new';
 $sql = "SELECT a.*, c.company_name, c.call_type, c.status AS call_status
@@ -130,7 +150,43 @@ function alert_wa_message($a) {
         </p>
       </section>
     <?php else: ?>
-      <?php foreach ($alerts as $a):
+      <?php foreach ($alerts as $a): ?>
+        <?php if ($a['kind'] === 'no_price'): /* can't-price: show a fix form, not a WhatsApp share */ ?>
+          <section class="admin-card" style="border-left:4px solid #E0A106; opacity:<?php echo $a['status']==='new'?'1':'0.62'; ?>">
+            <div style="font-size:16px; font-weight:700; color:#E8EEF5">
+              ⚠️ Can't price <?php echo htmlspecialchars($a['symbol']); ?>
+              <span style="font-size:12px; color:#8A9BB0; font-weight:500">· <?php echo strtoupper(htmlspecialchars($a['call_type'] ?? '')); ?></span>
+            </div>
+            <div style="margin-top:6px; color:#C7D2DE; font-size:14px">
+              The engine couldn't find a live price for this symbol on Yahoo. Enter its
+              <strong>NSE trading symbol</strong> below (e.g. <em>JUBILANT INGREVIA → JUBLINGREA</em>)
+              and the engine will track it from the next run.
+            </div>
+            <div style="margin-top:4px; color:#7C8B9C; font-size:12px">
+              Raised <?php echo date('d M, H:i', strtotime($a['created_at'])); ?>
+              <?php if ($a['status'] === 'dismissed'): ?> · <span style="color:#7C8B9C">Dismissed</span><?php endif; ?>
+            </div>
+            <div style="margin-top:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+              <form method="post" style="margin:0; display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+                <?php echo csrf_field(); ?>
+                <input type="hidden" name="action" value="alert_set_ticker">
+                <input type="hidden" name="call_id" value="<?php echo (int)$a['call_id']; ?>">
+                <input type="text" name="ticker" required placeholder="NSE symbol e.g. JUBLINGREA"
+                       style="text-transform:uppercase; padding:9px 12px; border-radius:8px; border:1px solid var(--border); background:rgba(255,255,255,0.04); color:#E8EEF5; min-width:200px">
+                <button type="submit" class="admin-btn">✓ Set ticker</button>
+              </form>
+              <?php if ($a['status'] !== 'dismissed'): ?>
+                <form method="post" style="margin:0">
+                  <?php echo csrf_field(); ?>
+                  <input type="hidden" name="action" value="alert_dismiss">
+                  <input type="hidden" name="id" value="<?php echo (int)$a['id']; ?>">
+                  <button type="submit" class="admin-btn admin-btn-ghost">Ignore</button>
+                </form>
+              <?php endif; ?>
+            </div>
+          </section>
+          <?php continue; endif; ?>
+        <?php
         $isTarget = $a['kind'] === 'target_hit';
         $accent   = $isTarget ? '#2BB673' : '#E05656';
         $icon     = $isTarget ? '🎯' : '🛑';

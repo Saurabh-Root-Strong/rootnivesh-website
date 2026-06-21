@@ -100,6 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
             ':action'       => $actionVal,
             ':symbol'       => $symbolUp,
             ':company_name' => trim($_POST['company_name'] ?? '') ?: null,
+            ':yahoo'        => strtoupper(trim($_POST['yahoo_symbol'] ?? '')) ?: null,
             ':entry'        => $entryVal,
             ':target'       => $targetNum,
             ':targets'      => $targetsText !== '' ? $targetsText : null,
@@ -119,6 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
             $vals[':id'] = $existingId;
             $pdo->prepare(
                 'UPDATE calls SET call_type=:call_type, action=:action, symbol=:symbol, company_name=:company_name,
+                        yahoo_symbol=:yahoo,
                         entry_price=:entry, target_price=:target, targets=:targets, targets_hit=:thit,
                         stop_loss=:stop, stop_losses=:stop_losses, thesis=:thesis, is_public=:is_public,
                         created_by=:created_by, status=:status, exit_price=:exit, exit_at=:exit_at,
@@ -163,8 +165,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
                        . 'If it really is a fresh trade, change a price or use “Post anyway”.';
             } else {
                 $pdo->prepare(
-                    'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, targets, targets_hit, stop_loss, stop_losses, thesis, is_public, created_by, status, exit_price, exit_at, pnl_pct, posted_at)
-                     VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :targets, :thit, :stop, :stop_losses, :thesis, :is_public, :created_by, :status, :exit, :exit_at, :pnl, :posted)'
+                    'INSERT INTO calls (call_type, action, symbol, company_name, yahoo_symbol, entry_price, target_price, targets, targets_hit, stop_loss, stop_losses, thesis, is_public, created_by, status, exit_price, exit_at, pnl_pct, posted_at)
+                     VALUES (:call_type, :action, :symbol, :company_name, :yahoo, :entry, :target, :targets, :thit, :stop, :stop_losses, :thesis, :is_public, :created_by, :status, :exit, :exit_at, :pnl, :posted)'
                 )->execute($vals);
                 $flash = 'Call posted successfully (#' . $pdo->lastInsertId() . ').';
             }
@@ -436,8 +438,22 @@ function build_wa_message($c) {
             </select>
           </label>
           <label>Symbol *
-            <input type="text" name="symbol" required placeholder="e.g. RELIANCE" style="text-transform:uppercase">
+            <input type="text" name="symbol" id="symbolInput" required placeholder="e.g. RELIANCE" style="text-transform:uppercase">
           </label>
+        </div>
+        <!-- Price-source check: confirms the engine can fetch a live price for
+             this symbol, and pins the exact Yahoo ticker so target/SL alerts
+             work. Optional — auto-derives if skipped — but one tap avoids the
+             "can't price" case for names whose ticker isn't obvious. -->
+        <div style="margin:-4px 0 10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+          <button type="button" class="admin-btn admin-btn-ghost" onclick="checkPrice(false)">✓ Check live price</button>
+          <span id="priceCheckMsg" style="font-size:13px; color:#8A9BB0"></span>
+          <input type="hidden" name="yahoo_symbol" id="yahooSymbol" value="">
+          <span id="tickerOverrideWrap" style="display:none; gap:8px; align-items:center; flex-wrap:wrap">
+            <input type="text" id="tickerOverride" placeholder="exact NSE symbol e.g. JUBLINGREA"
+                   style="text-transform:uppercase; padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:rgba(255,255,255,0.04); color:#E8EEF5; min-width:200px">
+            <button type="button" class="admin-btn admin-btn-ghost" onclick="checkPrice(true)">Re-check</button>
+          </span>
         </div>
         <div class="admin-row">
           <label>Company name
@@ -578,6 +594,41 @@ function build_wa_message($c) {
   </form>
 
   <script>
+    /* ---- Check live price / pin the Yahoo ticker for the engine ----
+       Asks resolve_symbol.php whether a live price exists for the typed symbol
+       (or a hand-typed NSE ticker). On success it stores the confirmed ticker
+       in the hidden yahoo_symbol field so target/SL alerts work for this call. */
+    function checkPrice(useOverride) {
+      var sym = (document.getElementById('symbolInput').value || '').trim();
+      var ov  = useOverride ? (document.getElementById('tickerOverride').value || '').trim() : '';
+      var msg = document.getElementById('priceCheckMsg');
+      var wrap = document.getElementById('tickerOverrideWrap');
+      if (!sym && !ov) { msg.style.color = '#E0A106'; msg.textContent = 'Enter a symbol first.'; return; }
+      msg.style.color = '#8A9BB0'; msg.textContent = 'Checking…';
+      var url = 'resolve_symbol.php?symbol=' + encodeURIComponent(sym) + '&ticker=' + encodeURIComponent(ov);
+      fetch(url, { credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d && d.ok) {
+            document.getElementById('yahooSymbol').value = d.ticker;
+            msg.style.color = '#2BB673';
+            msg.textContent = '✓ ' + d.ticker + ' — ₹' + d.price + ' (engine will track this)';
+            wrap.style.display = ov ? 'inline-flex' : 'none';
+          } else {
+            document.getElementById('yahooSymbol').value = '';
+            msg.style.color = '#E0A106';
+            msg.textContent = '⚠️ No price found — type the exact NSE symbol →';
+            wrap.style.display = 'inline-flex';
+          }
+        })
+        .catch(function () { msg.style.color = '#E05656'; msg.textContent = 'Check failed — try again.'; });
+    }
+    // A fresh symbol invalidates a previously-confirmed ticker.
+    document.getElementById('symbolInput').addEventListener('input', function () {
+      document.getElementById('yahooSymbol').value = '';
+      var msg = document.getElementById('priceCheckMsg'); if (msg) msg.textContent = '';
+    });
+
     /* ---- WhatsApp message -> form fields ----
        Heuristic, never auto-submits. Pulls action, symbol, entry, target, SL
        from free-form text. The user always reviews the form before posting. */

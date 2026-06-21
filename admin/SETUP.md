@@ -83,9 +83,9 @@ Data comes from Yahoo Finance (NSE `.NS` tickers); no API key needed.
 
 1. **Database** — open phpMyAdmin → your DB → **SQL** tab and run the new block
    from `admin/schema.sql` (the `call_alerts` table). On an **existing** install
-   also run the two `ALTER TABLE calls ...` lines noted in that file to add
-   `last_price` / `last_checked_at`. Fresh installs that paste the whole
-   `schema.sql` get everything automatically.
+   also run the `ALTER TABLE calls ...` lines noted in that file to add
+   `last_price`, `last_checked_at`, and `yahoo_symbol`. Fresh installs that paste
+   the whole `schema.sql` get everything automatically.
 
 2. **config.php** — add these three lines (copy from `config.sample.php`):
    - `MONITOR_SECRET` — a long random string (the cron URL's password). Generate:
@@ -105,6 +105,19 @@ Data comes from Yahoo Finance (NSE `.NS` tickers); no API key needed.
      ```
    The script self-guards to Mon–Fri 9:15–15:35 IST, so an always-on every-5-min
    cron is fine — it just no-ops outside market hours.
+
+### Getting the right ticker (no config edits needed)
+
+Yahoo prices a call by its NSE ticker. Most symbols auto-resolve (`CONCOR` →
+`CONCOR.NS`), but a few names differ from their ticker (`JUBILANT INGREVIA` →
+`JUBLINGREA`). Two safety nets handle this — the team never touches config.php:
+
+- **At post time:** in the Post-a-call form, type the symbol and tap
+  **✓ Check live price**. It shows e.g. *"✓ AEROFLEX.NS — ₹506"* and pins that
+  ticker to the call. If it can't find one, it asks for the exact NSE symbol.
+- **If skipped and the engine can't price it:** a yellow **"⚠️ Can't price X"**
+  card appears in the Alerts tab with a box to type the NSE symbol. Fix it once
+  there and the engine tracks it from the next run.
 
 ### Daily flow with alerts
 

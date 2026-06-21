@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS calls (
   action          ENUM('BUY','SELL') NOT NULL DEFAULT 'BUY',
   symbol          VARCHAR(20) NOT NULL,
   company_name    VARCHAR(200) DEFAULT NULL,
+  yahoo_symbol    VARCHAR(40)  DEFAULT NULL,    -- confirmed Yahoo ticker (e.g. JUBLINGREA.NS); blank = auto-derive from symbol
   entry_price     DECIMAL(12,2) NOT NULL,
   target_price    DECIMAL(12,2) DEFAULT NULL,   -- primary target (T1) for R:R math
   targets         VARCHAR(120)  DEFAULT NULL,   -- full list as posted, e.g. "1030, 1045, 1062"
@@ -44,6 +45,7 @@ CREATE TABLE IF NOT EXISTS calls (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- For EXISTING installs, run these once (ignore "duplicate column" if applied):
+--   ALTER TABLE calls ADD COLUMN yahoo_symbol VARCHAR(40) DEFAULT NULL AFTER company_name;
 --   ALTER TABLE calls ADD COLUMN created_by VARCHAR(50) DEFAULT NULL AFTER notes;
 --   ALTER TABLE calls ADD COLUMN targets VARCHAR(120) DEFAULT NULL AFTER target_price;
 --   ALTER TABLE calls ADD COLUMN stop_losses VARCHAR(120) DEFAULT NULL AFTER stop_loss;
@@ -89,8 +91,8 @@ CREATE TABLE IF NOT EXISTS call_alerts (
   call_id       INT NOT NULL,
   symbol        VARCHAR(40) NOT NULL,
   action        ENUM('BUY','SELL') NOT NULL DEFAULT 'BUY',
-  kind          ENUM('target_hit','stop_hit') NOT NULL,
-  level_index   INT NOT NULL DEFAULT 0,        -- 1=T1, 2=T2, ...; 0 for the stop
+  kind          ENUM('target_hit','stop_hit','no_price') NOT NULL,
+  level_index   INT NOT NULL DEFAULT 0,        -- 1=T1, 2=T2, ...; 0 for the stop / no_price
   level_price   DECIMAL(12,2) DEFAULT NULL,    -- the target/stop value that was crossed
   trigger_price DECIMAL(12,2) DEFAULT NULL,    -- the live price that crossed it
   entry_price   DECIMAL(12,2) DEFAULT NULL,    -- snapshot of the call's entry
@@ -105,6 +107,9 @@ CREATE TABLE IF NOT EXISTS call_alerts (
   INDEX idx_status (status),
   INDEX idx_created (created_at DESC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- If you created call_alerts BEFORE the 'no_price' kind existed, widen it once:
+--   ALTER TABLE call_alerts MODIFY kind ENUM('target_hit','stop_hit','no_price') NOT NULL;
 
 -- Snapshot of the last price the monitor saw, per call (display only).
 -- For EXISTING installs run these two once (ignore "duplicate column"):

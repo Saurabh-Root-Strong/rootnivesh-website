@@ -15,7 +15,7 @@
 
 require_once __DIR__ . '/config.php';
 
-/* Map a call symbol to its Yahoo Finance ticker. */
+/* Map a call symbol to its Yahoo Finance ticker (auto-derive path). */
 function rn_yahoo_ticker($symbol) {
     $key = strtoupper(trim($symbol));
     $map = $GLOBALS['YAHOO_SYMBOL_MAP'] ?? [];
@@ -27,10 +27,35 @@ function rn_yahoo_ticker($symbol) {
     return $clean . '.NS';
 }
 
-/* Fetch the last traded price for a symbol. Returns float|null. */
-function rn_fetch_price($symbol) {
-    $ticker = rn_yahoo_ticker($symbol);
+/* Normalise a hand-typed ticker override. "JUBLINGREA" -> "JUBLINGREA.NS",
+   "^NSEI" / "RELIANCE.BO" left as-is. Blank -> null. */
+function rn_norm_ticker($t) {
+    $t = strtoupper(trim((string) $t));
+    if ($t === '') return null;
+    if ($t[0] === '^') return $t;                       // index, e.g. ^NSEI
+    if (preg_match('/\.[A-Z]+$/', $t)) return $t;       // already has .NS/.BO
+    $clean = preg_replace('/[^A-Z0-9-]/', '', $t);
+    return $clean !== '' ? $clean . '.NS' : null;
+}
+
+/* Resolve the ticker to use for a call: a confirmed override wins, else the
+   auto-derived one from the symbol. */
+function rn_resolve_ticker($symbol, $override = null) {
+    $o = rn_norm_ticker($override);
+    return $o !== null ? $o : rn_yahoo_ticker($symbol);
+}
+
+/* Fetch the last traded price for a symbol. An optional confirmed ticker
+   ($override, e.g. the call's yahoo_symbol) takes precedence. Returns float|null. */
+function rn_fetch_price($symbol, $override = null) {
+    $ticker = rn_resolve_ticker($symbol, $override);
     if ($ticker === null) return null;
+    return rn_fetch_price_by_ticker($ticker);
+}
+
+/* Core fetch for a fully-resolved Yahoo ticker. Returns float|null. */
+function rn_fetch_price_by_ticker($ticker) {
+    if ($ticker === null || $ticker === '') return null;
 
     $url = 'https://query1.finance.yahoo.com/v8/finance/chart/'
          . rawurlencode($ticker) . '?interval=5m&range=1d';

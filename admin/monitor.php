@@ -73,7 +73,7 @@ function rn_num_list($raw) {
 
 /* ---- pull every open call ---- */
 $calls = $pdo->query(
-    "SELECT id, action, symbol, entry_price, target_price, targets,
+    "SELECT id, action, symbol, yahoo_symbol, entry_price, target_price, targets,
             targets_hit, stop_loss, stop_losses
      FROM calls WHERE status = 'open' ORDER BY id"
 )->fetchAll();
@@ -93,12 +93,24 @@ $updSnap = $pdo->prepare(
 foreach ($calls as $c) {
     $checked++;
     $sym   = $c['symbol'];
-    $ticker = rn_yahoo_ticker($sym);
+    // Confirmed ticker (yahoo_symbol) wins; else auto-derive from the symbol.
+    $ticker = rn_resolve_ticker($sym, $c['yahoo_symbol'] ?? null);
     if ($ticker !== null && !array_key_exists($ticker, $priceCache)) {
-        $priceCache[$ticker] = rn_fetch_price($sym);
+        $priceCache[$ticker] = rn_fetch_price_by_ticker($ticker);
     }
     $price = $ticker !== null ? $priceCache[$ticker] : null;
-    if ($price === null) { $details[] = ['call' => $c['id'], 'symbol' => $sym, 'price' => null]; continue; }
+
+    if ($price === null) {
+        // Never fail silently: raise ONE visible "can't price" alert so the
+        // team can set the right NSE ticker. Deduped by the unique key.
+        $insAlert->execute([
+            ':cid' => $c['id'], ':sym' => $sym, ':act' => $c['action'], ':kind' => 'no_price',
+            ':lvl' => 0, ':lvlp' => null, ':trig' => null, ':entry' => $c['entry_price'], ':pnl' => null,
+        ]);
+        if ($insAlert->rowCount() > 0) { $newAlerts++; }
+        $details[] = ['call' => $c['id'], 'symbol' => $sym, 'ticker' => $ticker, 'price' => null];
+        continue;
+    }
     $priced++;
 
     $updSnap->execute([':p' => $price, ':id' => $c['id']]);
