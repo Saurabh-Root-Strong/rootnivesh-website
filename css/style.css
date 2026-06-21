@@ -1810,9 +1810,9 @@
      Now it just hints at the plan focus while the chevron is the only
      interactive-looking affordance. */
   .plan-toggle-price {
-    font-family: 'Space Mono', monospace; font-size: 11.5px;
+    font-family: 'Space Mono', monospace; font-size: 12.5px; font-weight: 700;
     color: var(--gold);
-    letter-spacing: 0.5px; text-transform: uppercase;
+    letter-spacing: 0.3px; text-transform: uppercase;
     text-align: center; line-height: 1.25;
     max-width: 140px;
     word-break: keep-all; /* keep "SMART EQUITY" together — wrap between words */
@@ -2273,11 +2273,44 @@
     .snav-wrap { padding: 0; }
     .snav-content { padding: 20px 14px; }
 
-    /* Premium plan cards already stack at 768px — extra padding tighten */
-    .plan-body { padding: 22px 20px; }
-    .plan-pricing { padding: 22px 20px 20px; }
+    /* ===== Membership cards — mobile conversion polish =====
+       Goal: less wall-of-text, clear hierarchy, price + CTA as the hero. */
+    .plan-body { padding: 20px 18px 4px; }
     .plan-head h3 { font-size: 1.4rem; }
-    .plan-pricing-payable span:last-child { font-size: 1.2rem; }
+
+    /* Tighten the descriptive copy so it scans fast. */
+    .plan-desc { font-size: 12.5px; line-height: 1.55; margin: 0 0 14px; }
+    .plan-features-list { gap: 7px; margin: 0 0 14px; }
+    .plan-features-list li { font-size: 12.5px; line-height: 1.45; }
+
+    /* Trust strip: keep the 3 strongest proofs; the other two (instant
+       WhatsApp delivery, cancel anytime) already appear in the features
+       list and the CTA reassurance, so hiding them kills the redundancy. */
+    .plan-trust-list { padding: 11px 13px; gap: 7px; margin: 0 0 4px; }
+    .plan-trust-list li { font-size: 11.5px; line-height: 1.4; }
+    .plan-trust-list li:nth-child(n+4) { display: none; }
+    .plan-trust-tick { width: 15px; height: 15px; font-size: 10px; }
+
+    /* Pricing panel = the money shot. Make it a highlighted card with a
+       big gold price and a prominent, full-width CTA. */
+    .plan-pricing {
+      padding: 18px 18px 20px; gap: 12px;
+      background: linear-gradient(180deg, rgba(201,168,76,0.07), rgba(7,19,31,0.5));
+    }
+    .plan-pricing-title { font-size: 1.15rem; }
+    .plan-pricing-meta { font-size: 11.5px; padding-bottom: 10px; }
+    .plan-pricing-payable { padding-top: 12px; align-items: center; }
+    .plan-pricing-payable span:first-child { font-size: 12.5px; }
+    .plan-pricing-payable span:last-child { font-size: 1.9rem; line-height: 1; }
+    .plan-cta {
+      margin-top: 6px; padding: 14px 18px; font-size: 15px; font-weight: 700;
+      box-shadow: 0 8px 22px rgba(201,168,76,0.32);
+    }
+    .plan-cta-reassure { font-size: 11.5px; margin-top: 8px; }
+    .plan-pricing-tag { font-size: 10.5px; }
+
+    /* Header price chip stays compact and doesn't dominate. */
+    .plan-toggle-price { font-size: 10px; max-width: 96px; }
 
     /* Carousel testimonials — tighten quote card */
     .carousel-card { padding: 28px 22px; }
@@ -2394,11 +2427,11 @@
     .table-wrap table { min-width: 600px; }
     th, td { padding: 8px 10px; font-size: 12px; }
 
-    /* Plan cards — tighter padding */
-    .plan-body { padding: 18px 16px; }
-    .plan-pricing { padding: 18px 16px 16px; }
+    /* Plan cards — tighter padding (keep the price big; it's the hero) */
+    .plan-body { padding: 18px 15px 4px; }
+    .plan-pricing { padding: 16px 15px 18px; }
     .plan-head h3 { font-size: 1.25rem; }
-    .plan-pricing-payable span:last-child { font-size: 1.1rem; }
+    .plan-pricing-payable span:last-child { font-size: 1.75rem; }
 
     /* Mobile menu — slightly tighter */
     .mobile-menu { padding: 6px 10px calc(20px + env(safe-area-inset-bottom)); }
@@ -2434,9 +2467,9 @@
     .service-card { padding: 18px 14px; }
     .table-wrap table { min-width: 520px; }
     th, td { padding: 7px 8px; font-size: 11.5px; }
-    .plan-body { padding: 16px 14px; }
-    .plan-pricing { padding: 16px 14px 14px; }
-    .plan-pricing-payable span:last-child { font-size: 1rem; }
+    .plan-body { padding: 16px 14px 4px; }
+    .plan-pricing { padding: 16px 14px; }
+    .plan-pricing-payable span:last-child { font-size: 1.6rem; }
     .mobile-menu .mob-link { padding: 11px; font-size: 13.5px; }
     .mob-group-header { padding: 11px; font-size: 13.5px; }
     .mob-sub { padding: 9px 10px 9px 22px; font-size: 12.5px; }
