@@ -17,7 +17,7 @@ const PAGE_TO_PATH = {
   home:       '/',
   ipo:        '/ipo',
   learner:    '/learner',
-  calls:      '/calls',
+  calls:      '/membership',
   performance:'/performance',
   reports:    '/reports',
   tools:      '/tools',

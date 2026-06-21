@@ -1287,103 +1287,10 @@
     </div>
   </section>
 
-  <div class="page-split">
-    <!-- SIDEBAR NAV -->
-    <div class="snav-wrap">
-
-      <!-- ── SHORT TERM (parent) ── -->
-      <div class="snav-section">
-        <div class="snav-section-header open" id="sec-short" onclick="snavToggleSection('sec-short','secbody-short')">
-          <div class="snav-section-header-left">
-            <div class="snav-section-icon">&#x26A1;</div>
-            <span class="snav-section-title">Short Term</span>
-          </div>
-          <div class="snav-section-plus" id="secplus-short">+</div>
-        </div>
-        <div class="snav-section-body open" id="secbody-short">
-          <div class="snav-divider"></div>
-          <div class="snav-item active" id="snav-intraday" onclick="snavSelectCall('intraday',this)">
-            <span class="snav-item-label">Intraday</span>
-            <div class="snav-plus" onclick="snavToggle(event,'sub-intraday','snav-intraday')">+</div>
-          </div>
-          <div class="snav-sub" id="sub-intraday">
-            <div class="snav-sub-inner">
-              <p>Same-day buy/sell trades with tight stop-loss. Ideal for active traders who monitor markets closely.</p>
-              <span class="snav-sub-btn" onclick="snavSelectCall('intraday',document.getElementById('snav-intraday'))">View Intraday Calls &#8594;</span>
-            </div>
-          </div>
-          <div class="snav-item" id="snav-swing" onclick="snavSelectCall('swing',this)">
-            <span class="snav-item-label">Swing</span>
-            <div class="snav-plus" onclick="snavToggle(event,'sub-swing','snav-swing')">+</div>
-          </div>
-          <div class="snav-sub" id="sub-swing">
-            <div class="snav-sub-inner">
-              <p>7&#8211;14 day momentum-based trades capturing short-term price swings via technical analysis.</p>
-              <span class="snav-sub-btn" onclick="snavSelectCall('swing',document.getElementById('snav-swing'))">View Swing Calls &#8594;</span>
-            </div>
-          </div>
-          <div class="snav-item" id="snav-positional" onclick="snavSelectCall('positional',this)">
-            <span class="snav-item-label">Positional</span>
-            <div class="snav-plus" onclick="snavToggle(event,'sub-positional','snav-positional')">+</div>
-          </div>
-          <div class="snav-sub" id="sub-positional">
-            <div class="snav-sub-inner">
-              <p>1&#8211;3 month trend-following calls. Hold through minor pullbacks for larger price moves.</p>
-              <span class="snav-sub-btn" onclick="snavSelectCall('positional',document.getElementById('snav-positional'))">View Positional Calls &#8594;</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="snav-sep"></div>
-
-      <!-- ── LONG TERM (parent) ── -->
-      <div class="snav-section">
-        <div class="snav-section-header" id="sec-long" onclick="snavToggleSection('sec-long','secbody-long')">
-          <div class="snav-section-header-left">
-            <div class="snav-section-icon">&#x1F3E6;</div>
-            <span class="snav-section-title">Long Term</span>
-          </div>
-          <div class="snav-section-plus" id="secplus-long">+</div>
-        </div>
-        <div class="snav-section-body" id="secbody-long">
-          <div class="snav-divider"></div>
-          <div class="snav-item" id="snav-value" onclick="snavSelectCall('value',this)">
-            <span class="snav-item-label">Value Based Investing</span>
-            <div class="snav-plus" onclick="snavToggle(event,'sub-value','snav-value')">+</div>
-          </div>
-          <div class="snav-sub" id="sub-value">
-            <div class="snav-sub-inner">
-              <p>Stocks picked below intrinsic value. 18&#8211;30 month horizon for long-term wealth creation.</p>
-              <span class="snav-sub-btn" onclick="snavSelectCall('value',document.getElementById('snav-value'))">View Value Picks &#8594;</span>
-            </div>
-          </div>
-          <div class="snav-item" id="snav-monthly" onclick="snavSelectCall('monthly',this)">
-            <span class="snav-item-label">Monthly Based Investing</span>
-            <div class="snav-plus" onclick="snavToggle(event,'sub-monthly','snav-monthly')">+</div>
-          </div>
-          <div class="snav-sub" id="sub-monthly">
-            <div class="snav-sub-inner">
-              <p>Systematic monthly ideas &#8212; ETFs, index funds &amp; SIPs for long-term compounding.</p>
-              <span class="snav-sub-btn" onclick="snavSelectCall('monthly',document.getElementById('snav-monthly'))">View Monthly Ideas &#8594;</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /snav-wrap -->
-
-    <!-- CONTENT AREA -->
-    <div class="snav-content">
-      <div class="snav-content-header">
-        <div>
-          <div class="snav-breadcrumb">CALLS &nbsp;/&nbsp; <span id="callsBreadcrumb">INTRADAY</span></div>
-          <h2 id="callsTitle">&#x1F4C8; Intraday Calls</h2>
-          <p id="callsDesc">Same-day trades with precise entry, target &amp; stop-loss levels.</p>
-        </div>
-      </div>
-      <div style="display:flex; flex-direction:column; gap:14px;" id="callsGrid"></div>
-      <div class="card" style="margin-top:40px; text-align:center; background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03))">
+  <!-- Free updates CTA + disclaimer -->
+  <section style="padding:40px 0 60px">
+    <div class="container" style="max-width:760px">
+      <div class="card" style="text-align:center; background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03))">
         <h3 style="font-size:1.5rem; margin-bottom:10px">Join our Free Daily Updates Group</h3>
         <p style="max-width:480px; margin:0 auto 20px; font-size:13.5px; color:var(--grey2)">Free daily market updates, intraday &amp; swing ideas, IPO highlights and research snippets &mdash; delivered straight to your WhatsApp.</p>
         <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center">
@@ -1396,12 +1303,12 @@
           </a>
         </div>
       </div>
-      <div class="disclaimer">
+      <div class="disclaimer" style="margin-top:24px">
         <h4>&#9888;&#65039; Important Disclaimer</h4>
         <p>All calls are for informational purposes only. Past performance does not guarantee future results. RootNivesh Research (SEBI Reg. No. INH000XXXXX) &#8212; SEBI (Research Analysts) Regulations, 2014.</p>
       </div>
     </div>
-  </div>
+  </section>
 </div>
 
 
@@ -2160,8 +2067,8 @@
      Order matters — data must load first.
      Bump the ?v= number whenever you change either file to bust
      long-cached copies on visitors' phones. -->
-<script src="js/data.js?v=38"></script>
-<script src="js/script.js?v=63"></script>
+<script src="js/data.js?v=39"></script>
+<script src="js/script.js?v=64"></script>
 
 
 <section style="padding:40px 20px; max-width:900px; margin:auto; line-height:1.7;">

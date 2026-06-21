@@ -22,6 +22,8 @@ function escapeHtml(value) {
 const PATH_TO_PAGE = Object.fromEntries(
   Object.entries(PAGE_TO_PATH).map(function (e) { return [e[1], e[0]]; })
 );
+// Back-compat: the Calls page is now /membership; keep old /calls links working.
+PATH_TO_PAGE['/calls'] = 'calls';
 
 function showPage(id, fromPopState) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
