@@ -678,8 +678,8 @@ function build_wa_message($c) {
         togglePostExit();
       }
 
-      // Keep the full original message as the thesis (extra targets, notes, etc.).
-      set('thesis', raw);
+      // Thesis is left blank on parse — the team writes it themselves rather
+      // than dumping the raw WhatsApp message into the field.
 
       msg.textContent = found.length
         ? '✓ Filled: ' + found.join(', ') + '. Review the fields, then Post call.'
