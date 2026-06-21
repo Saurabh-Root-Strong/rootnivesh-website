@@ -216,10 +216,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
                 : round(($r['entry_price'] - $exit) / $r['entry_price'] * 100, 2);
         }
 
-        $pdo->prepare(
-            'UPDATE calls SET status = :status, exit_price = :exit, exit_at = :exit_at, pnl_pct = :pnl, is_public = :pub, targets_hit = :thit
-             WHERE id = :id'
-        )->execute([
+        // Optional: edit the call date. Blank = leave unchanged.
+        $callDateIn = trim($_POST['call_date'] ?? '');
+        $newPostedAt = null;
+        if ($callDateIn !== '') { $ts = strtotime($callDateIn); if ($ts) $newPostedAt = date('Y-m-d H:i:s', $ts); }
+
+        $sql  = 'UPDATE calls SET status = :status, exit_price = :exit, exit_at = :exit_at, pnl_pct = :pnl, is_public = :pub, targets_hit = :thit';
+        $args = [
             ':status'  => $status,
             ':exit'    => $exit,
             ':exit_at' => $exit !== null ? date('Y-m-d H:i:s') : null,
@@ -227,7 +230,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
             ':pub'     => $pub,
             ':thit'    => $thit,
             ':id'      => $id,
-        ]);
+        ];
+        if ($newPostedAt !== null) { $sql .= ', posted_at = :posted'; $args[':posted'] = $newPostedAt; }
+        $sql .= ' WHERE id = :id';
+        $pdo->prepare($sql)->execute($args);
         $flash = 'Call updated.';
     } catch (PDOException $e) {
         error_log('admin update_status failed: ' . $e->getMessage());
@@ -545,6 +551,7 @@ function build_wa_message($c) {
                 <input type="hidden" name="id" value="<?php echo $c['id']; ?>">
                 <?php echo progress_select_html($c); ?>
                 <input type="number" step="0.01" name="exit_price" placeholder="Exit ₹ (optional)" title="Optional — overrides the auto exit (final target for All Achieved, the stop for Stop-loss Hit). Use a blended average if you booked partials." value="<?php echo $c['exit_price'] !== null ? htmlspecialchars($c['exit_price']) : ''; ?>">
+                <input type="date" name="call_date" title="Call date — change when this call was given" value="<?php echo !empty($c['posted_at']) ? date('Y-m-d', strtotime($c['posted_at'])) : ''; ?>">
                 <label class="admin-check" style="margin:0 6px"><input type="checkbox" name="is_public" <?php echo $c['is_public'] ? 'checked' : ''; ?>><span>Public</span></label>
                 <button type="submit" class="admin-btn admin-btn-secondary">Save</button>
               </form>
