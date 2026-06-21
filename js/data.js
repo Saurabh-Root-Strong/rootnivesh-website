@@ -105,9 +105,9 @@ const TOOL_TYPES = ['brokerage', 'options', 'average', 'sip', 'returns', 'curren
    values (auto-refreshed weekly from NSE) come from lots.php; this just keeps
    the dropdown usable offline. INDEX_ORDER fixes the dropdown order. */
 const INDEX_LOTS_FALLBACK = {
-  NIFTY:      { name: 'Nifty 50',      lot: 75 },
-  BANKNIFTY:  { name: 'Bank Nifty',    lot: 35 },
-  FINNIFTY:   { name: 'Fin Nifty',     lot: 65 },
+  NIFTY:      { name: 'Nifty 50',      lot: 65 },
+  BANKNIFTY:  { name: 'Bank Nifty',    lot: 30 },
+  FINNIFTY:   { name: 'Fin Nifty',     lot: 60 },
   MIDCPNIFTY: { name: 'Midcap Nifty',  lot: 120 },
   NIFTYNXT50: { name: 'Nifty Next 50', lot: 25 },
   SENSEX:     { name: 'Sensex',        lot: 20 },

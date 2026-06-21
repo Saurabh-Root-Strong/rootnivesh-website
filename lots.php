@@ -32,9 +32,9 @@ if (!is_dir($cacheDir)) { @mkdir($cacheDir, 0755, true); }
 // Curated table. NSE values self-heal weekly from fo_mktlots.csv; BSE values
 // (not in that file) are maintained here.
 $CURATED = [
-    'NIFTY'      => ['name' => 'Nifty 50',      'exch' => 'NSE', 'lot' => 75],
-    'BANKNIFTY'  => ['name' => 'Bank Nifty',    'exch' => 'NSE', 'lot' => 35],
-    'FINNIFTY'   => ['name' => 'Fin Nifty',     'exch' => 'NSE', 'lot' => 65],
+    'NIFTY'      => ['name' => 'Nifty 50',      'exch' => 'NSE', 'lot' => 65],
+    'BANKNIFTY'  => ['name' => 'Bank Nifty',    'exch' => 'NSE', 'lot' => 30],
+    'FINNIFTY'   => ['name' => 'Fin Nifty',     'exch' => 'NSE', 'lot' => 60],
     'MIDCPNIFTY' => ['name' => 'Midcap Nifty',  'exch' => 'NSE', 'lot' => 120],
     'NIFTYNXT50' => ['name' => 'Nifty Next 50', 'exch' => 'NSE', 'lot' => 25],
     'SENSEX'     => ['name' => 'Sensex',        'exch' => 'BSE', 'lot' => 20],
