@@ -43,7 +43,7 @@ function is_market_open($istNow) {
 }
 
 $marketOpen = is_market_open($istNow);
-$ttl = $marketOpen ? 60 : 3600;
+$ttl = $marketOpen ? 15 : 3600;
 
 $cache = null;
 if (file_exists($cacheFile)) $cache = json_decode(file_get_contents($cacheFile), true);

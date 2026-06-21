@@ -659,10 +659,17 @@ function initFiiDii() {
   // Holidays are gated server-side via the market_open flag in each endpoint.
   setInterval(() => {
     if (!isMarketOpenIST()) return;
-    fetchIndices();
     fetchTopMovers();
     fetchFiiDiiHistory(); // FII/DII publishes T+1 evening but we still poll so the new day's data appears within 60s of the 7:30 PM cutoff
   }, 60 * 1000);
+  // Hero Nifty/Sensex tiles get their own faster cadence (15s) so the headline
+  // index prints feel near-live. Server cache (indices.php) is also 15s in
+  // market hours, so this is the tightest the data updates without hammering
+  // NSE/BSE harder than ~4 req/min.
+  setInterval(() => {
+    if (!isMarketOpenIST()) return;
+    fetchIndices();
+  }, 15 * 1000);
 }
 
 function isMarketOpenIST() {
@@ -704,8 +711,8 @@ async function fetchTopMovers() {
 }
 
 /* ===== Hero indices: Nifty 50 + BSE Sensex =====
-   Hits /indices.php which pulls from Yahoo Finance and caches
-   server-side. Refreshed every 5 min during market hours. */
+   Hits /indices.php (NSE/BSE direct, Yahoo fallback), cached server-side.
+   Server cache + client poll are both 15s in market hours → near-live tiles. */
 async function fetchIndices() {
   try {
     const res = await fetch('/indices.php?cb=' + Date.now(), { signal: AbortSignal.timeout(15000) });
