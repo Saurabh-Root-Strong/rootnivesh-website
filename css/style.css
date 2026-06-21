@@ -1924,7 +1924,42 @@
   }
   .plan-features-list li::before {
     content: '✓'; position: absolute; left: 0; top: 0;
-    color: var(--gold); font-weight: 700;
+    color: #25D366; font-weight: 800;
+  }
+
+  /* ====== Trust strip — honest reassurances (conversion, not promises) ====== */
+  .plan-trust-list {
+    list-style: none; padding: 12px 14px; margin: 0 0 18px;
+    display: flex; flex-direction: column; gap: 9px;
+    background: rgba(37,211,102,0.05);
+    border: 1px solid rgba(37,211,102,0.18);
+    border-radius: 12px;
+  }
+  .plan-trust-list li {
+    display: flex; align-items: flex-start; gap: 9px;
+    font-size: 12.5px; color: var(--grey2); line-height: 1.5; font-weight: 500;
+  }
+  .plan-trust-tick {
+    flex-shrink: 0; width: 17px; height: 17px; margin-top: 1px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #25D366; color: #04140a; border-radius: 50%;
+    font-size: 11px; font-weight: 900;
+  }
+
+  /* ====== "Most popular" highlight ====== */
+  .plan-card-popular { border-color: var(--gold); box-shadow: 0 0 0 1px rgba(201,168,76,0.35), 0 14px 36px rgba(0,0,0,0.35); position: relative; }
+  .plan-popular-badge {
+    display: inline-block; vertical-align: middle;
+    background: linear-gradient(135deg, var(--gold), #E8C46A); color: #05101F;
+    font-size: 9.5px; font-weight: 800; letter-spacing: 0.5px;
+    padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(201,168,76,0.4);
+  }
+
+  /* ====== CTA reassurance microcopy ====== */
+  .plan-cta-reassure {
+    margin: 9px 0 0; text-align: center;
+    font-size: 11.5px; color: var(--green, #3FB950); font-weight: 600;
   }
 
   /* ====== Pricing tag + note ====== */

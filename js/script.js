@@ -1863,6 +1863,13 @@ function renderPlanCard(p, openByDefault) {
     '<li>' + f + '</li>'
   ).join('');
 
+  // Shared trust strip — honest reassurances that remove buyer risk/friction.
+  const trustHTML = (typeof PLAN_TRUST_POINTS !== 'undefined')
+    ? '<ul class="plan-trust-list">' +
+        PLAN_TRUST_POINTS.map(t => '<li><span class="plan-trust-tick">✓</span>' + t + '</li>').join('') +
+      '</ul>'
+    : '';
+
   // Selector area varies by plan type ----------------------------------
   let selector, defaultSelection;
 
@@ -1953,15 +1960,19 @@ function renderPlanCard(p, openByDefault) {
     ? '<p class="plan-pricing-saved" id="plan-saved-' + p.id + '"' + (isSubscription ? ' style="display:none"' : '') + '></p>'
     : '';
 
+  const popularRibbon = p.popular
+    ? '<span class="plan-popular-badge">★ MOST POPULAR</span>'
+    : '';
+
   return ''
-    + '<div class="plan-card plan-card-' + p.type + openClass + '" id="plan-card-' + p.id + '" ' + dataAttrs + '>'
+    + '<div class="plan-card plan-card-' + p.type + (p.popular ? ' plan-card-popular' : '') + openClass + '" id="plan-card-' + p.id + '" ' + dataAttrs + '>'
 
     // ── ALWAYS-VISIBLE HEADER (click to toggle) ──────────────────────
     +   '<button class="plan-card-toggle" onclick="togglePlanCard(\'' + p.id + '\')" aria-label="Toggle ' + p.name + ' plan details">'
     +     '<div class="plan-toggle-left">'
     +       '<span class="plan-toggle-icon">' + p.icon + '</span>'
     +       '<div class="plan-toggle-text">'
-    +         '<span class="plan-toggle-name">' + p.name + ' ' + offerRibbon + '</span>'
+    +         '<span class="plan-toggle-name">' + p.name + ' ' + offerRibbon + ' ' + popularRibbon + '</span>'
     +         '<span class="plan-toggle-tagline">' + p.tagline + '</span>'
     +       '</div>'
     +     '</div>'
@@ -1977,6 +1988,7 @@ function renderPlanCard(p, openByDefault) {
     +       chipsHTML
     +       '<p class="plan-desc">' + p.description + '</p>'
     +       (featuresList ? '<ul class="plan-features-list">' + featuresList + '</ul>' : '')
+    +       trustHTML
     +       '<div class="plan-controls">' + selector + '</div>'
     +     '</div>'
     +     '<div class="plan-pricing">'
@@ -1993,8 +2005,9 @@ function renderPlanCard(p, openByDefault) {
     +       savedRowHTML
     +       '<p class="plan-pricing-note" id="plan-note-' + p.id + '"></p>'
     +       '<button class="btn btn-gold plan-cta" onclick="subscribeToPlan(\'' + p.id + '\')">'
-    +         (p.type === 'program' ? 'Apply for Programme' : 'Get Started')
+    +         (p.type === 'program' ? 'Apply for Programme →' : 'Get Instant Access →')
     +       '</button>'
+    +       '<p class="plan-cta-reassure">⚡ Activated on WhatsApp within minutes • Cancel anytime</p>'
     +       '<p class="plan-pricing-tag">+ 18% GST applicable as per SEBI norms</p>'
     +     '</div>'
     +   '</div>'

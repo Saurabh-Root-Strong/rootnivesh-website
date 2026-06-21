@@ -193,6 +193,7 @@ const PLANS = [
     name: 'Pro F&O',
     icon: '🔥',
     tagline: 'Index derivatives — serious traders',
+    popular: true,
     type: 'subscription',
     valueLabel: 'Derivatives Edge',
     chips: ['Index Derivatives', 'Options Edge', 'Real-Time Alerts', 'BTST + Expiry'],
@@ -230,6 +231,17 @@ const PLANS = [
       research: { 1: 799, 3: 2199, 6: 3999, 12: 7499 }
     }
   }
+];
+
+/* Trust strip shown on every plan card — honest, SEBI-compliant reassurances
+   (no return/profit guarantees). These convert by removing risk and friction,
+   not by promising outcomes. */
+const PLAN_TRUST_POINTS = [
+  'SEBI Registered Research Analyst — fully compliant',
+  'Every call with entry, target & stop-loss — never a blind tip',
+  'Transparent public track record you can verify',
+  'Instant WhatsApp delivery — never miss an entry',
+  'Cancel anytime — no lock-in, no questions'
 ];
 
 const PLAN_DURATIONS = [
