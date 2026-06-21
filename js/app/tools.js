@@ -210,7 +210,6 @@ function populateIndexSelect() {
   const order = (typeof INDEX_ORDER !== 'undefined') ? INDEX_ORDER : Object.keys(LOT_SIZES);
   let html = '';
   order.forEach(sym => { const it = LOT_SIZES[sym]; if (it) html += `<option value="${sym}">${it.name}</option>`; });
-  html += '<option value="custom">Stock / Custom</option>';
   sel.innerHTML = html;
   if (cur && [...sel.options].some(o => o.value === cur)) sel.value = cur;
   applyIndexLot();
