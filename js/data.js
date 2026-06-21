@@ -12,6 +12,17 @@
    ============================================================ */
 
 
+/* ----------- Author / compliance identity --------------------------------
+   Shown in the author box at the bottom of every blog article (E-E-A-T:
+   credentials matter most for finance/YMYL ranking). Edit in ONE place.
+   Replace SITE_SEBI_REG with the real INH number the day it is allotted. */
+const SITE_ANALYST   = 'RootNivesh Research';
+const SITE_SEBI_REG  = 'INH000XXXXX';            // <-- real SEBI Reg No. when allotted
+const SITE_ANALYST_BIO =
+  'RootNivesh Research is a SEBI Registered Research Analyst based in Mumbai, ' +
+  'publishing quant-backed, data-driven analysis of Indian equities, F&O and IPOs. ' +
+  'Research only — not investment advice. Markets carry risk; read the full disclaimer.';
+
 /* ----------- URL routing -------------------------------------------------- */
 const PAGE_TO_PATH = {
   home:       '/',

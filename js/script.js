@@ -1145,8 +1145,28 @@ function renderArticle(post) {
         <div class="article-cta">
           <a class="btn btn-gold" href="https://wa.me/917467094575?text=Hi%20RootNivesh%2C%20I%20read%20your%20article%20and%20want%20to%20know%20more%20about%20your%20research." target="_blank" rel="noopener">Get research on WhatsApp →</a>
         </div>
+        ${articleAuthorBox(post)}
       </article>
     </div>`;
+}
+
+/* Author / credentials box — E-E-A-T trust signal under every article.
+   Pulls name + SEBI reg from the single constants in data.js. */
+function articleAuthorBox(post) {
+  const name = (typeof SITE_ANALYST !== 'undefined') ? SITE_ANALYST : 'RootNivesh Research';
+  const reg  = (typeof SITE_SEBI_REG !== 'undefined') ? SITE_SEBI_REG : '';
+  const bio  = (typeof SITE_ANALYST_BIO !== 'undefined') ? SITE_ANALYST_BIO : '';
+  const initials = name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  return `
+    <aside class="article-author">
+      <div class="article-author-avatar">${escapeHtml(initials)}</div>
+      <div class="article-author-body">
+        <div class="article-author-name">${escapeHtml(name)}</div>
+        <div class="article-author-cred">SEBI Registered Research Analyst${reg ? ' · Reg. No. ' + escapeHtml(reg) : ''}</div>
+        <p class="article-author-bio">${escapeHtml(bio)}</p>
+        <a class="article-author-link" onclick="showPage('disclaimer')">Read full disclaimer &amp; disclosures →</a>
+      </div>
+    </aside>`;
 }
 
 function blogScrollTo(id) { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
