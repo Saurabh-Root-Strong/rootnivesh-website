@@ -199,17 +199,18 @@ function optInstrument(mode, btn) {
   if (fw) fw.style.display = optMode === 'futures' ? 'block' : 'none';
   document.querySelectorAll('#opt-instrument .tab').forEach(t => t.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  if (optMode === 'futures' && !document.querySelector('#futLegs .fut-leg')) addFutLeg('buy', 24000, 1);
+  if (optMode === 'futures' && !document.querySelector('#futLegs .fut-leg')) addFutLeg('buy', 24000, 24200, 1);
   const r = document.getElementById('optResult'); if (r) r.classList.remove('show'); // clear stale result
 }
-function addFutLeg(side, entry, lots) {
+function addFutLeg(side, entry, exit, lots) {
   const wrap = document.getElementById('futLegs');
   const div = document.createElement('div');
   div.className = 'fut-leg';
-  div.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr) auto;gap:8px;margin-bottom:8px;align-items:end';
+  div.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr) auto;gap:8px;margin-bottom:8px;align-items:end';
   div.innerHTML =
     `<div class="form-group" style="margin:0"><label>Action</label><select class="fut-side"><option value="buy"${side==='sell'?'':' selected'}>Buy (Long)</option><option value="sell"${side==='sell'?' selected':''}>Sell (Short)</option></select></div>` +
     `<div class="form-group" style="margin:0"><label>Entry Price</label><input type="number" class="fut-entry" placeholder="e.g. 24000" value="${entry != null ? entry : ''}"></div>` +
+    `<div class="form-group" style="margin:0"><label>Exit Price <span style="color:var(--grey);font-weight:400">— optional</span></label><input type="number" class="fut-exit" placeholder="e.g. 24200" value="${exit != null ? exit : ''}"></div>` +
     `<div class="form-group" style="margin:0"><label>Lots</label><input type="number" class="fut-lots" placeholder="e.g. 1" value="${lots != null ? lots : 1}"></div>` +
     `<button type="button" class="calc-btn" style="background:transparent;border:1px solid var(--border);color:var(--grey);max-width:46px;padding:10px" onclick="this.parentElement.remove()" title="Remove position">✕</button>`;
   wrap.appendChild(div);
@@ -217,11 +218,12 @@ function addFutLeg(side, entry, lots) {
 function _futLegs() {
   const sides   = document.querySelectorAll('#futLegs .fut-side');
   const entries = document.querySelectorAll('#futLegs .fut-entry');
+  const exits   = document.querySelectorAll('#futLegs .fut-exit');
   const lotsEls = document.querySelectorAll('#futLegs .fut-lots');
   const legs = [];
   for (let i = 0; i < entries.length; i++) {
-    const e = parseFloat(entries[i].value), l = parseFloat(lotsEls[i].value) || 1;
-    if (e > 0) legs.push({ side: sides[i].value, entry: e, lots: l });
+    const e = parseFloat(entries[i].value), x = parseFloat(exits[i].value), l = parseFloat(lotsEls[i].value) || 1;
+    if (e > 0) legs.push({ side: sides[i].value, entry: e, exit: x, lots: l });
   }
   return legs;
 }
@@ -277,12 +279,24 @@ function calcOptions() {
 
   const tSpot = toolNum('optSpot');
   const spotBox = document.getElementById('optSpotResult');
-  if (isFinite(tSpot) && tSpot > 0) {
+  let shown = false;
+  // Futures with explicit exit price(s) → show the realized entry→exit P&L.
+  if (optMode === 'futures') {
+    const fl = _futLegs();
+    const allExit = fl.length && fl.every(l => isFinite(l.exit) && l.exit > 0);
+    if (allExit) {
+      const realized = fl.reduce((s, l) => s + (l.side === 'buy' ? (l.exit - l.entry) : (l.entry - l.exit)) * lotSize * l.lots, 0);
+      spotBox.innerHTML = `Realized P&amp;L (entry &#8594; exit): <strong style="color:${realized >= 0 ? 'var(--green)' : '#ff6b6b'}">${inr(Math.abs(realized))} ${realized >= 0 ? 'profit' : 'loss'}</strong>.`;
+      spotBox.style.display = 'block'; shown = true;
+    }
+  }
+  if (!shown && isFinite(tSpot) && tSpot > 0) {
     const pnl = payoffFn(tSpot);
     const what = optMode === 'futures' ? 'position' : 'strategy';
     spotBox.innerHTML = `At spot <strong style="color:var(--white)">${Math.round(tSpot)}</strong>, this ${what} ${pnl >= 0 ? 'makes' : 'loses'} <strong style="color:${pnl >= 0 ? 'var(--green)' : '#ff6b6b'}">${inr(Math.abs(pnl))}</strong>.`;
-    spotBox.style.display = 'block';
-  } else { spotBox.style.display = 'none'; }
+    spotBox.style.display = 'block'; shown = true;
+  }
+  if (!shown) spotBox.style.display = 'none';
 
   document.getElementById('optChart').innerHTML = _optPayoffSvg(pts, bes);
   document.getElementById('optResult').classList.add('show');
