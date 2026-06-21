@@ -439,8 +439,8 @@ function build_wa_message($c) {
           <label>Entry *
             <input type="number" step="0.01" name="entry_price" required>
           </label>
-          <label>Call date — blank = now
-            <input type="datetime-local" name="posted_at">
+          <label>Call date — blank = today
+            <input type="date" name="posted_at">
           </label>
         </div>
         <div class="admin-row">

@@ -202,9 +202,9 @@ $catLabels = ['education' => 'Education', 'strategy' => 'Strategy', 'markets' =>
               <option value="draft" <?php echo ($editing && $editing['status'] === 'draft') ? 'selected' : ''; ?>>Draft (hidden)</option>
             </select>
           </label>
-          <label>Publish date — blank = now
-            <input type="datetime-local" name="published_at"
-                   value="<?php echo ($editing && !empty($editing['published_at'])) ? date('Y-m-d\TH:i', strtotime($editing['published_at'])) : ''; ?>">
+          <label>Publish date — blank = today
+            <input type="date" name="published_at"
+                   value="<?php echo ($editing && !empty($editing['published_at'])) ? date('Y-m-d', strtotime($editing['published_at'])) : ''; ?>">
           </label>
         </div>
 
