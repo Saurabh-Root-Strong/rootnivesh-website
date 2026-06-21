@@ -215,29 +215,6 @@ const PLANS = [
     pricing: {
       research: { 1: 799, 3: 2199, 6: 3999, 12: 7499 }
     }
-  },
-  {
-    id: 'mentorship',
-    name: 'Mentorship',
-    icon: '🎓',
-    tagline: '1-on-1 coaching • premium segment',
-    type: 'program',
-    valueLabel: 'Lifetime Mastery',
-    chips: ['1:1 Coaching', 'Lifetime Framework', 'Quant + Technical', 'All Markets'],
-    discountPct: 30,
-    offerLabel: 'EXCLUSIVE',
-    description: 'High-touch personal coaching. Strategy building, trader psychology, risk mastery and a lifetime framework you can apply across markets — not just signals you blindly follow.',
-    features: [
-      'Personal 1:1 coaching sessions',
-      'Live strategy building & back-testing',
-      'Trader psychology + risk mastery',
-      'Lifetime framework, not just signals'
-    ],
-    tiers: [
-      { id: 'beginner', name: 'Beginner Program',     price: 14999, suffix: '',  note: 'Foundation in research-driven trading' },
-      { id: 'advanced', name: 'Advanced Trading',     price: 24999, suffix: '',  note: 'Quant + technical + risk integration' },
-      { id: 'mastery',  name: 'Complete Mastery',     price: 39999, suffix: '+', note: 'All-markets framework, lifetime access' }
-    ]
   }
 ];
 
