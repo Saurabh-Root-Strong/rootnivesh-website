@@ -217,29 +217,6 @@ const PLANS = [
     }
   },
   {
-    id: 'elite',
-    name: 'Elite',
-    icon: '💎',
-    tagline: 'Bespoke advisory — multi-market',
-    type: 'service',
-    valueLabel: 'Bespoke Advisory',
-    chips: ['Bespoke Strategy', 'Multi-Market', 'Portfolio Tracking', 'Dedicated RM'],
-    discountPct: 35,
-    offerLabel: 'PREMIUM',
-    description: 'Personalised, dedicated trade assistance. Calls customised to your capital, real portfolio tracking, and coverage across Equity, F&O, Forex and Commodity markets — all anchored to your individual risk profile.',
-    features: [
-      'Dedicated relationship manager',
-      'Calls customised to your capital',
-      'Live portfolio tracking & rebalancing',
-      'Multi-market: Equity / F&O / Forex / Commodity'
-    ],
-    tiers: [
-      { id: 'standard', name: 'Standard', price: 999,  suffix: '/month', note: 'Core advisory access' },
-      { id: 'premium',  name: 'Premium',  price: 1999, suffix: '/month', note: 'Faster turnaround + portfolio review' },
-      { id: 'ultra',    name: 'Ultra',    price: 3499, suffix: '/month', note: 'Concierge service across all markets' }
-    ]
-  },
-  {
     id: 'mentorship',
     name: 'Mentorship',
     icon: '🎓',
