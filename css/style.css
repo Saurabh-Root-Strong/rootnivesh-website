@@ -1344,11 +1344,26 @@
     .snav-item-label { font-size: 13px; }
     .snav-plus { display: none; }
     .snav-sub { display: none; }
-    .snav-content { padding: 24px 18px; }
+    .snav-content { padding: 24px 18px; min-width: 0; max-width: 100%; }
     /* Trim the oversized hero so the calculators sit higher on screen. */
     .tools-hero { padding: 80px 0 18px !important; }
     .tools-hero h1 { font-size: 1.8rem !important; }
     .tools-hero p { font-size: 13px !important; }
+
+    /* Kill horizontal overflow inside the calculators. The form grids use
+       auto-fill/minmax which can spill to 2 columns and clip on narrow
+       phones — force every calc grid to a single column, let fields shrink
+       below their intrinsic width, and clip any stray overflow. */
+    #page-tools { overflow-x: hidden; }
+    #page-tools .page-split > * { min-width: 0; }
+    #page-tools div[style*="minmax"] { grid-template-columns: 1fr !important; }
+    #page-tools .form-group input,
+    #page-tools .form-group select,
+    #page-tools .form-group textarea { min-width: 0; max-width: 100%; }
+    /* Result charts (donut / bar / payoff SVG) scale to the card width. */
+    #page-tools .calc-result svg,
+    #page-tools [id$="Chart"] svg { max-width: 100%; height: auto; }
+    #page-tools .calc-btn { max-width: 100% !important; }
   }
 
   /* ====== FII / DII TALLY WIDGET ====== */
