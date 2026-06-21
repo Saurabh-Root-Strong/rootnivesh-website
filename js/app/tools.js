@@ -158,18 +158,20 @@ function calcAverage() {
    OPTIONS PAYOFF + STRATEGY BUILDER  (F&O, expiry payoff)
    ============================================================ */
 let optLegCount = 0;
-function addOptLeg(side, type, strike, premium, lots) {
+function addOptLeg(side, type, strike, premium, exit, lots) {
   optLegCount++;
   const wrap = document.getElementById('optLegs');
   const div = document.createElement('div');
   div.className = 'opt-leg';
-  div.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr) auto;gap:8px;margin-bottom:8px;align-items:end';
+  div.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(108px,1fr));gap:8px;margin-bottom:8px;align-items:end';
   div.innerHTML =
     `<div class="form-group" style="margin:0"><label>Action</label><select class="opt-side"><option value="buy"${side==='sell'?'':' selected'}>Buy</option><option value="sell"${side==='sell'?' selected':''}>Sell</option></select></div>` +
     `<div class="form-group" style="margin:0"><label>Type</label><select class="opt-type"><option value="call"${type==='put'?'':' selected'}>Call</option><option value="put"${type==='put'?' selected':''}>Put</option></select></div>` +
     `<div class="form-group" style="margin:0"><label>Strike</label><input type="number" class="opt-strike" placeholder="e.g. 24000" value="${strike != null ? strike : ''}"></div>` +
-    `<div class="form-group" style="margin:0"><label>Premium</label><input type="number" class="opt-prem" placeholder="e.g. 120" value="${premium != null ? premium : ''}"></div>` +
-    `<button type="button" class="calc-btn" style="background:transparent;border:1px solid var(--border);color:var(--grey);max-width:46px;padding:10px" onclick="this.parentElement.remove()" title="Remove leg">✕</button>`;
+    `<div class="form-group" style="margin:0"><label>Entry Premium</label><input type="number" class="opt-prem" placeholder="e.g. 120" value="${premium != null ? premium : ''}"></div>` +
+    `<div class="form-group" style="margin:0"><label>Exit Premium <span style="color:var(--grey);font-weight:400">— opt.</span></label><input type="number" class="opt-exit" placeholder="e.g. 180" value="${exit != null ? exit : ''}"></div>` +
+    `<div class="form-group" style="margin:0"><label>Lots</label><input type="number" class="opt-lots" placeholder="e.g. 1" value="${lots != null ? lots : 1}"></div>` +
+    `<button type="button" class="calc-btn" style="background:transparent;border:1px solid var(--border);color:var(--grey);max-width:46px;padding:10px;align-self:end" onclick="this.parentElement.remove()" title="Remove leg">✕</button>`;
   wrap.appendChild(div);
 }
 function _optLegs() {
@@ -177,17 +179,19 @@ function _optLegs() {
   const types   = document.querySelectorAll('#optLegs .opt-type');
   const strikes = document.querySelectorAll('#optLegs .opt-strike');
   const prems   = document.querySelectorAll('#optLegs .opt-prem');
+  const exits   = document.querySelectorAll('#optLegs .opt-exit');
+  const lotsEls = document.querySelectorAll('#optLegs .opt-lots');
   const legs = [];
   for (let i = 0; i < strikes.length; i++) {
-    const k = parseFloat(strikes[i].value), p = parseFloat(prems[i].value);
-    if (k > 0 && p >= 0) legs.push({ side: sides[i].value, type: types[i].value, strike: k, premium: p });
+    const k = parseFloat(strikes[i].value), p = parseFloat(prems[i].value), x = parseFloat(exits[i].value), l = parseFloat(lotsEls[i].value) || 1;
+    if (k > 0 && p >= 0) legs.push({ side: sides[i].value, type: types[i].value, strike: k, premium: p, exit: x, lots: l });
   }
   return legs;
 }
 function _legPnL(leg, S, lotSize) {
   const intrinsic = leg.type === 'call' ? Math.max(S - leg.strike, 0) : Math.max(leg.strike - S, 0);
   const per = leg.side === 'buy' ? (intrinsic - leg.premium) : (leg.premium - intrinsic);
-  return per * lotSize;
+  return per * lotSize * (leg.lots || 1);
 }
 /* ---- Futures instrument mode ---- */
 let optMode = 'options';
@@ -206,7 +210,7 @@ function addFutLeg(side, entry, exit, lots) {
   const wrap = document.getElementById('futLegs');
   const div = document.createElement('div');
   div.className = 'fut-leg';
-  div.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr) auto;gap:8px;margin-bottom:8px;align-items:end';
+  div.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:8px;align-items:end';
   div.innerHTML =
     `<div class="form-group" style="margin:0"><label>Action</label><select class="fut-side"><option value="buy"${side==='sell'?'':' selected'}>Buy (Long)</option><option value="sell"${side==='sell'?' selected':''}>Sell (Short)</option></select></div>` +
     `<div class="form-group" style="margin:0"><label>Entry Price</label><input type="number" class="fut-entry" placeholder="e.g. 24000" value="${entry != null ? entry : ''}"></div>` +
@@ -247,7 +251,7 @@ function calcOptions() {
     const ks = legs.map(l => l.strike);
     lo = Math.min(...ks) * 0.85; hi = Math.max(...ks) * 1.15;
     payoffFn = S => legs.reduce((s, l) => s + _legPnL(l, S, lotSize), 0);
-    const netPrem = legs.reduce((s, l) => s + (l.side === 'buy' ? -l.premium : l.premium) * lotSize, 0);
+    const netPrem = legs.reduce((s, l) => s + (l.side === 'buy' ? -l.premium : l.premium) * lotSize * (l.lots || 1), 0);
     netLabel = 'Net Premium';
     netVal = (netPrem >= 0 ? 'Credit ' : 'Debit ') + inr(Math.abs(netPrem));
   }
@@ -280,13 +284,22 @@ function calcOptions() {
   const tSpot = toolNum('optSpot');
   const spotBox = document.getElementById('optSpotResult');
   let shown = false;
-  // Futures with explicit exit price(s) → show the realized entry→exit P&L.
+  // Explicit exit price(s) on every leg → show the realized entry→exit P&L.
+  // Futures exit = futures price; Options exit = closing premium.
   if (optMode === 'futures') {
     const fl = _futLegs();
     const allExit = fl.length && fl.every(l => isFinite(l.exit) && l.exit > 0);
     if (allExit) {
       const realized = fl.reduce((s, l) => s + (l.side === 'buy' ? (l.exit - l.entry) : (l.entry - l.exit)) * lotSize * l.lots, 0);
       spotBox.innerHTML = `Realized P&amp;L (entry &#8594; exit): <strong style="color:${realized >= 0 ? 'var(--green)' : '#ff6b6b'}">${inr(Math.abs(realized))} ${realized >= 0 ? 'profit' : 'loss'}</strong>.`;
+      spotBox.style.display = 'block'; shown = true;
+    }
+  } else {
+    const ol = _optLegs();
+    const allExit = ol.length && ol.every(l => isFinite(l.exit) && l.exit > 0);
+    if (allExit) {
+      const realized = ol.reduce((s, l) => s + (l.side === 'buy' ? (l.exit - l.premium) : (l.premium - l.exit)) * lotSize * (l.lots || 1), 0);
+      spotBox.innerHTML = `Realized P&amp;L (premium entry &#8594; exit): <strong style="color:${realized >= 0 ? 'var(--green)' : '#ff6b6b'}">${inr(Math.abs(realized))} ${realized >= 0 ? 'profit' : 'loss'}</strong>. <span style="color:var(--grey)">Closing the legs before expiry, not the expiry payoff.</span>`;
       spotBox.style.display = 'block'; shown = true;
     }
   }
@@ -495,7 +508,7 @@ function initToolRows() {
     addAvgRow(250, 100); addAvgRow(220, 150);
   }
   if (document.getElementById('optLegs') && !document.querySelector('#optLegs .opt-leg')) {
-    addOptLeg('buy', 'call', 24000, 120, 1);
+    addOptLeg('buy', 'call', 24000, 120, null, 1);
   }
   if (document.getElementById('xirrRows') && !document.querySelector('#xirrRows .xirr-date')) {
     addXirrRow('', -100000); addXirrRow('', 130000);
