@@ -29,6 +29,47 @@
 .admin-link { color: var(--gold); text-decoration: none; font-size: 13px; }
 .admin-main { max-width: 1100px; margin: 0 auto; padding: 24px 18px 40px; }
 
+/* ===== Left sidebar layout ===== */
+.admin-layout { display: flex; min-height: 100vh; }
+.admin-sidebar {
+  width: 220px; flex-shrink: 0; background: rgba(7,19,31,0.95);
+  border-right: 1px solid var(--border); position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column; padding: 18px 14px;
+}
+.admin-brand { font-weight: 800; font-size: 1.05rem; letter-spacing: 0.3px; padding: 6px 10px 18px; }
+.admin-brand span { color: var(--gold); font-weight: 600; }
+.admin-nav { display: flex; flex-direction: column; gap: 4px; }
+.admin-nav-link {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px;
+  color: var(--grey2); text-decoration: none; font-size: 14px; font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+.admin-nav-link span { width: 18px; text-align: center; }
+.admin-nav-link:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.admin-nav-link.active { background: rgba(201,168,76,0.14); color: var(--gold); }
+.admin-side-foot { margin-top: auto; border-top: 1px solid var(--border); padding-top: 12px; }
+.admin-side-user { font-size: 13px; font-weight: 700; padding: 6px 12px 10px; display: flex; flex-direction: column; }
+.admin-side-user span { font-size: 11px; color: var(--grey); font-weight: 500; text-transform: capitalize; }
+.admin-content { flex: 1; min-width: 0; }
+.admin-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px; border-bottom: 1px solid var(--border);
+  background: rgba(7,19,31,0.6); position: sticky; top: 0; z-index: 5;
+}
+.admin-topbar h1 { font-size: 1.05rem; margin: 0; letter-spacing: 0.3px; }
+
+@media (max-width: 720px) {
+  .admin-layout { flex-direction: column; }
+  .admin-sidebar {
+    width: 100%; height: auto; position: static; flex-direction: row; flex-wrap: wrap;
+    align-items: center; gap: 6px; padding: 10px 12px;
+  }
+  .admin-brand { padding: 6px 8px; }
+  .admin-nav { flex-direction: row; flex-wrap: wrap; }
+  .admin-side-foot { margin: 0 0 0 auto; border: none; padding: 0; display: flex; align-items: center; gap: 8px; }
+  .admin-side-user { padding: 0 8px; }
+}
+
 .admin-card {
   background: rgba(11,28,52,0.55);
   border: 1px solid var(--border);

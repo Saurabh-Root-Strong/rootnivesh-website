@@ -86,10 +86,10 @@ $users = $pdo->query('SELECT id, username, display_name, role, is_active, create
 <link rel="stylesheet" href="admin.css">
 </head>
 <body class="admin-body">
-  <header class="admin-header">
-    <h1>RootNivesh Admin — Team</h1>
-    <span class="admin-link"><a href="index.php" class="admin-link">← Calls</a> &nbsp; <a href="logout.php" class="admin-link">Logout</a></span>
-  </header>
+<div class="admin-layout">
+  <?php $ADMIN_PAGE = 'team'; include __DIR__ . '/_sidebar.php'; ?>
+  <div class="admin-content">
+  <div class="admin-topbar"><h1>Team</h1></div>
 
   <main class="admin-main">
     <?php if ($flash): ?><div class="admin-flash"><?php echo htmlspecialchars($flash); ?></div><?php endif; ?>
@@ -160,5 +160,7 @@ $users = $pdo->query('SELECT id, username, display_name, role, is_active, create
       <?php endforeach; endif; ?>
     </section>
   </main>
+  </div><!-- /.admin-content -->
+</div><!-- /.admin-layout -->
 </body>
 </html>

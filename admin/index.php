@@ -342,16 +342,10 @@ function build_wa_message($c) {
 <link rel="stylesheet" href="admin.css">
 </head>
 <body class="admin-body">
-  <header class="admin-header">
-    <h1>RootNivesh Admin</h1>
-    <span class="admin-link">
-      Signed in as <strong><?php echo htmlspecialchars(admin_display()); ?></strong> (<?php echo htmlspecialchars(admin_role()); ?>)
-      &nbsp;·&nbsp;
-      <a href="blog.php" class="admin-link">Blog</a> &nbsp;·&nbsp;
-      <?php if (admin_is_owner()): ?><a href="users.php" class="admin-link">Team</a> &nbsp;·&nbsp; <?php endif; ?>
-      <a href="logout.php" class="admin-link">Logout</a>
-    </span>
-  </header>
+<div class="admin-layout">
+  <?php $ADMIN_PAGE = 'calls'; include __DIR__ . '/_sidebar.php'; ?>
+  <div class="admin-content">
+  <div class="admin-topbar"><h1>Calls</h1></div>
 
   <main class="admin-main">
 
@@ -792,5 +786,7 @@ function build_wa_message($c) {
         .catch(() => {});
     }
   </script>
+  </div><!-- /.admin-content -->
+</div><!-- /.admin-layout -->
 </body>
 </html>

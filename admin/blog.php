@@ -112,15 +112,10 @@ $catLabels = ['education' => 'Education', 'strategy' => 'Strategy', 'markets' =>
 <link rel="stylesheet" href="admin.css">
 </head>
 <body class="admin-body">
-  <header class="admin-header">
-    <h1>RootNivesh Admin — Blog</h1>
-    <span class="admin-link">
-      Signed in as <strong><?php echo htmlspecialchars(admin_display()); ?></strong> (<?php echo htmlspecialchars(admin_role()); ?>)
-      &nbsp;·&nbsp; <a href="index.php" class="admin-link">Calls</a>
-      <?php if (admin_is_owner()): ?>&nbsp;·&nbsp; <a href="users.php" class="admin-link">Team</a><?php endif; ?>
-      &nbsp;·&nbsp; <a href="logout.php" class="admin-link">Logout</a>
-    </span>
-  </header>
+<div class="admin-layout">
+  <?php $ADMIN_PAGE = 'blog'; include __DIR__ . '/_sidebar.php'; ?>
+  <div class="admin-content">
+  <div class="admin-topbar"><h1>Blog</h1></div>
 
   <main class="admin-main">
 
@@ -216,5 +211,7 @@ $catLabels = ['education' => 'Education', 'strategy' => 'Strategy', 'markets' =>
     </section>
 
   </main>
+  </div><!-- /.admin-content -->
+</div><!-- /.admin-layout -->
 </body>
 </html>
