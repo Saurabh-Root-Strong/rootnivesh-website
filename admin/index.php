@@ -89,7 +89,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
         $look->execute([':s' => $symbolUp, ':a' => $actionVal]);
         $existingId = $look->fetchColumn();
 
+        // Call date — when the call was actually given. Blank = now.
+        $postedIn = trim($_POST['posted_at'] ?? '');
+        $postedAt = date('Y-m-d H:i:s');
+        if ($postedIn !== '') { $ts = strtotime($postedIn); if ($ts) $postedAt = date('Y-m-d H:i:s', $ts); }
+
         $vals = [
+            ':posted'       => $postedAt,
             ':call_type'    => $_POST['call_type'] ?? 'intraday',
             ':action'       => $actionVal,
             ':symbol'       => $symbolUp,
@@ -116,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
                         entry_price=:entry, target_price=:target, targets=:targets, targets_hit=:thit,
                         stop_loss=:stop, stop_losses=:stop_losses, thesis=:thesis, is_public=:is_public,
                         created_by=:created_by, status=:status, exit_price=:exit, exit_at=:exit_at,
-                        pnl_pct=:pnl, posted_at=NOW()
+                        pnl_pct=:pnl, posted_at=:posted
                  WHERE id=:id'
             )->execute($vals);
             $flash = 'Same call advanced (#' . $existingId . ') — updated existing row, no duplicate.';
@@ -157,8 +163,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
                        . 'If it really is a fresh trade, change a price or use “Post anyway”.';
             } else {
                 $pdo->prepare(
-                    'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, targets, targets_hit, stop_loss, stop_losses, thesis, is_public, created_by, status, exit_price, exit_at, pnl_pct)
-                     VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :targets, :thit, :stop, :stop_losses, :thesis, :is_public, :created_by, :status, :exit, :exit_at, :pnl)'
+                    'INSERT INTO calls (call_type, action, symbol, company_name, entry_price, target_price, targets, targets_hit, stop_loss, stop_losses, thesis, is_public, created_by, status, exit_price, exit_at, pnl_pct, posted_at)
+                     VALUES (:call_type, :action, :symbol, :company_name, :entry, :target, :targets, :thit, :stop, :stop_losses, :thesis, :is_public, :created_by, :status, :exit, :exit_at, :pnl, :posted)'
                 )->execute($vals);
                 $flash = 'Call posted successfully (#' . $pdo->lastInsertId() . ').';
             }
@@ -432,6 +438,9 @@ function build_wa_message($c) {
           </label>
           <label>Entry *
             <input type="number" step="0.01" name="entry_price" required>
+          </label>
+          <label>Call date — blank = now
+            <input type="datetime-local" name="posted_at">
           </label>
         </div>
         <div class="admin-row">
