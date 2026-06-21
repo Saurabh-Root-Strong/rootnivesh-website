@@ -54,6 +54,18 @@ foreach ($static as $path => $meta) {
     echo "  </url>\n";
 }
 
+/* Per-broker brokerage-calculator deep links — each ranks for
+   "<broker> brokerage calculator", a high-intent India search term. */
+$brokers = ['zerodha', 'groww', 'angelone', 'upstox', 'dhan', 'fyers', 'fivepaisa', 'paytmmoney', 'icicidirect', 'hdfcsec', 'kotak', 'sbisec', 'motilal'];
+foreach ($brokers as $bid) {
+    echo "  <url>\n";
+    echo "    <loc>" . htmlspecialchars($ORIGIN . '/tools?broker=' . $bid, ENT_XML1) . "</loc>\n";
+    echo "    <lastmod>$today</lastmod>\n";
+    echo "    <changefreq>weekly</changefreq>\n";
+    echo "    <priority>0.6</priority>\n";
+    echo "  </url>\n";
+}
+
 foreach ($posts as $p) {
     $loc  = $ORIGIN . '/blog/' . rawurlencode($p['slug']);
     $lm   = $p['lastmod'] ? date('Y-m-d', strtotime($p['lastmod'])) : $today;

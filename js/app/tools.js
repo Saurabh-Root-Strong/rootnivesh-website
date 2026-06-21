@@ -114,16 +114,17 @@ const BROKER_RATES = {
   options:  { sttBuy: 0,        sttSell: 0.001,    exch: 0.0003503, stamp: 0.00003, dp: 0 },
 };
 function brokerageSegmentDefault() {
-  // Delivery brokerage is ₹0 at discount brokers; everything else flat ₹20/order.
+  // Manual ("Custom" broker) default: delivery ₹0, else flat ₹20/order.
   const seg = document.getElementById('brkSegment').value;
-  document.getElementById('brkPerOrder').value = seg === 'delivery' ? 0 : 20;
+  const po = document.getElementById('brkPerOrder');
+  if (po) po.value = seg === 'delivery' ? 0 : 20;
+  const res = document.getElementById('brkResult'); if (res && res.classList.contains('show')) calcBrokerage();
 }
 function calcBrokerage() {
   const seg   = document.getElementById('brkSegment').value;
   const buy   = toolNum('brkBuy');
   const sell  = toolNum('brkSell');
   const qty   = toolNum('brkQty');
-  let perOrder = toolNum('brkPerOrder'); if (!isFinite(perOrder)) perOrder = 0;
   if (!buy || !sell || !qty) return;
 
   const R = BROKER_RATES[seg];
@@ -131,7 +132,17 @@ function calcBrokerage() {
   const sellTo = sell * qty;
   const turnover = buyTo + sellTo;
 
-  const brokerage = perOrder * 2;                       // buy + sell order
+  // Brokerage: from the selected broker's plan, or a manual per-order amount.
+  const brokerSel = document.getElementById('brkBroker');
+  const brokerId  = brokerSel ? brokerSel.value : 'custom';
+  let brokerage;
+  if (brokerId === 'custom' || !BROKERS[brokerId]) {
+    let perOrder = toolNum('brkPerOrder'); if (!isFinite(perOrder)) perOrder = 0;
+    brokerage = perOrder * 2;                           // buy + sell order
+  } else {
+    const rule = BROKERS[brokerId][seg];
+    brokerage = _brokerCharge(rule, buyTo) + _brokerCharge(rule, sellTo);
+  }
   const stt   = buyTo * R.sttBuy + sellTo * R.sttSell;
   const exch  = turnover * R.exch;
   const sebi  = turnover * 0.000001;                    // ₹10 per crore
@@ -278,6 +289,62 @@ function applyIndexLot() {
   const it = LOT_SIZES[sel.value];
   if (it) { lotIn.value = it.lot; lotIn.readOnly = true; lotIn.style.opacity = '0.7'; lotIn.title = sel.value + ' lot size — set automatically'; }
   else { lotIn.readOnly = false; lotIn.style.opacity = '1'; lotIn.title = 'Enter the contract lot size'; }
+}
+
+/* ---- Broker brokerage models (Brokerage Calculator) ----
+   Loaded from /brokers.php; falls back to BROKERS_FALLBACK offline. Picking a
+   broker computes brokerage from that broker's plan AND swaps in broker-specific
+   SEO (H2, intro copy, document title) for organic ranking. ---- */
+let BROKERS = (typeof BROKERS_FALLBACK !== 'undefined') ? BROKERS_FALLBACK : {};
+let BROKERS_REVIEWED = '';
+async function loadBrokers() {
+  try {
+    const r = await fetch('/brokers.php', { signal: AbortSignal.timeout(8000) });
+    if (r.ok) { const d = await r.json(); if (d && d.brokers) { BROKERS = d.brokers; BROKERS_REVIEWED = d.reviewed || ''; } }
+  } catch (e) {}
+}
+function populateBrokerSelect() {
+  const sel = document.getElementById('brkBroker');
+  if (!sel) return;
+  const cur = sel.value;
+  const order = (typeof BROKER_ORDER !== 'undefined') ? BROKER_ORDER : Object.keys(BROKERS);
+  let html = '';
+  order.forEach(id => { const b = BROKERS[id]; if (b) html += `<option value="${id}">${b.name}${b.plan ? ' (' + b.plan + ')' : ''}</option>`; });
+  html += '<option value="custom">Custom — enter brokerage</option>';
+  sel.innerHTML = html;
+  if (cur && [...sel.options].some(o => o.value === cur)) sel.value = cur;
+}
+function _brokerCharge(rule, sideTurnover) {
+  if (!rule) return 0;
+  if (rule.type === 'flat') return rule.flat;
+  if (rule.type === 'pct') return rule.pct / 100 * sideTurnover;
+  if (rule.type === 'minpctcap') return Math.min(rule.pct / 100 * sideTurnover, rule.cap);
+  return 0; // 'zero'
+}
+function onBrokerChange(push) {
+  const sel = document.getElementById('brkBroker'); if (!sel) return;
+  const id = sel.value;
+  const custom = id === 'custom' || !BROKERS[id];
+  const cw = document.getElementById('brkPerOrderWrap'); if (cw) cw.style.display = custom ? '' : 'none';
+  const h2 = document.getElementById('brkSeoH2'), intro = document.getElementById('brkSeoIntro');
+  if (!custom && h2 && intro) {
+    const name = BROKERS[id].name, plan = BROKERS[id].plan ? ' (' + BROKERS[id].plan + ')' : '';
+    h2.innerHTML = '&#x1F9FE; ' + name + ' Brokerage Calculator';
+    intro.innerHTML = `Calculate <strong>${name} brokerage</strong>, STT/CTT, GST, stamp duty, SEBI &amp; exchange transaction charges and your real <strong>net P&amp;L</strong> for intraday, delivery and F&amp;O trades. This free ${name} brokerage calculator uses ${name}'s published charges${plan} so you see the exact breakeven and net profit before you place an order.`;
+    document.title = name + ' Brokerage Calculator — Charges & Net P&L | RootNivesh';
+  } else if (h2 && intro) {
+    h2.innerHTML = '&#x1F9FE; Brokerage &amp; Net P&amp;L Calculator';
+    intro.innerHTML = 'Work out the exact brokerage, STT/CTT, GST, SEBI fees, stamp duty and exchange transaction charges on any equity intraday, delivery or F&amp;O trade — then see your real net profit and the breakeven move after all costs.';
+    document.title = 'Brokerage Calculator — Charges & Net P&L | RootNivesh';
+  }
+  if (push) { try { const u = new URL(location.href); if (!custom) u.searchParams.set('broker', id); else u.searchParams.delete('broker'); history.replaceState(history.state, '', u); } catch (e) {} }
+  const res = document.getElementById('brkResult'); if (res && res.classList.contains('show')) calcBrokerage();
+}
+function selectBroker(id) {
+  if (typeof snavSelectTool === 'function') { const el = document.getElementById('snav-brokerage'); if (el) snavSelectTool('brokerage', el); }
+  const sel = document.getElementById('brkBroker');
+  if (sel && [...sel.options].some(o => o.value === id)) { sel.value = id; onBrokerChange(true); }
+  const t = document.getElementById('toolContent-brokerage'); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /* ---- Futures instrument mode ---- */
@@ -603,6 +670,19 @@ async function convertCurrency() {
 /* ---- Seed the dynamic-row tools with a couple of starter rows once the
         Tools page DOM exists. Safe to call on DOMContentLoaded. ---- */
 function initToolRows() {
+  if (document.getElementById('brkBroker')) {
+    populateBrokerSelect();
+    const sel = document.getElementById('brkBroker');
+    const pb = new URLSearchParams(location.search).get('broker');
+    if (pb && [...sel.options].some(o => o.value === pb)) sel.value = pb;
+    onBrokerChange(false);
+    loadBrokers().then(() => {
+      const keep = sel.value;
+      populateBrokerSelect();
+      if ([...sel.options].some(o => o.value === keep)) sel.value = keep;
+      onBrokerChange(false);
+    });
+  }
   if (document.getElementById('optIndex')) { populateIndexSelect(); loadLotSizes(); }
   if (document.getElementById('avgRows') && !document.querySelector('#avgRows .avg-row')) {
     addAvgRow(250, 100); addAvgRow(220, 150);

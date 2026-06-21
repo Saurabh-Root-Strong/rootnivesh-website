@@ -116,6 +116,28 @@ const INDEX_LOTS_FALLBACK = {
 };
 const INDEX_ORDER = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50', 'SENSEX', 'BANKEX', 'SENSEX50'];
 
+/* Broker brokerage models — offline fallback for /brokers.php. Order also sets
+   the dropdown order (most-searched first). Rule types: zero | flat{flat} |
+   pct{pct} | minpctcap{pct,cap}. */
+const BROKER_ORDER = ['zerodha', 'groww', 'angelone', 'upstox', 'dhan', 'fyers', 'fivepaisa', 'paytmmoney', 'icicidirect', 'hdfcsec', 'kotak', 'sbisec', 'motilal'];
+const _mc = (pct, cap) => ({ type: 'minpctcap', pct: pct, cap: cap || 20 });
+const _z = { type: 'zero' }, _f20 = { type: 'flat', flat: 20 };
+const BROKERS_FALLBACK = {
+  zerodha:    { name: 'Zerodha',          plan: '',                delivery: _z,        intraday: _mc(0.03), futures: _mc(0.03), options: _f20 },
+  groww:      { name: 'Groww',            plan: '',                delivery: _mc(0.1),  intraday: _mc(0.1),  futures: _f20,       options: _f20 },
+  angelone:   { name: 'Angel One',        plan: '',                delivery: _mc(0.1),  intraday: _mc(0.03), futures: _mc(0.03), options: _f20 },
+  upstox:     { name: 'Upstox',           plan: '',                delivery: _mc(2.5),  intraday: _mc(0.05), futures: _mc(0.05), options: _f20 },
+  dhan:       { name: 'Dhan',             plan: '',                delivery: _z,        intraday: _mc(0.03), futures: _mc(0.03), options: _f20 },
+  fyers:      { name: 'Fyers',            plan: '',                delivery: _z,        intraday: _mc(0.03), futures: _mc(0.03), options: _f20 },
+  fivepaisa:  { name: '5paisa',           plan: '',                delivery: _f20,      intraday: _f20,      futures: _f20,       options: _f20 },
+  paytmmoney: { name: 'Paytm Money',      plan: '',                delivery: _mc(2.5),  intraday: _f20,      futures: _f20,       options: _f20 },
+  icicidirect:{ name: 'ICICI Direct',     plan: 'Neo plan',        delivery: _z,        intraday: _f20,      futures: _f20,       options: _f20 },
+  hdfcsec:    { name: 'HDFC Securities',  plan: 'Sky plan',        delivery: _mc(0.10), intraday: _f20,      futures: _f20,       options: _f20 },
+  kotak:      { name: 'Kotak Securities', plan: 'Trade Free plan', delivery: _z,        intraday: _f20,      futures: _f20,       options: _f20 },
+  sbisec:     { name: 'SBI Securities',   plan: '',                delivery: _mc(0.50), intraday: _mc(0.05), futures: _f20,       options: _f20 },
+  motilal:    { name: 'Motilal Oswal',    plan: '',                delivery: _mc(0.20), intraday: _mc(0.02), futures: _f20,       options: _f20 },
+};
+
 
 /* ----------- Live ticker (Yahoo Finance via /proxy.php) ------------------- */
 const TICKER_SYMBOLS = [

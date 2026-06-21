@@ -1520,11 +1520,15 @@
         <div class="snav-content-header">
           <div>
             <div class="snav-breadcrumb">TOOLS &nbsp;/&nbsp; <span style="color:var(--gold)">BROKERAGE CALCULATOR</span></div>
-            <h2>&#x1F9FE; Brokerage &amp; Net P&amp;L Calculator</h2>
-            <p>Work out the exact brokerage, STT/CTT, GST, SEBI fees, stamp duty and exchange transaction charges on any equity intraday, delivery or F&amp;O trade &mdash; then see your real net profit and the breakeven move after all costs. Built on India&rsquo;s post&#8209;October&#8209;2024 charge structure, the same way Zerodha, Groww and Angel One compute a contract note.</p>
+            <h2 id="brkSeoH2">&#x1F9FE; Brokerage &amp; Net P&amp;L Calculator</h2>
+            <p id="brkSeoIntro">Work out the exact brokerage, STT/CTT, GST, SEBI fees, stamp duty and exchange transaction charges on any equity intraday, delivery or F&amp;O trade &mdash; then see your real net profit and the breakeven move after all costs. Pick your broker below to use their published charges.</p>
           </div>
         </div>
         <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px;">
+          <div class="form-group">
+            <label>Broker</label>
+            <select id="brkBroker" onchange="onBrokerChange(true)"></select>
+          </div>
           <div class="form-group">
             <label>Segment</label>
             <select id="brkSegment" onchange="brokerageSegmentDefault()">
@@ -1537,7 +1541,7 @@
           <div class="form-group"><label>Buy Price (&#8377;)</label><input type="number" id="brkBuy" placeholder="e.g. 1000" value="1000"></div>
           <div class="form-group"><label>Sell Price (&#8377;)</label><input type="number" id="brkSell" placeholder="e.g. 1020" value="1020"></div>
           <div class="form-group"><label>Quantity (shares / units)</label><input type="number" id="brkQty" placeholder="e.g. 100" value="100"></div>
-          <div class="form-group"><label>Brokerage / order (&#8377;)</label><input type="number" id="brkPerOrder" step="0.01" placeholder="e.g. 20" value="0"></div>
+          <div class="form-group" id="brkPerOrderWrap" style="display:none"><label>Brokerage / order (&#8377;)</label><input type="number" id="brkPerOrder" step="0.01" placeholder="e.g. 20" value="0"></div>
         </div>
         <button class="calc-btn" style="max-width:280px; margin-top:8px" onclick="calcBrokerage()">Calculate Net P&amp;L &#8594;</button>
         <div class="calc-result" id="brkResult" style="margin-top:24px">
@@ -1550,6 +1554,31 @@
           <div id="brkBreakdown" style="margin-top:16px; padding:14px; border-radius:8px; background:rgba(255,255,255,0.03); border:1px solid var(--border); font-size:12.5px"></div>
           <div id="brkChart" style="margin-top:18px"></div>
         </div>
+
+        <!-- Broker-wise SEO block (always in the DOM so search engines index each
+             "<broker> brokerage calculator" term; clicking a broker loads it). -->
+        <section style="margin-top:30px; padding-top:22px; border-top:1px solid var(--border)">
+          <h3 style="font-size:18px; margin:0 0 6px">Brokerage Calculator for Every Indian Broker</h3>
+          <p style="color:var(--grey2); font-size:13.5px; margin:0 0 14px; max-width:760px">
+            Compare real, all-in trading costs across India&rsquo;s top discount and full-service brokers. Pick your broker above, or jump straight to a broker&rsquo;s calculator below &mdash; each one applies that broker&rsquo;s published brokerage plus STT/CTT, GST, stamp duty, SEBI and exchange charges to show your exact net P&amp;L and breakeven.
+          </p>
+          <div style="display:flex; flex-wrap:wrap; gap:8px">
+            <a onclick="selectBroker('zerodha')"   style="cursor:pointer; padding:7px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--gold)">Zerodha Brokerage Calculator</a>
+            <a onclick="selectBroker('groww')"      style="cursor:pointer; padding:7px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--gold)">Groww Brokerage Calculator</a>
+            <a onclick="selectBroker('angelone')"   style="cursor:pointer; padding:7px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--gold)">Angel One Brokerage Calculator</a>
+            <a onclick="selectBroker('upstox')"     style="cursor:pointer; padding:7px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--gold)">Upstox Brokerage Calculator</a>
+            <a onclick="selectBroker('dhan')"       style="cursor:pointer; padding:7px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--gold)">Dhan Brokerage Calculator</a>
+            <a onclick="selectBroker('fyers')"      style="cursor:pointer; padding:7px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--gold)">Fyers Brokerage Calculator</a>
+            <a onclick="selectBroker('fivepaisa')"  style="cursor:pointer; padding:7px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--gold)">5paisa Brokerage Calculator</a>
+            <a onclick="selectBroker('paytmmoney')" style="cursor:pointer; padding:7px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--gold)">Paytm Money Brokerage Calculator</a>
+            <a onclick="selectBroker('icicidirect')"style="cursor:pointer; padding:7px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--gold)">ICICI Direct Brokerage Calculator</a>
+            <a onclick="selectBroker('hdfcsec')"    style="cursor:pointer; padding:7px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--gold)">HDFC Securities Brokerage Calculator</a>
+            <a onclick="selectBroker('kotak')"      style="cursor:pointer; padding:7px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--gold)">Kotak Securities Brokerage Calculator</a>
+            <a onclick="selectBroker('sbisec')"     style="cursor:pointer; padding:7px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--gold)">SBI Securities Brokerage Calculator</a>
+            <a onclick="selectBroker('motilal')"    style="cursor:pointer; padding:7px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--gold)">Motilal Oswal Brokerage Calculator</a>
+          </div>
+          <p style="color:var(--grey); font-size:11px; margin:14px 0 0">Brokerage plans are curated from each broker&rsquo;s published charges and reviewed periodically; verify the latest on the broker&rsquo;s own site before trading. Statutory charges follow the post-Oct-2024 structure.</p>
+        </section>
       </div>
 
       <!-- OPTIONS PAYOFF + STRATEGY BUILDER -->
@@ -2310,13 +2339,13 @@
      boot block (DOMContentLoaded) lives in market.js but only runs after all
      files have parsed, so every feature function is defined by then.
      Bump the ?v= number on any file you change to bust long-cached copies. -->
-<script src="js/data.js?v=49"></script>
+<script src="js/data.js?v=50"></script>
 <script src="js/app/core.js?v=76"></script>
 <script src="js/app/market.js?v=84"></script>
 <script src="js/app/content.js?v=76"></script>
 <script src="js/app/trade.js?v=76"></script>
 <script src="js/app/ipo-tools.js?v=76"></script>
-<script src="js/app/tools.js?v=83"></script>
+<script src="js/app/tools.js?v=85"></script>
 
 
 <section style="padding:40px 20px; max-width:900px; margin:auto; line-height:1.7;">
