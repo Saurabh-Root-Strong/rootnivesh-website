@@ -101,6 +101,21 @@ const callsMeta = {
 const PROXY = '/proxy.php?url=';
 const TOOL_TYPES = ['brokerage', 'options', 'average', 'sip', 'returns', 'currency', 'emi'];
 
+/* F&O index lot sizes — fallback used if /lots.php is unreachable. The live
+   values (auto-refreshed weekly from NSE) come from lots.php; this just keeps
+   the dropdown usable offline. INDEX_ORDER fixes the dropdown order. */
+const INDEX_LOTS_FALLBACK = {
+  NIFTY:      { name: 'Nifty 50',      lot: 75 },
+  BANKNIFTY:  { name: 'Bank Nifty',    lot: 35 },
+  FINNIFTY:   { name: 'Fin Nifty',     lot: 65 },
+  MIDCPNIFTY: { name: 'Midcap Nifty',  lot: 120 },
+  NIFTYNXT50: { name: 'Nifty Next 50', lot: 25 },
+  SENSEX:     { name: 'Sensex',        lot: 20 },
+  BANKEX:     { name: 'Bankex',        lot: 30 },
+  SENSEX50:   { name: 'Sensex 50',     lot: 60 },
+};
+const INDEX_ORDER = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTYNXT50', 'SENSEX', 'BANKEX', 'SENSEX50'];
+
 
 /* ----------- Live ticker (Yahoo Finance via /proxy.php) ------------------- */
 const TICKER_SYMBOLS = [

@@ -1565,6 +1565,9 @@
           <button class="tab" onclick="optInstrument('futures',this)">Futures</button>
         </div>
         <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin-bottom:14px">
+          <div class="form-group"><label>Index / Instrument</label>
+            <select id="optIndex" onchange="applyIndexLot()"></select>
+          </div>
           <div class="form-group"><label>Lot size (units / lot)</label><input type="number" id="optLotSize" placeholder="e.g. 75" value="75"></div>
           <div class="form-group"><label>Spot at expiry (optional)</label><input type="number" id="optSpot" placeholder="e.g. 24200"></div>
         </div>
@@ -2301,13 +2304,13 @@
      boot block (DOMContentLoaded) lives in market.js but only runs after all
      files have parsed, so every feature function is defined by then.
      Bump the ?v= number on any file you change to bust long-cached copies. -->
-<script src="js/data.js?v=46"></script>
+<script src="js/data.js?v=47"></script>
 <script src="js/app/core.js?v=76"></script>
 <script src="js/app/market.js?v=76"></script>
 <script src="js/app/content.js?v=76"></script>
 <script src="js/app/trade.js?v=76"></script>
 <script src="js/app/ipo-tools.js?v=76"></script>
-<script src="js/app/tools.js?v=79"></script>
+<script src="js/app/tools.js?v=80"></script>
 
 
 <section style="padding:40px 20px; max-width:900px; margin:auto; line-height:1.7;">

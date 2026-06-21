@@ -193,6 +193,37 @@ function _legPnL(leg, S, lotSize) {
   const per = leg.side === 'buy' ? (intrinsic - leg.premium) : (leg.premium - intrinsic);
   return per * lotSize * (leg.lots || 1);
 }
+/* ---- F&O index → lot size ----
+   Lot sizes load from /lots.php (auto-refreshed weekly from NSE); falls back
+   to INDEX_LOTS_FALLBACK if the endpoint is unreachable. ---- */
+let LOT_SIZES = (typeof INDEX_LOTS_FALLBACK !== 'undefined') ? JSON.parse(JSON.stringify(INDEX_LOTS_FALLBACK)) : {};
+async function loadLotSizes() {
+  try {
+    const r = await fetch('/lots.php', { signal: AbortSignal.timeout(8000) });
+    if (r.ok) { const d = await r.json(); if (d && d.lots && Object.keys(d.lots).length) { LOT_SIZES = d.lots; populateIndexSelect(); } }
+  } catch (e) {}
+}
+function populateIndexSelect() {
+  const sel = document.getElementById('optIndex');
+  if (!sel) return;
+  const cur = sel.value;
+  const order = (typeof INDEX_ORDER !== 'undefined') ? INDEX_ORDER : Object.keys(LOT_SIZES);
+  let html = '';
+  order.forEach(sym => { const it = LOT_SIZES[sym]; if (it) html += `<option value="${sym}">${it.name} — lot ${it.lot}</option>`; });
+  html += '<option value="custom">Stock / Custom — enter lot</option>';
+  sel.innerHTML = html;
+  if (cur && [...sel.options].some(o => o.value === cur)) sel.value = cur;
+  applyIndexLot();
+}
+function applyIndexLot() {
+  const sel = document.getElementById('optIndex');
+  const lotIn = document.getElementById('optLotSize');
+  if (!sel || !lotIn) return;
+  const it = LOT_SIZES[sel.value];
+  if (it) { lotIn.value = it.lot; lotIn.readOnly = true; lotIn.style.opacity = '0.7'; lotIn.title = sel.value + ' lot size — set automatically'; }
+  else { lotIn.readOnly = false; lotIn.style.opacity = '1'; lotIn.title = 'Enter the contract lot size'; }
+}
+
 /* ---- Futures instrument mode ---- */
 let optMode = 'options';
 function optInstrument(mode, btn) {
@@ -504,6 +535,7 @@ async function convertCurrency() {
 /* ---- Seed the dynamic-row tools with a couple of starter rows once the
         Tools page DOM exists. Safe to call on DOMContentLoaded. ---- */
 function initToolRows() {
+  if (document.getElementById('optIndex')) { populateIndexSelect(); loadLotSizes(); }
   if (document.getElementById('avgRows') && !document.querySelector('#avgRows .avg-row')) {
     addAvgRow(250, 100); addAvgRow(220, 150);
   }
