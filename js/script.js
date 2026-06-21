@@ -1391,7 +1391,7 @@ function renderPerfTable(calls) {
 
     return `
     <tr>
-      <td>${fmtDate(c.exit_at || c.posted_at)}</td>
+      <td>${fmtDate(c.posted_at || c.exit_at)}</td>
       <td><span class="perf-stock">${escapeHtml(c.symbol)}</span></td>
       <td style="text-transform:capitalize">${escapeHtml(c.call_type)}</td>
       <td><span class="perf-side ${c.action === 'BUY' ? 'buy' : 'sell'}">${escapeHtml(c.action)}</span></td>

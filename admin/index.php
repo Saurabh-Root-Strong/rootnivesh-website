@@ -184,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
         $exitInput = ($_POST['exit_price'] ?? '') !== '' ? floatval($_POST['exit_price']) : null;
 
         // Pull the call so a single "progress" choice can derive status, targets_hit and exit.
-        $row = $pdo->prepare('SELECT action, entry_price, targets, target_price, stop_loss FROM calls WHERE id = :id');
+        $row = $pdo->prepare('SELECT action, entry_price, targets, target_price, stop_loss, exit_at FROM calls WHERE id = :id');
         $row->execute([':id' => $id]);
         $r = $row->fetch();
         $tl = call_targets_list($r ?: []);
@@ -225,7 +225,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
         $args = [
             ':status'  => $status,
             ':exit'    => $exit,
-            ':exit_at' => $exit !== null ? date('Y-m-d H:i:s') : null,
+            // Stamp the outcome date once; preserve it on later re-saves.
+            ':exit_at' => $exit !== null ? (!empty($r['exit_at']) ? $r['exit_at'] : date('Y-m-d H:i:s')) : null,
             ':pnl'     => $pnl,
             ':pub'     => $pub,
             ':thit'    => $thit,
