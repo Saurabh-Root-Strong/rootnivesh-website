@@ -2875,6 +2875,10 @@
   font-family: 'Space Mono', monospace; margin-top: 4px; }
 
 /* Article reading view + "In this article" TOC */
+/* In article view the blog hero (which normally clears the fixed nav) is
+   hidden, so the article must add its own clearance for the 92px nav +
+   ticker. Without this the "Back to blog" link slides under the header. */
+#blogArticleView { padding-top: 104px; padding-bottom: 48px; }
 .article-back { margin-bottom: 18px; }
 .article-back a { color: var(--gold, #E5A50A); cursor: pointer; font-weight: 600; font-size: 14px; }
 .article-back a:hover { text-decoration: underline; }
@@ -2924,7 +2928,11 @@
 @media (max-width: 540px) { .article-author { flex-direction: column; } }
 
 @media (max-width: 820px) {
+  #blogArticleView { padding-top: 88px; padding-bottom: 36px; }
   .article-wrap { grid-template-columns: 1fr; gap: 20px; }
+  /* TOC stacks above the body on mobile; drop the desktop sticky height cap
+     so the full list shows instead of an awkward inner scroll box. */
   .article-toc { position: static; border-left: none; border-top: 1px solid var(--border, rgba(255,255,255,0.10));
-    padding-left: 0; padding-top: 16px; order: 2; }
+    padding-left: 0; padding-top: 16px; order: -1; max-height: none; overflow: visible; }
+  .article-body { max-width: 100%; }
 }
