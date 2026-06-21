@@ -1338,11 +1338,10 @@ function renderLivePerf(calls) {
     const hit = parseInt(c.targets_hit || 0, 10) || 0;
     const total = parseInt(c.targets_total || 0, 10) || 0;
 
-    // Progress cell: booked % to the last achieved target — the proof hook.
+    // Progress cell: how many targets are booked (percentage intentionally hidden).
     let progress;
     if (c.booked_pct != null) {
-      const g = parseFloat(c.booked_pct);
-      progress = `<span class="perf-result win">✅ ${hit} target${hit > 1 ? 's' : ''} hit · ${(g >= 0 ? '+' : '') + g.toFixed(2)}%</span>`;
+      progress = `<span class="perf-result win">✅ ${hit} target${hit > 1 ? 's' : ''} hit</span>`;
     } else {
       progress = `<span class="perf-running">🟢 Active</span>`;
     }
