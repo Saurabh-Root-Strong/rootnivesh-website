@@ -1020,7 +1020,7 @@ function filterCourses(level, btn) {
 /* ===== BLOG — admin-managed posts (posts.php) ===== */
 let blogPosts = null;            // cached list payload
 let blogCurrentCat = 'all';
-const BLOG_CAT_LABELS = { education: 'Education', strategy: 'Strategy', markets: 'Markets', quant: 'Quant Research' };
+const BLOG_CAT_LABELS = { education: 'Education', strategy: 'Strategy', markets: 'Markets', quant: 'Quant Research', investing: 'Investing', 'personal-finance': 'Personal Finance' };
 function blogFmtDate(iso) {
   const d = new Date((iso || '').replace(' ', 'T'));
   return isNaN(d) ? '' : d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });

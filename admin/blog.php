@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['action'] ?? ''), 
         }
         $body     = trim($_POST['body'] ?? '');
         $status   = ($_POST['status'] ?? 'published') === 'draft' ? 'draft' : 'published';
-        $allowedCats = ['education', 'strategy', 'markets', 'quant'];
+        $allowedCats = ['education', 'strategy', 'markets', 'quant', 'investing', 'personal-finance'];
         if (!in_array($category, $allowedCats, true)) $category = 'markets';
 
         if ($title === '') { throw new RuntimeException('Title is required.'); }
@@ -132,7 +132,7 @@ if (isset($_GET['edit'])) {
 }
 
 $posts = $pdo->query('SELECT id, title, slug, category, status, published_at FROM posts ORDER BY published_at DESC LIMIT 100')->fetchAll();
-$catLabels = ['education' => 'Education', 'strategy' => 'Strategy', 'markets' => 'Markets', 'quant' => 'Quant Research'];
+$catLabels = ['education' => 'Education', 'strategy' => 'Strategy', 'markets' => 'Markets', 'quant' => 'Quant Research', 'investing' => 'Investing', 'personal-finance' => 'Personal Finance'];
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
