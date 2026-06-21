@@ -173,7 +173,8 @@ $catLabels = ['education' => 'Education', 'strategy' => 'Strategy', 'markets' =>
         “In this article” menu), leave a blank line between paragraphs, and wrap text in
         <strong>**double asterisks**</strong> for bold. No HTML needed.
       </p>
-      <form method="post" class="admin-form" enctype="multipart/form-data">
+      <form method="post" class="admin-form" enctype="multipart/form-data" id="blogForm"
+            onsubmit="var b=document.getElementById('blogSaveBtn'); if(b){b.disabled=true; b.textContent='Saving…';}">
         <?php echo csrf_field(); ?>
         <input type="hidden" name="action" value="<?php echo $editing ? 'edit' : 'add'; ?>">
         <?php if ($editing): ?><input type="hidden" name="id" value="<?php echo intval($editing['id']); ?>"><?php endif; ?>
@@ -207,9 +208,9 @@ $catLabels = ['education' => 'Education', 'strategy' => 'Strategy', 'markets' =>
           </label>
         </div>
 
-        <label>Cover image — upload from your device
-          <input type="file" name="cover_file" accept="image/jpeg,image/png,image/webp,image/gif">
-        </label>
+        <div class="admin-label">Cover image — upload from your device
+          <input type="file" id="coverFile" name="cover_file" accept="image/jpeg,image/png,image/webp,image/gif">
+        </div>
         <?php if ($editing && !empty($editing['cover_image'])): ?>
           <div style="display:flex; align-items:center; gap:12px; margin-top:-4px">
             <img src="<?php echo htmlspecialchars($editing['cover_image']); ?>" alt="" style="height:54px; border-radius:6px; border:1px solid var(--border)">
@@ -230,7 +231,7 @@ $catLabels = ['education' => 'Education', 'strategy' => 'Strategy', 'markets' =>
         </label>
 
         <div style="display:flex; gap:10px; align-items:center">
-          <button type="submit" class="admin-btn"><?php echo $editing ? 'Save changes' : 'Publish post'; ?></button>
+          <button type="submit" id="blogSaveBtn" class="admin-btn"><?php echo $editing ? 'Save changes' : 'Publish post'; ?></button>
           <?php if ($editing): ?><a href="blog.php" class="admin-btn admin-btn-secondary">Cancel edit</a><?php endif; ?>
         </div>
       </form>
