@@ -32,6 +32,8 @@ CREATE TABLE IF NOT EXISTS calls (
   exit_price      DECIMAL(12,2) DEFAULT NULL,
   exit_at         DATETIME DEFAULT NULL,
   pnl_pct         DECIMAL(6,2) DEFAULT NULL,
+  last_price      DECIMAL(12,2) DEFAULT NULL,   -- last live price the monitor cron saw
+  last_checked_at DATETIME DEFAULT NULL,         -- when the monitor last polled this call
   is_public       TINYINT(1) NOT NULL DEFAULT 1,
   shared_to_wa_at DATETIME DEFAULT NULL,
   notes           TEXT,
@@ -71,6 +73,44 @@ CREATE TABLE IF NOT EXISTS users (
 -- **bold**) — the public site parses it into HTML + a TOC. No HTML
 -- knowledge needed by the team.
 -- =============================================================
+-- =============================================================
+-- Price-watch ALERTS. The monitor cron (admin/monitor.php) polls
+-- live prices for every OPEN call and, when a target or the stop is
+-- breached, drops ONE row here. The team sees it in the admin
+-- "Alerts" tab, taps "Send to WhatsApp" (1 tap), then confirms the
+-- call's progress. The engine never edits the call itself — humans
+-- confirm, so a bad tick can't auto-close a position.
+--
+-- Two snapshot columns on `calls` let the Alerts/Calls views show the
+-- last seen price without re-fetching.
+-- =============================================================
+CREATE TABLE IF NOT EXISTS call_alerts (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  call_id       INT NOT NULL,
+  symbol        VARCHAR(40) NOT NULL,
+  action        ENUM('BUY','SELL') NOT NULL DEFAULT 'BUY',
+  kind          ENUM('target_hit','stop_hit') NOT NULL,
+  level_index   INT NOT NULL DEFAULT 0,        -- 1=T1, 2=T2, ...; 0 for the stop
+  level_price   DECIMAL(12,2) DEFAULT NULL,    -- the target/stop value that was crossed
+  trigger_price DECIMAL(12,2) DEFAULT NULL,    -- the live price that crossed it
+  entry_price   DECIMAL(12,2) DEFAULT NULL,    -- snapshot of the call's entry
+  pnl_pct       DECIMAL(6,2)  DEFAULT NULL,    -- % from entry at the trigger price
+  status        ENUM('new','sent','dismissed') NOT NULL DEFAULT 'new',
+  created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  sent_at       DATETIME DEFAULT NULL,
+  handled_by    VARCHAR(50) DEFAULT NULL,
+  -- One alert per call + kind + level. Re-polls that see the same breach
+  -- are ignored by the engine (INSERT IGNORE on this unique key).
+  UNIQUE KEY uniq_call_kind_level (call_id, kind, level_index),
+  INDEX idx_status (status),
+  INDEX idx_created (created_at DESC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Snapshot of the last price the monitor saw, per call (display only).
+-- For EXISTING installs run these two once (ignore "duplicate column"):
+--   ALTER TABLE calls ADD COLUMN last_price DECIMAL(12,2) DEFAULT NULL AFTER pnl_pct;
+--   ALTER TABLE calls ADD COLUMN last_checked_at DATETIME DEFAULT NULL AFTER last_price;
+
 CREATE TABLE IF NOT EXISTS posts (
   id            INT AUTO_INCREMENT PRIMARY KEY,
   slug          VARCHAR(200) NOT NULL UNIQUE,

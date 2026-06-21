@@ -32,3 +32,22 @@ define('WA_NUMBER', '917467094575');
 // Replace placeholder once you have your real INH number.
 define('SEBI_REG', 'INH000XXXXX');
 
+// Price-watch engine (admin/monitor.php).
+// Secret that guards the monitor URL so a random visitor can't trigger it.
+// The cron job must pass ?key=<this>. Generate any long random string
+// (e.g. php -r "echo bin2hex(random_bytes(16));") and keep it private.
+define('MONITOR_SECRET', 'CHANGE_ME_long_random_string');
+
+// Master on/off switch for the price-watch engine.
+define('MONITOR_ENABLED', true);
+
+// Symbol -> Yahoo Finance ticker overrides. Most NSE cash symbols resolve
+// automatically as "<SYMBOL>.NS" (spaces stripped). Add an entry here ONLY
+// when that default is wrong (indices, renamed tickers, etc.).
+$GLOBALS['YAHOO_SYMBOL_MAP'] = [
+    'NIFTY'     => '^NSEI',
+    'NIFTY50'   => '^NSEI',
+    'BANKNIFTY' => '^NSEBANK',
+    'SENSEX'    => '^BSESN',
+];
+

@@ -70,6 +70,56 @@ URL (`?p=...`) writes it in plaintext to the server access logs.
 
 When the call hits target or stops out, click **Update status** on that call's card to mark it.
 
+## Price-watch alerts (auto target / stop-loss notifications)
+
+The panel can watch live prices for every **open** call and raise an alert the
+moment a target or the stop-loss is breached. The alert shows in the **🔔 Alerts**
+tab with a one-tap **Send to WhatsApp** button. The engine never edits a call on
+its own — your team confirms each one (so a bad tick can't wrongly close a trade).
+
+Data comes from Yahoo Finance (NSE `.NS` tickers); no API key needed.
+
+### One-time setup
+
+1. **Database** — open phpMyAdmin → your DB → **SQL** tab and run the new block
+   from `admin/schema.sql` (the `call_alerts` table). On an **existing** install
+   also run the two `ALTER TABLE calls ...` lines noted in that file to add
+   `last_price` / `last_checked_at`. Fresh installs that paste the whole
+   `schema.sql` get everything automatically.
+
+2. **config.php** — add these three lines (copy from `config.sample.php`):
+   - `MONITOR_SECRET` — a long random string (the cron URL's password). Generate:
+     `php -r "echo bin2hex(random_bytes(16));"`
+   - `MONITOR_ENABLED` — `true`
+   - `$GLOBALS['YAHOO_SYMBOL_MAP']` — index/ticker overrides (defaults provided)
+
+3. **Cron job** — Hostinger cPanel → **Cron Jobs**. Add one that runs every
+   5 minutes (`*/5 * * * *`). Either form works:
+   - **URL pinger / wget:**
+     ```
+     wget -q -O /dev/null "https://rootnivesh.in/admin/monitor.php?key=YOUR_MONITOR_SECRET"
+     ```
+   - **PHP CLI:**
+     ```
+     php /home/USERNAME/public_html/admin/monitor.php key=YOUR_MONITOR_SECRET
+     ```
+   The script self-guards to Mon–Fri 9:15–15:35 IST, so an always-on every-5-min
+   cron is fine — it just no-ops outside market hours.
+
+### Daily flow with alerts
+
+1. Post your calls as usual.
+2. When price hits a target or the stop, an alert appears in **🔔 Alerts** (the
+   nav badge shows the count; it refreshes every ~45s without reloading).
+3. Tap **Send to WhatsApp**, pick your group, send.
+4. Go to **Calls** and set that call's progress (1st Target / Stop hit / etc).
+
+### Test it now
+
+Visit (logged in or via the secret) — `force=1` ignores market hours:
+`https://rootnivesh.in/admin/monitor.php?key=YOUR_MONITOR_SECRET&force=1`
+It returns JSON like `{"ok":true,"open_calls":3,"priced":3,"new_alerts":1,...}`.
+
 ## Public API
 
 Anyone can fetch the latest public calls at:

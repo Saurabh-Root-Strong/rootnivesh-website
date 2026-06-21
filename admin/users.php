@@ -83,7 +83,7 @@ $users = $pdo->query('SELECT id, username, display_name, role, is_active, create
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>RootNivesh Admin — Team</title>
-<link rel="stylesheet" href="admin.css?v=4">
+<link rel="stylesheet" href="admin.css?v=5">
 </head>
 <body class="admin-body">
 <div class="admin-layout">

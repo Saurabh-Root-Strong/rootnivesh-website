@@ -127,6 +127,19 @@
   background: linear-gradient(135deg, #25D366, #1ebf5b);
   color: #fff;
 }
+.admin-btn-ghost {
+  background: transparent; color: var(--grey2);
+  border: 1px solid var(--border); font-weight: 600;
+}
+.admin-btn-ghost:hover { filter: none; background: rgba(255,255,255,0.05); color: #fff; }
+
+/* Alerts nav badge — unhandled price-watch alert count. */
+.admin-nav-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px; padding: 0 5px; margin-left: auto;
+  background: #E05656; color: #fff; border-radius: 999px;
+  font-size: 11px; font-weight: 800; line-height: 1;
+}
 
 .admin-error {
   background: rgba(231,76,60,0.12); border: 1px solid rgba(231,76,60,0.3);
