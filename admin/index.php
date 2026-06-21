@@ -243,8 +243,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
     $flash = 'Call deleted.';
 }
 
-/* ---------- Fetch recent calls ---------- */
-$calls = $pdo->query('SELECT * FROM calls ORDER BY posted_at DESC LIMIT 50')->fetchAll();
+/* ---------- Fetch recent calls (with date filter) ---------- */
+// Filter on the call's posted date. range = all|today|week|custom.
+// 'today'/'week' computed in IST so the boundary matches the team's clock.
+$range = in_array($_GET['range'] ?? '', ['all','today','week','custom'], true) ? $_GET['range'] : 'all';
+$fromIn = (preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['from'] ?? '')) ? $_GET['from'] : '';
+$toIn   = (preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['to']   ?? '')) ? $_GET['to']   : '';
+
+$ist   = new DateTime('now', new DateTimeZone('Asia/Kolkata'));
+$today = $ist->format('Y-m-d');
+$dFrom = $dTo = '';
+if ($range === 'today') {
+    $dFrom = $dTo = $today;
+} elseif ($range === 'week') {
+    // Week = Monday..today (IST).
+    $mon = (clone $ist);
+    $dow = (int)$mon->format('N');            // 1=Mon..7=Sun
+    if ($dow > 1) $mon->modify('-' . ($dow - 1) . ' days');
+    $dFrom = $mon->format('Y-m-d');
+    $dTo   = $today;
+} elseif ($range === 'custom') {
+    $dFrom = $fromIn;
+    $dTo   = $toIn;
+}
+
+$where = '';
+$params = [];
+if ($dFrom !== '') { $where .= ' AND DATE(posted_at) >= :dfrom'; $params[':dfrom'] = $dFrom; }
+if ($dTo   !== '') { $where .= ' AND DATE(posted_at) <= :dto';   $params[':dto']   = $dTo; }
+
+$stmt = $pdo->prepare('SELECT * FROM calls WHERE 1=1' . $where . ' ORDER BY posted_at DESC LIMIT 50');
+$stmt->execute($params);
+$calls = $stmt->fetchAll();
 
 /* ---------- Target helpers (parse list, ordinals, progress dropdown) ---------- */
 function call_targets_list($c) {
@@ -442,8 +472,25 @@ function build_wa_message($c) {
     <!-- ===== RECENT CALLS ===== -->
     <section class="admin-card">
       <h2>Recent calls (<?php echo count($calls); ?>)</h2>
+
+      <!-- Date filter: Today / This Week / Custom -->
+      <form method="get" class="admin-datefilter" id="callDateFilter">
+        <div class="admin-datefilter-tabs">
+          <a href="?range=all"   class="admin-chip<?php echo $range==='all'  ?' active':''; ?>">All</a>
+          <a href="?range=today" class="admin-chip<?php echo $range==='today'?' active':''; ?>">Today</a>
+          <a href="?range=week"  class="admin-chip<?php echo $range==='week' ?' active':''; ?>">This Week</a>
+          <button type="button" class="admin-chip<?php echo $range==='custom'?' active':''; ?>" onclick="document.getElementById('customRange').hidden=!document.getElementById('customRange').hidden">Custom Date</button>
+        </div>
+        <div id="customRange" class="admin-datefilter-custom" <?php echo $range==='custom'?'':'hidden'; ?>>
+          <input type="hidden" name="range" value="custom">
+          <label>From <input type="date" name="from" value="<?php echo htmlspecialchars($dFrom ?: $today); ?>"></label>
+          <label>To <input type="date" name="to" value="<?php echo htmlspecialchars($dTo ?: $today); ?>"></label>
+          <button type="submit" class="admin-btn admin-btn-secondary">Apply</button>
+        </div>
+      </form>
+
       <?php if (empty($calls)): ?>
-        <p style="color:#8A9BB0">No calls posted yet. Add your first call above.</p>
+        <p style="color:#8A9BB0"><?php echo $range==='all' ? 'No calls posted yet. Add your first call above.' : 'No calls in this date range.'; ?></p>
       <?php else: foreach ($calls as $c):
         $waMsg = build_wa_message($c);
         $waUrl = 'https://wa.me/' . WA_NUMBER . '?text=' . rawurlencode($waMsg);
