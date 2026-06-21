@@ -909,28 +909,6 @@
         <button class="perf-mode" onclick="setPerfMode('live', this)">🔴 Live Calls</button>
       </div>
 
-      <!-- Segment filter -->
-      <div class="tabs" id="perfTabs" style="margin-top:18px">
-        <button class="tab active" onclick="filterPerformance('', this)">All</button>
-        <button class="tab" onclick="filterPerformance('intraday', this)">Intraday</button>
-        <button class="tab" onclick="filterPerformance('swing', this)">Swing</button>
-        <button class="tab" onclick="filterPerformance('positional', this)">Positional</button>
-        <button class="tab" onclick="filterPerformance('fno', this)">F&amp;O</button>
-      </div>
-
-      <!-- Date-range filter -->
-      <div class="perf-date-bar" id="perfDateBar" style="margin-top:14px">
-        <button class="perf-date active" onclick="setPerfRange('all', this)">All Dates</button>
-        <button class="perf-date" onclick="setPerfRange('today', this)">Today</button>
-        <button class="perf-date" onclick="setPerfRange('week', this)">This Week</button>
-        <button class="perf-date" onclick="setPerfRange('custom', this)">Custom</button>
-        <span class="perf-date-custom" id="perfCustomWrap" style="display:none">
-          <input type="date" id="perfFrom" onchange="applyPerfCustom()">
-          <span style="color:var(--grey)">to</span>
-          <input type="date" id="perfTo" onchange="applyPerfCustom()">
-        </span>
-      </div>
-
       <!-- Closed-trade log (Achieved mode) -->
       <div class="perf-table-wrap" id="perfAchievedWrap">
         <table class="perf-table" id="perfTable">
