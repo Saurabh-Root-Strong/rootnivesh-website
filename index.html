@@ -242,83 +242,8 @@
       </div>
     </li>
 
-    <!-- CALLS mega trigger -->
-    <li>
-      <div class="nav-dd-trigger" id="triggerCalls" onclick="toggleMega('megaCalls','triggerCalls')">
-        Calls <span class="dd-arrow">▾</span>
-      </div>
-      <div class="mega-menu" id="megaCalls">
-        <div class="mega-inner cols-2">
-
-          <!-- LEFT: SHORT TERM -->
-          <div class="mega-col">
-            <div class="mega-col-header">
-              <div class="mega-col-icon">⚡</div>
-              <span class="mega-col-title">Short Term</span>
-            </div>
-            <div class="mega-row" onclick="megaGoCall('intraday')">
-              <span class="mega-row-label">Intraday</span>
-              <div class="mega-plus" onclick="megaToggleSub(event,'msub-intraday','snav-intraday')">+</div>
-            </div>
-            <div class="mega-sub" id="msub-intraday">
-              <div class="mega-sub-inner">
-                <p>Same-day buy/sell trades with tight stop-loss. Ideal for active traders.</p>
-                <span class="mega-sub-go" onclick="megaGoCall('intraday')">View Calls →</span>
-              </div>
-            </div>
-            <div class="mega-row" onclick="megaGoCall('swing')">
-              <span class="mega-row-label">Swing</span>
-              <div class="mega-plus" onclick="megaToggleSub(event,'msub-swing','snav-swing')">+</div>
-            </div>
-            <div class="mega-sub" id="msub-swing">
-              <div class="mega-sub-inner">
-                <p>7–14 day momentum trades capturing short-term price swings.</p>
-                <span class="mega-sub-go" onclick="megaGoCall('swing')">View Calls →</span>
-              </div>
-            </div>
-            <div class="mega-row" onclick="megaGoCall('positional')">
-              <span class="mega-row-label">Positional</span>
-              <div class="mega-plus" onclick="megaToggleSub(event,'msub-positional','snav-positional')">+</div>
-            </div>
-            <div class="mega-sub" id="msub-positional">
-              <div class="mega-sub-inner">
-                <p>1–3 month trend-following calls. Hold for larger price moves.</p>
-                <span class="mega-sub-go" onclick="megaGoCall('positional')">View Calls →</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- RIGHT: LONG TERM -->
-          <div class="mega-col">
-            <div class="mega-col-header">
-              <div class="mega-col-icon">🏦</div>
-              <span class="mega-col-title">Long Term</span>
-            </div>
-            <div class="mega-row" onclick="megaGoCall('value')">
-              <span class="mega-row-label">Value Based Investing</span>
-              <div class="mega-plus" onclick="megaToggleSub(event,'msub-value','snav-value')">+</div>
-            </div>
-            <div class="mega-sub" id="msub-value">
-              <div class="mega-sub-inner">
-                <p>Stocks picked below intrinsic value. 18–30 month wealth creation horizon.</p>
-                <span class="mega-sub-go" onclick="megaGoCall('value')">View Picks →</span>
-              </div>
-            </div>
-            <div class="mega-row" onclick="megaGoCall('monthly')">
-              <span class="mega-row-label">Monthly Based Investing</span>
-              <div class="mega-plus" onclick="megaToggleSub(event,'msub-monthly','snav-monthly')">+</div>
-            </div>
-            <div class="mega-sub" id="msub-monthly">
-              <div class="mega-sub-inner">
-                <p>SIP, ETF & index fund ideas for systematic long-term compounding.</p>
-                <span class="mega-sub-go" onclick="megaGoCall('monthly')">View Ideas →</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </li>
+    <!-- CALLS -->
+    <li><a onclick="showPage('calls');closeMegas()">Calls</a></li>
 
     <li><a onclick="showPage('performance');closeMegas()">Performance</a></li>
 
