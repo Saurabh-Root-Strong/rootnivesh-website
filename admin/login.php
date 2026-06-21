@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/auth.php';
 
 /* ---- Brute-force throttle: lock an IP for 15 min after 5 failed attempts. ---- */
@@ -47,7 +47,7 @@ if (admin_is_logged_in()) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Admin Login â€” RootNivesh</title>
+<title>Admin Login — RootNivesh</title>
 <link rel="stylesheet" href="admin.css?v=4">
 </head>
 <body class="admin-body">
@@ -69,4 +69,3 @@ if (admin_is_logged_in()) {
   </div>
 </body>
 </html>
-

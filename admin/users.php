@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/auth.php';
 admin_require_owner();           // owner role only
 
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_u
     $role     = in_array($_POST['role'] ?? '', ['owner','analyst'], true) ? $_POST['role'] : 'analyst';
 
     if (!preg_match('/^[a-z0-9_.]{3,50}$/', $username)) {
-        $err = 'Username must be 3â€“50 chars: lowercase letters, numbers, dot or underscore.';
+        $err = 'Username must be 3–50 chars: lowercase letters, numbers, dot or underscore.';
     } elseif (strlen($password) < 8) {
         $err = 'Password must be at least 8 characters.';
     } else {
@@ -82,7 +82,7 @@ $users = $pdo->query('SELECT id, username, display_name, role, is_active, create
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>RootNivesh Admin â€” Team</title>
+<title>RootNivesh Admin — Team</title>
 <link rel="stylesheet" href="admin.css?v=4">
 </head>
 <body class="admin-body">
@@ -164,4 +164,3 @@ $users = $pdo->query('SELECT id, username, display_name, role, is_active, create
 </div><!-- /.admin-layout -->
 </body>
 </html>
-
