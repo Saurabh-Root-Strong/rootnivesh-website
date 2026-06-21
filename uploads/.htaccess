@@ -1,0 +1,29 @@
+# Uploaded blog images live here. They must NEVER be executed as code —
+# only served as static files. Even though admin/blog.php already validates
+# every upload (real-image check via getimagesize + a forced safe extension +
+# a random name), this is defense-in-depth: if a malicious file ever lands
+# here, the server still refuses to run it.
+
+# Disable any server-side script handlers for this tree.
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+<IfModule lsapi_module>
+  php_flag engine off
+</IfModule>
+
+# Strip execute handlers and force the few image types we accept to be
+# served inline as static content, never parsed.
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .phps .pl .py .cgi .asp .aspx .sh .lua
+RemoveType    .php .phtml .php3 .php4 .php5 .php7 .phps .pl .py .cgi .asp .aspx .sh .lua
+
+<FilesMatch "\.(jpe?g|png|webp|gif)$">
+  Require all granted
+</FilesMatch>
+
+# Anything that is NOT one of those image types is denied outright.
+<FilesMatch "(?<!\.jpg)(?<!\.jpeg)(?<!\.png)(?<!\.webp)(?<!\.gif)$">
+  Require all denied
+</FilesMatch>
+
+Options -ExecCGI -Indexes

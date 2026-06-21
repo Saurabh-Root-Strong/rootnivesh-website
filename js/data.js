@@ -5,10 +5,11 @@
    subscription prices, course list, sample reports, ticker
    symbols, page titles, IPO endpoints, etc.
 
-   This file MUST load before script.js — index.html does that.
+   This file MUST load before the app layers in js/app/ — index.html
+   loads it first.
 
    No side effects. No DOM access. Just `const` declarations
-   that script.js reads from.
+   that the js/app/ layers read from.
    ============================================================ */
 
 
@@ -48,7 +49,7 @@ const PAGE_TITLES = {
   blog:       'Stock Market Blog — Investing, Trading & Personal Finance | RootNivesh Research',
   performance:'Calls Performance & Track Record | RootNivesh Research',
   reports:    'Research Reports | RootNivesh Research',
-  tools:      'Smart Calculators | RootNivesh Research',
+  tools:      'Free Stock Market Calculators — Brokerage, Options, SIP, CAGR & Currency | RootNivesh',
   about:      'About Us | RootNivesh Research',
   contact:    'Contact | RootNivesh Research',
   privacy:    'Privacy Policy | RootNivesh Research',
@@ -66,7 +67,7 @@ const PAGE_DESCRIPTIONS = {
   blog:       'Indian stock market blog by a SEBI Registered Research Analyst — investing, SIP & mutual funds, F&O and swing trading strategies, factor & quant research, and personal finance. Practical, data-driven, no tips.',
   performance:'Transparent track record — win-rate, average return and a closed-trade log of every public call from RootNivesh Research. Past performance is not indicative of future results.',
   reports:    'In-depth equity research reports with target prices, upside and time horizons — data-driven, no-tip-style analysis.',
-  tools:      'Free smart calculators for Indian investors — brokerage, SIP, position-size and risk-reward tools.',
+  tools:      'Free online calculators for Indian traders & investors — brokerage & net P&L, options profit/payoff & strategy builder, stock average, SIP, CAGR, XIRR, SIP-vs-lumpsum and live currency converter.',
   about:      'About RootNivesh Research — a SEBI Registered Research Analyst based in Mumbai providing quant-backed market research.',
   contact:    'Contact RootNivesh Research for research subscriptions, queries and SEBI-compliant advisory.',
   privacy:    'How RootNivesh Research collects, uses and protects your personal data.',
@@ -98,7 +99,7 @@ const callsMeta = {
 
 /* ----------- Backend / proxy config --------------------------------------- */
 const PROXY = '/proxy.php?url=';
-const TOOL_TYPES = ['emi', 'pos', 'sip'];
+const TOOL_TYPES = ['brokerage', 'options', 'average', 'sip', 'returns', 'currency', 'emi'];
 
 
 /* ----------- Live ticker (Yahoo Finance via /proxy.php) ------------------- */

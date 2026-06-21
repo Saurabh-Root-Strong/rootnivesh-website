@@ -214,6 +214,66 @@
               <div class="mega-col-icon">🔧</div>
               <span class="mega-col-title">Financial Tools</span>
             </div>
+            <div class="mega-row" onclick="megaGoTool('brokerage')">
+              <span class="mega-row-label">Brokerage &amp; P&amp;L Calculator</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-brokerage')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-brokerage">
+              <div class="mega-sub-inner">
+                <p>Exact brokerage, STT, GST, stamp duty and exchange charges with your net profit and breakeven.</p>
+                <span class="mega-sub-go" onclick="megaGoTool('brokerage')">Open Calculator →</span>
+              </div>
+            </div>
+            <div class="mega-row" onclick="megaGoTool('options')">
+              <span class="mega-row-label">Options Profit &amp; Strategy Builder</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-options')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-options">
+              <div class="mega-sub-inner">
+                <p>Build any F&amp;O strategy and see max profit, max loss, breakevens and the payoff chart.</p>
+                <span class="mega-sub-go" onclick="megaGoTool('options')">Open Calculator →</span>
+              </div>
+            </div>
+            <div class="mega-row" onclick="megaGoTool('average')">
+              <span class="mega-row-label">Stock Average Calculator</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-average')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-average">
+              <div class="mega-sub-inner">
+                <p>Average across multiple buys to get your true average cost price and total holding.</p>
+                <span class="mega-sub-go" onclick="megaGoTool('average')">Open Calculator →</span>
+              </div>
+            </div>
+            <div class="mega-row" onclick="megaGoTool('sip')">
+              <span class="mega-row-label">SIP Calculator</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-sip')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-sip">
+              <div class="mega-sub-inner">
+                <p>Project the future value of a monthly SIP, with invested amount and gains broken out.</p>
+                <span class="mega-sub-go" onclick="megaGoTool('sip')">Open Calculator →</span>
+              </div>
+            </div>
+            <div class="mega-row" onclick="megaGoTool('returns')">
+              <span class="mega-row-label">CAGR / XIRR / Lumpsum</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-returns')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-returns">
+              <div class="mega-sub-inner">
+                <p>CAGR, date-accurate XIRR, and SIP-vs-lumpsum compared side by side.</p>
+                <span class="mega-sub-go" onclick="megaGoTool('returns')">Open Calculator →</span>
+              </div>
+            </div>
+            <div class="mega-row" onclick="megaGoTool('currency')">
+              <span class="mega-row-label">Currency Converter</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-currency')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-currency">
+              <div class="mega-sub-inner">
+                <p>Convert USD, EUR, GBP and more to INR at the live mid-market rate.</p>
+                <span class="mega-sub-go" onclick="megaGoTool('currency')">Open Calculator →</span>
+              </div>
+            </div>
             <div class="mega-row" onclick="megaGoTool('emi')">
               <span class="mega-row-label">EMI Calculator</span>
               <div class="mega-plus" onclick="megaToggleSub(event,'msub-emi')">+</div>
@@ -222,26 +282,6 @@
               <div class="mega-sub-inner">
                 <p>Calculate monthly EMI, total interest payable and principal breakdown for any loan type.</p>
                 <span class="mega-sub-go" onclick="megaGoTool('emi')">Open Calculator →</span>
-              </div>
-            </div>
-            <div class="mega-row" onclick="megaGoTool('sip')">
-              <span class="mega-row-label">SIP Calculator</span>
-              <div class="mega-plus" onclick="megaToggleSub(event,'msub-sip','snav-sip')">+</div>
-            </div>
-            <div class="mega-sub" id="msub-sip">
-              <div class="mega-sub-inner">
-                <p>Project the future value of a monthly SIP, with invested amount and gains broken out.</p>
-                <span class="mega-sub-go" onclick="megaGoTool('sip')">Open Calculator →</span>
-              </div>
-            </div>
-            <div class="mega-row" onclick="megaGoTool('pos')">
-              <span class="mega-row-label">Position Sizing Calculator</span>
-              <div class="mega-plus" onclick="megaToggleSub(event,'msub-pos')">+</div>
-            </div>
-            <div class="mega-sub" id="msub-pos">
-              <div class="mega-sub-inner">
-                <p>Find the exact number of shares to buy so your loss never exceeds a set % of capital.</p>
-                <span class="mega-sub-go" onclick="megaGoTool('pos')">Open Calculator →</span>
               </div>
             </div>
           </div>
@@ -277,9 +317,13 @@
       <span class="mob-chevron">▾</span>
     </button>
     <div class="mob-group-body">
-      <a class="mob-sub" onclick="megaGoTool('emi')"><span>🏦</span><span>EMI Calculator</span></a>
+      <a class="mob-sub" onclick="megaGoTool('brokerage')"><span>🧾</span><span>Brokerage &amp; P&amp;L</span></a>
+      <a class="mob-sub" onclick="megaGoTool('options')"><span>⚖️</span><span>Options Builder</span></a>
+      <a class="mob-sub" onclick="megaGoTool('average')"><span>📊</span><span>Stock Average</span></a>
       <a class="mob-sub" onclick="megaGoTool('sip')"><span>💰</span><span>SIP Calculator</span></a>
-      <a class="mob-sub" onclick="megaGoTool('pos')"><span>📐</span><span>Position Sizing</span></a>
+      <a class="mob-sub" onclick="megaGoTool('returns')"><span>📈</span><span>CAGR / XIRR</span></a>
+      <a class="mob-sub" onclick="megaGoTool('currency')"><span>💱</span><span>Currency Converter</span></a>
+      <a class="mob-sub" onclick="megaGoTool('emi')"><span>🏦</span><span>EMI Calculator</span></a>
     </div>
   </div>
 
@@ -1375,9 +1419,9 @@
 <div class="page" id="page-tools">
   <div style="padding:100px 0 24px; text-align:center; border-bottom:1px solid var(--border); background:radial-gradient(ellipse 60% 40% at 50% 0%, rgba(201,168,76,0.05),transparent)">
     <div class="container">
-      <div class="section-tag">Free Financial Tools</div>
-      <h1 style="font-size:clamp(2rem,4vw,3rem); margin-bottom:8px">Smart <em>Calculators</em></h1>
-      <p style="color:var(--grey2); font-size:14px">Select a tool from the left panel</p>
+      <div class="section-tag">Free Online Calculators · India</div>
+      <h1 style="font-size:clamp(2rem,4vw,3rem); margin-bottom:8px">Free Stock Market &amp; Trading <em>Calculators</em></h1>
+      <p style="color:var(--grey2); font-size:14px; max-width:680px; margin:0 auto">Brokerage &amp; net P&amp;L, options profit &amp; strategy builder, stock average, SIP, CAGR &amp; XIRR, and live currency conversion — accurate, free, and built for Indian traders &amp; investors. Pick a tool from the left.</p>
     </div>
   </div>
 
@@ -1394,7 +1438,67 @@
         </div>
         <div class="snav-section-body open" id="secbody-tools">
           <div class="snav-divider"></div>
-          <div class="snav-item active" id="snav-emi" onclick="snavSelectTool('emi',this)">
+          <div class="snav-item active" id="snav-brokerage" onclick="snavSelectTool('brokerage',this)">
+            <span class="snav-item-label">Brokerage &amp; P&amp;L</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-brokerage','snav-brokerage')">+</div>
+          </div>
+          <div class="snav-sub" id="sub-brokerage">
+            <div class="snav-sub-inner">
+              <p>All-in brokerage, STT, GST, stamp duty and exchange charges with your net profit and breakeven.</p>
+              <span class="snav-sub-btn" onclick="snavSelectTool('brokerage',document.getElementById('snav-brokerage'))">Open Brokerage Calculator &#8594;</span>
+            </div>
+          </div>
+          <div class="snav-item" id="snav-options" onclick="snavSelectTool('options',this)">
+            <span class="snav-item-label">Options Profit Builder</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-options','snav-options')">+</div>
+          </div>
+          <div class="snav-sub" id="sub-options">
+            <div class="snav-sub-inner">
+              <p>Build any F&amp;O strategy leg by leg and see max profit, max loss, breakevens and the payoff chart.</p>
+              <span class="snav-sub-btn" onclick="snavSelectTool('options',document.getElementById('snav-options'))">Open Options Calculator &#8594;</span>
+            </div>
+          </div>
+          <div class="snav-item" id="snav-average" onclick="snavSelectTool('average',this)">
+            <span class="snav-item-label">Stock Average</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-average','snav-average')">+</div>
+          </div>
+          <div class="snav-sub" id="sub-average">
+            <div class="snav-sub-inner">
+              <p>Average down across multiple buys to get your true average cost price and total holding.</p>
+              <span class="snav-sub-btn" onclick="snavSelectTool('average',document.getElementById('snav-average'))">Open Average Calculator &#8594;</span>
+            </div>
+          </div>
+          <div class="snav-item" id="snav-sip" onclick="snavSelectTool('sip',this)">
+            <span class="snav-item-label">SIP Calculator</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-sip','snav-sip')">+</div>
+          </div>
+          <div class="snav-sub" id="sub-sip">
+            <div class="snav-sub-inner">
+              <p>Project the future value of a monthly SIP at any expected return rate &mdash; invested amount and gains broken out.</p>
+              <span class="snav-sub-btn" onclick="snavSelectTool('sip',document.getElementById('snav-sip'))">Open SIP Calculator &#8594;</span>
+            </div>
+          </div>
+          <div class="snav-item" id="snav-returns" onclick="snavSelectTool('returns',this)">
+            <span class="snav-item-label">CAGR / XIRR / Lumpsum</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-returns','snav-returns')">+</div>
+          </div>
+          <div class="snav-sub" id="sub-returns">
+            <div class="snav-sub-inner">
+              <p>Measure returns the right way — CAGR, date-accurate XIRR, and SIP-vs-lumpsum side by side.</p>
+              <span class="snav-sub-btn" onclick="snavSelectTool('returns',document.getElementById('snav-returns'))">Open Returns Calculator &#8594;</span>
+            </div>
+          </div>
+          <div class="snav-item" id="snav-currency" onclick="snavSelectTool('currency',this)">
+            <span class="snav-item-label">Currency Converter</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-currency','snav-currency')">+</div>
+          </div>
+          <div class="snav-sub" id="sub-currency">
+            <div class="snav-sub-inner">
+              <p>Convert USD, EUR, GBP and more to INR at the live mid-market rate.</p>
+              <span class="snav-sub-btn" onclick="snavSelectTool('currency',document.getElementById('snav-currency'))">Open Currency Converter &#8594;</span>
+            </div>
+          </div>
+          <div class="snav-item" id="snav-emi" onclick="snavSelectTool('emi',this)">
             <span class="snav-item-label">EMI Calculator</span>
             <div class="snav-plus" onclick="snavToggle(event,'sub-emi','snav-emi')">+</div>
           </div>
@@ -1404,26 +1508,6 @@
               <span class="snav-sub-btn" onclick="snavSelectTool('emi',document.getElementById('snav-emi'))">Open EMI Calculator &#8594;</span>
             </div>
           </div>
-          <div class="snav-item" id="snav-pos" onclick="snavSelectTool('pos',this)">
-            <span class="snav-item-label">Position Sizing</span>
-            <div class="snav-plus" onclick="snavToggle(event,'sub-pos','snav-pos')">+</div>
-          </div>
-          <div class="snav-sub" id="sub-pos">
-            <div class="snav-sub-inner">
-              <p>Find the exact number of shares to buy so your loss never exceeds a set % of capital.</p>
-              <span class="snav-sub-btn" onclick="snavSelectTool('pos',document.getElementById('snav-pos'))">Open Position Sizer &#8594;</span>
-            </div>
-          </div>
-          <div class="snav-item" id="snav-sip" onclick="snavSelectTool('sip',this)">
-            <span class="snav-item-label">SIP Calculator</span>
-            <div class="snav-plus" onclick="snavToggle(event,'sub-sip','snav-sip')">+</div>
-          </div>
-          <div class="snav-sub" id="sub-sip">
-            <div class="snav-sub-inner">
-              <p>Project the future value of a monthly SIP at any expected return rate &mdash; with invested amount and gains broken out.</p>
-              <span class="snav-sub-btn" onclick="snavSelectTool('sip',document.getElementById('snav-sip'))">Open SIP Calculator &#8594;</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -1431,13 +1515,98 @@
     <!-- CONTENT AREA -->
     <div class="snav-content">
 
+      <!-- BROKERAGE & NET P&L TOOL -->
+      <div id="toolContent-brokerage">
+        <div class="snav-content-header">
+          <div>
+            <div class="snav-breadcrumb">TOOLS &nbsp;/&nbsp; <span style="color:var(--gold)">BROKERAGE CALCULATOR</span></div>
+            <h2>&#x1F9FE; Brokerage &amp; Net P&amp;L Calculator</h2>
+            <p>Work out the exact brokerage, STT/CTT, GST, SEBI fees, stamp duty and exchange transaction charges on any equity intraday, delivery or F&amp;O trade &mdash; then see your real net profit and the breakeven move after all costs. Built on India&rsquo;s post&#8209;October&#8209;2024 charge structure, the same way Zerodha, Groww and Angel One compute a contract note.</p>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px;">
+          <div class="form-group">
+            <label>Segment</label>
+            <select id="brkSegment" onchange="brokerageSegmentDefault()">
+              <option value="delivery">Equity Delivery</option>
+              <option value="intraday">Equity Intraday</option>
+              <option value="futures">F&amp;O Futures</option>
+              <option value="options">F&amp;O Options</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Buy Price (&#8377;)</label><input type="number" id="brkBuy" placeholder="e.g. 1000" value="1000"></div>
+          <div class="form-group"><label>Sell Price (&#8377;)</label><input type="number" id="brkSell" placeholder="e.g. 1020" value="1020"></div>
+          <div class="form-group"><label>Quantity (shares / units)</label><input type="number" id="brkQty" placeholder="e.g. 100" value="100"></div>
+          <div class="form-group"><label>Brokerage / order (&#8377;)</label><input type="number" id="brkPerOrder" step="0.01" placeholder="e.g. 20" value="0"></div>
+        </div>
+        <button class="calc-btn" style="max-width:280px; margin-top:8px" onclick="calcBrokerage()">Calculate Net P&amp;L &#8594;</button>
+        <div class="calc-result" id="brkResult" style="margin-top:24px">
+          <div class="result-grid">
+            <div class="result-item"><div class="r-val" id="brkTurnover">-</div><div class="r-label">Turnover</div></div>
+            <div class="result-item"><div class="r-val" id="brkCharges">-</div><div class="r-label">Total Charges</div></div>
+            <div class="result-item"><div class="r-val" id="brkGross">-</div><div class="r-label">Gross P&amp;L</div></div>
+            <div class="result-item"><div class="r-val" id="brkNet">-</div><div class="r-label">Net P&amp;L</div></div>
+          </div>
+          <div id="brkBreakdown" style="margin-top:16px; padding:14px; border-radius:8px; background:rgba(255,255,255,0.03); border:1px solid var(--border); font-size:12.5px"></div>
+        </div>
+      </div>
+
+      <!-- OPTIONS PAYOFF + STRATEGY BUILDER -->
+      <div id="toolContent-options" style="display:none">
+        <div class="snav-content-header">
+          <div>
+            <div class="snav-breadcrumb">TOOLS &nbsp;/&nbsp; <span style="color:var(--gold)">OPTIONS STRATEGY BUILDER</span></div>
+            <h2>&#x2696;&#xFE0F; Options Profit Calculator &amp; Strategy Builder</h2>
+            <p>Build any F&amp;O options strategy &mdash; covered call, bull call spread, straddle, strangle, iron condor &mdash; leg by leg, and instantly see net premium, maximum profit, maximum loss, breakeven points and the full expiry payoff chart. Works for NIFTY, BANK NIFTY and stock options with any lot size.</p>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin-bottom:14px">
+          <div class="form-group"><label>Lot size (units / lot)</label><input type="number" id="optLotSize" placeholder="e.g. 75" value="75"></div>
+          <div class="form-group"><label>Spot at expiry (optional)</label><input type="number" id="optSpot" placeholder="e.g. 24200"></div>
+        </div>
+        <div id="optLegs"></div>
+        <button type="button" class="calc-btn" style="max-width:160px; background:transparent; border:1px solid var(--border); color:var(--gold); margin:0 0 14px" onclick="addOptLeg()">+ Add leg</button>
+        <button class="calc-btn" style="max-width:280px; margin-top:0" onclick="calcOptions()">Calculate Payoff &#8594;</button>
+        <div class="calc-result" id="optResult" style="margin-top:24px">
+          <div class="result-grid">
+            <div class="result-item"><div class="r-val" id="optNetPrem">-</div><div class="r-label">Net Premium</div></div>
+            <div class="result-item"><div class="r-val" id="optMaxP">-</div><div class="r-label">Max Profit</div></div>
+            <div class="result-item"><div class="r-val" id="optMaxL">-</div><div class="r-label">Max Loss</div></div>
+            <div class="result-item"><div class="r-val" id="optBE">-</div><div class="r-label">Breakeven(s)</div></div>
+          </div>
+          <div id="optSpotResult" style="margin-top:14px; padding:12px; border-radius:8px; background:rgba(201,168,76,0.05); border:1px solid var(--border2); font-size:13px; display:none"></div>
+          <div id="optChart" style="margin-top:16px"></div>
+        </div>
+      </div>
+
+      <!-- STOCK AVERAGE TOOL -->
+      <div id="toolContent-average" style="display:none">
+        <div class="snav-content-header">
+          <div>
+            <div class="snav-breadcrumb">TOOLS &nbsp;/&nbsp; <span style="color:var(--gold)">STOCK AVERAGE CALCULATOR</span></div>
+            <h2>&#x1F4CA; Stock Average Calculator</h2>
+            <p>Bought the same share at different prices? Add every buy below to get your true average cost price, total quantity and total invested amount. The share average calculator helps you decide where to average down and what price you need to break even.</p>
+          </div>
+        </div>
+        <div id="avgRows" style="margin-bottom:6px"></div>
+        <button type="button" class="calc-btn" style="max-width:170px; background:transparent; border:1px solid var(--border); color:var(--gold); margin:0 0 14px" onclick="addAvgRow()">+ Add another buy</button>
+        <button class="calc-btn" style="max-width:280px; margin-top:0" onclick="calcAverage()">Calculate Average &#8594;</button>
+        <div class="calc-result" id="avgResult" style="margin-top:24px">
+          <div class="result-grid">
+            <div class="result-item"><div class="r-val" id="avgPrice">-</div><div class="r-label">Average Price</div></div>
+            <div class="result-item"><div class="r-val" id="avgQty">-</div><div class="r-label">Total Quantity</div></div>
+            <div class="result-item"><div class="r-val" id="avgInvest">-</div><div class="r-label">Total Invested</div></div>
+          </div>
+        </div>
+      </div>
+
       <!-- EMI TOOL -->
-      <div id="toolContent-emi">
+      <div id="toolContent-emi" style="display:none">
         <div class="snav-content-header">
           <div>
             <div class="snav-breadcrumb">TOOLS &nbsp;/&nbsp; <span style="color:var(--gold)">EMI CALCULATOR</span></div>
             <h2>&#x1F3E6; EMI Calculator</h2>
-            <p>Calculate monthly instalment, total interest &amp; principal breakdown for any loan.</p>
+            <p>Calculate the monthly instalment, total interest payable and principal breakdown for any home, car, personal, education or business loan.</p>
           </div>
         </div>
         <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px;">
@@ -1489,49 +1658,6 @@
         </div>
       </div>
 
-      <!-- POSITION SIZING TOOL -->
-      <div id="toolContent-pos" style="display:none">
-        <div class="snav-content-header">
-          <div>
-            <div class="snav-breadcrumb">TOOLS &nbsp;/&nbsp; <span style="color:var(--gold)">POSITION SIZING</span></div>
-            <h2>&#x1F4D0; Position Sizing Calculator</h2>
-            <p>Find the exact share quantity to keep your trade risk within a safe % of capital.</p>
-          </div>
-        </div>
-        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px;">
-          <div class="form-group">
-            <label>Total Capital (&#8377;)</label>
-            <input type="number" id="capital" placeholder="e.g. 500000" value="500000">
-          </div>
-          <div class="form-group">
-            <label>Risk Per Trade (%)</label>
-            <input type="number" id="riskPct" step="0.1" placeholder="e.g. 1" value="1">
-          </div>
-          <div class="form-group">
-            <label>Entry Price (&#8377;)</label>
-            <input type="number" id="entryPrice" placeholder="e.g. 2500" value="2500">
-          </div>
-          <div class="form-group">
-            <label>Stop Loss Price (&#8377;)</label>
-            <input type="number" id="slPrice" placeholder="e.g. 2450" value="2450">
-          </div>
-          <div class="form-group">
-            <label>Target Price (&#8377;) <span style="color:var(--grey);font-weight:400">&#8212; optional</span></label>
-            <input type="number" id="targetPrice" placeholder="e.g. 2650">
-          </div>
-        </div>
-        <button class="calc-btn" style="max-width:280px; margin-top:8px" onclick="calcPosition()">Calculate Position &#8594;</button>
-        <div class="calc-result" id="posResult" style="margin-top:24px">
-          <div class="result-grid">
-            <div class="result-item"><div class="r-val" id="posQty">-</div><div class="r-label">Shares to Buy</div></div>
-            <div class="result-item"><div class="r-val" id="posInvest">-</div><div class="r-label">Capital Invested</div></div>
-            <div class="result-item"><div class="r-val" id="posRisk">-</div><div class="r-label">Max Risk (&#8377;)</div></div>
-            <div class="result-item"><div class="r-val" id="posRR">-</div><div class="r-label">Risk:Reward</div></div>
-          </div>
-          <div id="posAdvice" style="margin-top:16px; padding:12px; border-radius:8px; font-size:12.5px; line-height:1.6; display:none;"></div>
-        </div>
-      </div>
-
       <!-- SIP CALCULATOR -->
       <div id="toolContent-sip" style="display:none">
         <div class="snav-content-header">
@@ -1564,6 +1690,111 @@
             <div class="result-item"><div class="r-val" id="sipMultiplier">-</div><div class="r-label">Wealth Multiplier</div></div>
           </div>
           <div id="sipBreakdown" style="margin-top:16px; padding:14px; border-radius:8px; background:rgba(201,168,76,0.05); border:1px solid var(--border2); font-size:12.5px; line-height:1.6; color:var(--grey2); display:none;"></div>
+        </div>
+      </div>
+
+      <!-- RETURNS: CAGR / XIRR / SIP vs LUMPSUM -->
+      <div id="toolContent-returns" style="display:none">
+        <div class="snav-content-header">
+          <div>
+            <div class="snav-breadcrumb">TOOLS &nbsp;/&nbsp; <span style="color:var(--gold)">RETURNS CALCULATOR</span></div>
+            <h2>&#x1F4C8; CAGR, XIRR &amp; SIP vs Lumpsum Calculator</h2>
+            <p>Measure investment returns the right way. Use CAGR for a single buy-and-hold, date-accurate XIRR when money goes in and out at different times (SIPs, top-ups, partial redemptions), and the SIP&#8209;vs&#8209;lumpsum comparison to see which approach builds more wealth at your expected return.</p>
+          </div>
+        </div>
+        <div id="ret-tabs" class="tabs" style="margin-bottom:18px">
+          <button class="tab active" onclick="returnsTab('cagr',this)">CAGR</button>
+          <button class="tab" onclick="returnsTab('xirr',this)">XIRR</button>
+          <button class="tab" onclick="returnsTab('lump',this)">SIP vs Lumpsum</button>
+        </div>
+
+        <!-- CAGR -->
+        <div id="ret-cagr">
+          <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px;">
+            <div class="form-group"><label>Initial Investment (&#8377;)</label><input type="number" id="cagrInit" placeholder="e.g. 100000" value="100000"></div>
+            <div class="form-group"><label>Final Value (&#8377;)</label><input type="number" id="cagrFinal" placeholder="e.g. 250000" value="250000"></div>
+            <div class="form-group"><label>Duration (Years)</label><input type="number" id="cagrYears" step="0.1" placeholder="e.g. 5" value="5"></div>
+          </div>
+          <button class="calc-btn" style="max-width:280px; margin-top:8px" onclick="calcCAGR()">Calculate CAGR &#8594;</button>
+          <div class="calc-result" id="cagrResult" style="margin-top:24px">
+            <div class="result-grid">
+              <div class="result-item"><div class="r-val" id="cagrVal">-</div><div class="r-label">CAGR</div></div>
+              <div class="result-item"><div class="r-val" id="cagrAbs">-</div><div class="r-label">Absolute Return</div></div>
+              <div class="result-item"><div class="r-val" id="cagrMult">-</div><div class="r-label">Multiple</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- XIRR -->
+        <div id="ret-xirr" style="display:none">
+          <p style="color:var(--grey2); font-size:13px; margin:0 0 12px">Enter each cashflow with its date. Money invested is <strong>negative</strong>; redemptions or the current value is <strong>positive</strong>.</p>
+          <div id="xirrRows"></div>
+          <button type="button" class="calc-btn" style="max-width:170px; background:transparent; border:1px solid var(--border); color:var(--gold); margin:0 0 14px" onclick="addXirrRow()">+ Add cashflow</button>
+          <button class="calc-btn" style="max-width:280px; margin-top:0" onclick="calcXIRR()">Calculate XIRR &#8594;</button>
+          <div id="xirrOut" style="display:none; margin-top:14px; font-size:13px"></div>
+          <div class="calc-result" id="xirrResult" style="margin-top:24px">
+            <div class="result-grid">
+              <div class="result-item"><div class="r-val" id="xirrVal">-</div><div class="r-label">XIRR (annualised)</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SIP vs LUMPSUM -->
+        <div id="ret-lump" style="display:none">
+          <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px;">
+            <div class="form-group"><label>Monthly SIP (&#8377;)</label><input type="number" id="lvMonthly" placeholder="e.g. 10000" value="10000"></div>
+            <div class="form-group"><label>Lumpsum (&#8377;)</label><input type="number" id="lvLump" placeholder="e.g. 1200000" value="1200000"></div>
+            <div class="form-group"><label>Expected Annual Return (%)</label><input type="number" id="lvReturn" step="0.1" placeholder="e.g. 12" value="12"></div>
+            <div class="form-group"><label>Period (Years)</label><input type="number" id="lvYears" placeholder="e.g. 10" value="10"></div>
+          </div>
+          <button class="calc-btn" style="max-width:280px; margin-top:8px" onclick="calcLumpVsSip()">Compare &#8594;</button>
+          <div class="calc-result" id="lvResult" style="margin-top:24px">
+            <div class="result-grid">
+              <div class="result-item"><div class="r-val" id="lvSipFv">-</div><div class="r-label" id="lvSipInv">SIP Maturity</div></div>
+              <div class="result-item"><div class="r-val" id="lvLumpFv">-</div><div class="r-label" id="lvLumpInv">Lumpsum Maturity</div></div>
+            </div>
+            <div id="lvVerdict" style="margin-top:16px; padding:14px; border-radius:8px; background:rgba(201,168,76,0.05); border:1px solid var(--border2); font-size:12.5px; line-height:1.6; color:var(--grey2); display:none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CURRENCY CONVERTER -->
+      <div id="toolContent-currency" style="display:none">
+        <div class="snav-content-header">
+          <div>
+            <div class="snav-breadcrumb">TOOLS &nbsp;/&nbsp; <span style="color:var(--gold)">CURRENCY CONVERTER</span></div>
+            <h2>&#x1F4B1; Currency Converter &mdash; USD to INR &amp; More</h2>
+            <p>Convert US Dollar, Euro, Pound, Dirham, Yen and other major currencies to Indian Rupee (and back) at the live mid&#8209;market exchange rate, refreshed from Yahoo Finance. Handy for tracking ADRs, foreign remittances and import/export pricing.</p>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; align-items:end">
+          <div class="form-group"><label>Amount</label><input type="number" id="fxAmount" placeholder="e.g. 100" value="100"></div>
+          <div class="form-group"><label>From</label>
+            <select id="fxFrom">
+              <option value="USD" selected>USD &mdash; US Dollar</option><option value="EUR">EUR &mdash; Euro</option>
+              <option value="GBP">GBP &mdash; British Pound</option><option value="INR">INR &mdash; Indian Rupee</option>
+              <option value="AED">AED &mdash; UAE Dirham</option><option value="JPY">JPY &mdash; Japanese Yen</option>
+              <option value="AUD">AUD &mdash; Australian Dollar</option><option value="CAD">CAD &mdash; Canadian Dollar</option>
+              <option value="SGD">SGD &mdash; Singapore Dollar</option><option value="CHF">CHF &mdash; Swiss Franc</option>
+              <option value="CNY">CNY &mdash; Chinese Yuan</option>
+            </select>
+          </div>
+          <div class="form-group"><label>To</label>
+            <select id="fxTo">
+              <option value="INR" selected>INR &mdash; Indian Rupee</option><option value="USD">USD &mdash; US Dollar</option>
+              <option value="EUR">EUR &mdash; Euro</option><option value="GBP">GBP &mdash; British Pound</option>
+              <option value="AED">AED &mdash; UAE Dirham</option><option value="JPY">JPY &mdash; Japanese Yen</option>
+              <option value="AUD">AUD &mdash; Australian Dollar</option><option value="CAD">CAD &mdash; Canadian Dollar</option>
+              <option value="SGD">SGD &mdash; Singapore Dollar</option><option value="CHF">CHF &mdash; Swiss Franc</option>
+              <option value="CNY">CNY &mdash; Chinese Yuan</option>
+            </select>
+          </div>
+        </div>
+        <button class="calc-btn" style="max-width:280px; margin-top:8px" onclick="convertCurrency()">Convert &#8594;</button>
+        <div class="calc-result" id="fxResult" style="margin-top:24px">
+          <div class="result-grid">
+            <div class="result-item" style="grid-column:1/-1"><div class="r-val" id="fxConverted">-</div><div class="r-label" id="fxRate">Enter an amount and convert</div></div>
+          </div>
         </div>
       </div>
 
@@ -2006,9 +2237,11 @@
         <h5>Learn & Tools</h5>
         <ul>
           <li><a onclick="showPage('blog')">Blogs</a></li>
-          <li><a onclick="showPage('tools');setTool('emi')">EMI Calculator</a></li>
-          <li><a onclick="showPage('tools');setTool('sip')">SIP Calculator</a></li>
-          <li><a onclick="showPage('tools');setTool('position')">Position Sizing</a></li>
+          <li><a onclick="showPage('tools');setTool('brokerage')">Brokerage Calculator</a></li>
+          <li><a onclick="showPage('tools');setTool('options')">Options Strategy Builder</a></li>
+          <li><a onclick="showPage('tools');setTool('average')">Stock Average Calculator</a></li>
+          <li><a onclick="showPage('tools');setTool('returns')">CAGR / XIRR Calculator</a></li>
+          <li><a onclick="showPage('tools');setTool('currency')">Currency Converter</a></li>
           <li><a onclick="showPage('about')">About Us</a></li>
         </ul>
       </div>
@@ -2046,13 +2279,25 @@
 
 
 <!-- ====== JAVASCRIPT ======
-     data.js holds all the casual-edit content (prices, courses,
-     reports, ticker symbols). script.js holds the application logic.
-     Order matters — data must load first.
-     Bump the ?v= number whenever you change either file to bust
-     long-cached copies on visitors' phones. -->
-<script src="js/data.js?v=45"></script>
-<script src="js/script.js?v=74"></script>
+     data.js holds all the casual-edit content (prices, courses, reports,
+     ticker symbols). The application logic is split into cohesive layers
+     under js/app/ — each loaded in dependency order below:
+       core      — HTML escaping, router/history, nav, carousel, lead form
+       market    — live ticker, FII/DII, indices, movers, history widgets
+       content   — reports, courses, blog list + article rendering
+       trade     — live calls + performance track-record rendering
+       ipo-tools — IPO table + lookups, premium plans, calculators, contact
+     Order matters: data.js first, then core, then the feature layers. The
+     boot block (DOMContentLoaded) lives in market.js but only runs after all
+     files have parsed, so every feature function is defined by then.
+     Bump the ?v= number on any file you change to bust long-cached copies. -->
+<script src="js/data.js?v=46"></script>
+<script src="js/app/core.js?v=76"></script>
+<script src="js/app/market.js?v=76"></script>
+<script src="js/app/content.js?v=76"></script>
+<script src="js/app/trade.js?v=76"></script>
+<script src="js/app/ipo-tools.js?v=76"></script>
+<script src="js/app/tools.js?v=76"></script>
 
 
 <section style="padding:40px 20px; max-width:900px; margin:auto; line-height:1.7;">

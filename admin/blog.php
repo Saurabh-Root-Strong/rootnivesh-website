@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['action'] ?? ''), 
         }
     } catch (Throwable $e) {
         error_log('admin blog save failed: ' . $e->getMessage());
-        $flash = 'Could not save the post: ' . htmlspecialchars($e->getMessage());
+        $flash = 'Could not save the post: ' . $e->getMessage();
     }
 }
 
@@ -162,7 +162,7 @@ $catLabels = ['education' => 'Education', 'strategy' => 'Strategy', 'markets' =>
   <main class="admin-main">
 
     <?php if ($flash): ?>
-      <div class="admin-flash"><?php echo $flash; ?></div>
+      <div class="admin-flash"><?php echo htmlspecialchars($flash); ?></div>
     <?php endif; ?>
 
     <!-- ===== WRITE / EDIT A POST ===== -->
