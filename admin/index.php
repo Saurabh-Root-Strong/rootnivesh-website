@@ -481,7 +481,7 @@ function build_wa_message($c) {
           <a href="?range=week"  class="admin-chip<?php echo $range==='week' ?' active':''; ?>">This Week</a>
           <button type="button" id="customChip" class="admin-chip<?php echo $range==='custom'?' active':''; ?>" onclick="var b=document.getElementById('customRange');b.hidden=!b.hidden;this.classList.toggle('active',!b.hidden)">Custom Date</button>
         </div>
-        <div id="customRange" class="admin-datefilter-custom" <?php echo $range==='custom'?'':'hidden'; ?>>
+        <div id="customRange" class="admin-datefilter-custom" hidden>
           <input type="hidden" name="range" value="custom">
           <label>From <input type="date" name="from" value="<?php echo htmlspecialchars($dFrom ?: $today); ?>"></label>
           <label>To <input type="date" name="to" value="<?php echo htmlspecialchars($dTo ?: $today); ?>"></label>
