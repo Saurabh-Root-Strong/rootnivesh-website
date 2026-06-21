@@ -189,35 +189,77 @@ function _legPnL(leg, S, lotSize) {
   const per = leg.side === 'buy' ? (intrinsic - leg.premium) : (leg.premium - intrinsic);
   return per * lotSize;
 }
-function calcOptions() {
-  const legs = _optLegs();
-  const lotSize = toolNum('optLotSize') || 1;
-  if (!legs.length) return;
-
-  const strikes = legs.map(l => l.strike);
-  const lo = Math.min(...strikes) * 0.85;
-  const hi = Math.max(...strikes) * 1.15;
-  const steps = 240;
-  const pts = [];
-  for (let i = 0; i <= steps; i++) {
-    const S = lo + (hi - lo) * i / steps;
-    let pnl = 0;
-    legs.forEach(l => { pnl += _legPnL(l, S, lotSize); });
-    pts.push({ S, pnl });
+/* ---- Futures instrument mode ---- */
+let optMode = 'options';
+function optInstrument(mode, btn) {
+  optMode = mode === 'futures' ? 'futures' : 'options';
+  const ow = document.getElementById('optOptWrap');
+  const fw = document.getElementById('optFutWrap');
+  if (ow) ow.style.display = optMode === 'options' ? 'block' : 'none';
+  if (fw) fw.style.display = optMode === 'futures' ? 'block' : 'none';
+  document.querySelectorAll('#opt-instrument .tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (optMode === 'futures' && !document.querySelector('#futLegs .fut-leg')) addFutLeg('buy', 24000, 1);
+  const r = document.getElementById('optResult'); if (r) r.classList.remove('show'); // clear stale result
+}
+function addFutLeg(side, entry, lots) {
+  const wrap = document.getElementById('futLegs');
+  const div = document.createElement('div');
+  div.className = 'fut-leg';
+  div.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr) auto;gap:8px;margin-bottom:8px;align-items:end';
+  div.innerHTML =
+    `<div class="form-group" style="margin:0"><label>Action</label><select class="fut-side"><option value="buy"${side==='sell'?'':' selected'}>Buy (Long)</option><option value="sell"${side==='sell'?' selected':''}>Sell (Short)</option></select></div>` +
+    `<div class="form-group" style="margin:0"><label>Entry Price</label><input type="number" class="fut-entry" placeholder="e.g. 24000" value="${entry != null ? entry : ''}"></div>` +
+    `<div class="form-group" style="margin:0"><label>Lots</label><input type="number" class="fut-lots" placeholder="e.g. 1" value="${lots != null ? lots : 1}"></div>` +
+    `<button type="button" class="calc-btn" style="background:transparent;border:1px solid var(--border);color:var(--grey);max-width:46px;padding:10px" onclick="this.parentElement.remove()" title="Remove position">✕</button>`;
+  wrap.appendChild(div);
+}
+function _futLegs() {
+  const sides   = document.querySelectorAll('#futLegs .fut-side');
+  const entries = document.querySelectorAll('#futLegs .fut-entry');
+  const lotsEls = document.querySelectorAll('#futLegs .fut-lots');
+  const legs = [];
+  for (let i = 0; i < entries.length; i++) {
+    const e = parseFloat(entries[i].value), l = parseFloat(lotsEls[i].value) || 1;
+    if (e > 0) legs.push({ side: sides[i].value, entry: e, lots: l });
   }
-  // Net premium (debit negative, credit positive), per full position.
-  let netPrem = 0;
-  legs.forEach(l => { netPrem += (l.side === 'buy' ? -l.premium : l.premium) * lotSize; });
+  return legs;
+}
+
+function calcOptions() {
+  const lotSize = toolNum('optLotSize') || 1;
+  let lo, hi, payoffFn, netLabel, netVal;
+
+  if (optMode === 'futures') {
+    const legs = _futLegs();
+    if (!legs.length) return;
+    const es = legs.map(l => l.entry);
+    lo = Math.min(...es) * 0.85; hi = Math.max(...es) * 1.15;
+    payoffFn = S => legs.reduce((s, l) => s + (l.side === 'buy' ? (S - l.entry) : (l.entry - S)) * lotSize * l.lots, 0);
+    const netLots = legs.reduce((s, l) => s + (l.side === 'buy' ? l.lots : -l.lots), 0);
+    netLabel = 'Net Position';
+    netVal = netLots === 0 ? 'Hedged (0)' : (netLots > 0 ? 'Long ' : 'Short ') + Math.abs(netLots) + ' lot' + (Math.abs(netLots) > 1 ? 's' : '');
+  } else {
+    const legs = _optLegs();
+    if (!legs.length) return;
+    const ks = legs.map(l => l.strike);
+    lo = Math.min(...ks) * 0.85; hi = Math.max(...ks) * 1.15;
+    payoffFn = S => legs.reduce((s, l) => s + _legPnL(l, S, lotSize), 0);
+    const netPrem = legs.reduce((s, l) => s + (l.side === 'buy' ? -l.premium : l.premium) * lotSize, 0);
+    netLabel = 'Net Premium';
+    netVal = (netPrem >= 0 ? 'Credit ' : 'Debit ') + inr(Math.abs(netPrem));
+  }
+
+  const steps = 240, pts = [];
+  for (let i = 0; i <= steps; i++) { const S = lo + (hi - lo) * i / steps; pts.push({ S, pnl: payoffFn(S) }); }
 
   const pnls = pts.map(p => p.pnl);
-  let maxP = Math.max(...pnls), minP = Math.min(...pnls);
-  // Boundary slope → unlimited detection.
+  const maxP = Math.max(...pnls), minP = Math.min(...pnls);
   const rising  = pnls[pnls.length - 1] > pnls[pnls.length - 2] + 1e-6;
-  const falling = pnls[0] > pnls[1] + 1e-6; // payoff high at far-left edge (keeps rising as S→0)
+  const falling = pnls[0] > pnls[1] + 1e-6;
   const maxLabel = rising  ? 'Unlimited' : inr(maxP);
   const minLabel = falling ? 'Unlimited loss' : inr(minP);
 
-  // Breakevens — zero crossings (interpolated).
   const bes = [];
   for (let i = 1; i < pts.length; i++) {
     const a = pts[i - 1], b = pts[i];
@@ -227,17 +269,18 @@ function calcOptions() {
     }
   }
 
-  document.getElementById('optNetPrem').textContent = (netPrem >= 0 ? 'Credit ' : 'Debit ') + inr(Math.abs(netPrem));
+  const lbl = document.getElementById('optNetPremLabel'); if (lbl) lbl.textContent = netLabel;
+  document.getElementById('optNetPrem').textContent = netVal;
   document.getElementById('optMaxP').textContent = maxLabel;
   document.getElementById('optMaxL').textContent = minLabel;
   document.getElementById('optBE').textContent = bes.length ? bes.map(b => Math.round(b)).join(', ') : '—';
 
-  // Payoff at a chosen spot.
   const tSpot = toolNum('optSpot');
   const spotBox = document.getElementById('optSpotResult');
   if (isFinite(tSpot) && tSpot > 0) {
-    let pnl = 0; legs.forEach(l => { pnl += _legPnL(l, tSpot, lotSize); });
-    spotBox.innerHTML = `At expiry spot <strong style="color:var(--white)">${Math.round(tSpot)}</strong>, this strategy ${pnl >= 0 ? 'makes' : 'loses'} <strong style="color:${pnl >= 0 ? 'var(--green)' : '#ff6b6b'}">${inr(Math.abs(pnl))}</strong>.`;
+    const pnl = payoffFn(tSpot);
+    const what = optMode === 'futures' ? 'position' : 'strategy';
+    spotBox.innerHTML = `At spot <strong style="color:var(--white)">${Math.round(tSpot)}</strong>, this ${what} ${pnl >= 0 ? 'makes' : 'loses'} <strong style="color:${pnl >= 0 ? 'var(--green)' : '#ff6b6b'}">${inr(Math.abs(pnl))}</strong>.`;
     spotBox.style.display = 'block';
   } else { spotBox.style.display = 'none'; }
 

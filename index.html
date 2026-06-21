@@ -1560,16 +1560,26 @@
             <p>Build any F&amp;O options strategy &mdash; covered call, bull call spread, straddle, strangle, iron condor &mdash; leg by leg, and instantly see net premium, maximum profit, maximum loss, breakeven points and the full expiry payoff chart. Works for NIFTY, BANK NIFTY and stock options with any lot size.</p>
           </div>
         </div>
+        <div class="tabs" id="opt-instrument" style="margin-bottom:16px">
+          <button class="tab active" onclick="optInstrument('options',this)">Options</button>
+          <button class="tab" onclick="optInstrument('futures',this)">Futures</button>
+        </div>
         <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin-bottom:14px">
           <div class="form-group"><label>Lot size (units / lot)</label><input type="number" id="optLotSize" placeholder="e.g. 75" value="75"></div>
           <div class="form-group"><label>Spot at expiry (optional)</label><input type="number" id="optSpot" placeholder="e.g. 24200"></div>
         </div>
-        <div id="optLegs"></div>
-        <button type="button" class="calc-btn" style="max-width:160px; background:transparent; border:1px solid var(--border); color:var(--gold); margin:0 0 14px" onclick="addOptLeg()">+ Add leg</button>
+        <div id="optOptWrap">
+          <div id="optLegs"></div>
+          <button type="button" class="calc-btn" style="max-width:160px; background:transparent; border:1px solid var(--border); color:var(--gold); margin:0 0 14px" onclick="addOptLeg()">+ Add leg</button>
+        </div>
+        <div id="optFutWrap" style="display:none">
+          <div id="futLegs"></div>
+          <button type="button" class="calc-btn" style="max-width:180px; background:transparent; border:1px solid var(--border); color:var(--gold); margin:0 0 14px" onclick="addFutLeg()">+ Add position</button>
+        </div>
         <button class="calc-btn" style="max-width:280px; margin-top:0" onclick="calcOptions()">Calculate Payoff &#8594;</button>
         <div class="calc-result" id="optResult" style="margin-top:24px">
           <div class="result-grid">
-            <div class="result-item"><div class="r-val" id="optNetPrem">-</div><div class="r-label">Net Premium</div></div>
+            <div class="result-item"><div class="r-val" id="optNetPrem">-</div><div class="r-label" id="optNetPremLabel">Net Premium</div></div>
             <div class="result-item"><div class="r-val" id="optMaxP">-</div><div class="r-label">Max Profit</div></div>
             <div class="result-item"><div class="r-val" id="optMaxL">-</div><div class="r-label">Max Loss</div></div>
             <div class="result-item"><div class="r-val" id="optBE">-</div><div class="r-label">Breakeven(s)</div></div>
@@ -2297,7 +2307,7 @@
 <script src="js/app/content.js?v=76"></script>
 <script src="js/app/trade.js?v=76"></script>
 <script src="js/app/ipo-tools.js?v=76"></script>
-<script src="js/app/tools.js?v=76"></script>
+<script src="js/app/tools.js?v=77"></script>
 
 
 <section style="padding:40px 20px; max-width:900px; margin:auto; line-height:1.7;">
