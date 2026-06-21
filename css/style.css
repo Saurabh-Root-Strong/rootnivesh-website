@@ -1167,6 +1167,9 @@
     min-height: calc(100vh - 120px);
     gap: 0;
   }
+  /* Tools page has no hero, so add the clearance the hero used to provide
+     below the fixed nav/ticker. */
+  #page-tools .page-split { padding-top: 96px; }
   .snav-wrap {
     background: #07131F;
     border-right: 1px solid var(--border);
@@ -1311,6 +1314,7 @@
 
   @media (max-width: 900px) {
     .page-split { grid-template-columns: 1fr; }
+    #page-tools .page-split { padding-top: 64px; }
     /* Mobile: turn the desktop sidebar into a horizontal-scroll pill strip.
        The "TOOLS" accordion header and the per-item "+" expanders are dead
        weight on phones (descriptions are hidden), so drop them and make the
