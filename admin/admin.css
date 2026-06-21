@@ -227,6 +227,14 @@
 }
 .admin-datefilter-custom .admin-btn { padding: 8px 16px; }
 
+/* Date inputs: use a normal pointer (some setups show a busy/loading-style
+   cursor over the native date field). */
+.admin-form input[type="date"],
+.admin-form input[type="datetime-local"],
+input[type="date"] { cursor: pointer; }
+.admin-form input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; }
+
 /* Delete button */
 .admin-btn-danger {
   background: rgba(248,81,73,0.12);

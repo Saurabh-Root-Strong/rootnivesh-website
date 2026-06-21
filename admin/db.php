@@ -1,5 +1,5 @@
-<?php
-/* admin/db.php — single PDO instance shared across admin/calls.php endpoints */
+﻿<?php
+/* admin/db.php â€” single PDO instance shared across admin/calls.php endpoints */
 
 if (!file_exists(__DIR__ . '/config.php')) {
     http_response_code(500);
@@ -31,3 +31,4 @@ function db() {
     }
     return $pdo;
 }
+

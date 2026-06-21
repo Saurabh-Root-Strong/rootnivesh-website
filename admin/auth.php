@@ -1,11 +1,11 @@
-<?php
-/* admin/auth.php — session-based admin auth helper.
+﻿<?php
+/* admin/auth.php â€” session-based admin auth helper.
    Include this at the top of every admin page that requires login.
    It auto-redirects unauthenticated users to login.php. */
 
 require_once __DIR__ . '/db.php';
 
-// Harden session cookie — HTTPS only, JS can't read, no cross-site leak.
+// Harden session cookie â€” HTTPS only, JS can't read, no cross-site leak.
 ini_set('session.cookie_httponly', '1');
 ini_set('session.cookie_samesite', 'Lax');
 if (!empty($_SERVER['HTTPS'])) ini_set('session.cookie_secure', '1');
@@ -73,7 +73,7 @@ function admin_is_owner() { return admin_role() === 'owner'; }
 
 function admin_require_owner() {
     admin_require_login();
-    if (!admin_is_owner()) { http_response_code(403); echo 'Forbidden — owner access only.'; exit; }
+    if (!admin_is_owner()) { http_response_code(403); echo 'Forbidden â€” owner access only.'; exit; }
 }
 
 function admin_login($username, $password) {
@@ -98,7 +98,7 @@ function admin_login($username, $password) {
         // to the config owner (avoids a deactivated user reusing the bootstrap).
         if ($u) return false;
     } catch (PDOException $e) {
-        // users table may not exist yet on a fresh install — fall through to bootstrap.
+        // users table may not exist yet on a fresh install â€” fall through to bootstrap.
     }
 
     // 2) Bootstrap owner from admin/config.php. Always available so the panel
@@ -120,3 +120,4 @@ function admin_logout() {
     }
     session_destroy();
 }
+
