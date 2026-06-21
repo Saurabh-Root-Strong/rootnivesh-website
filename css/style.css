@@ -1314,7 +1314,7 @@
 
   @media (max-width: 900px) {
     .page-split { grid-template-columns: 1fr; }
-    #page-tools .page-split { padding-top: 64px; }
+    #page-tools .page-split { padding-top: 72px; }
     /* Mobile: turn the desktop sidebar into a horizontal-scroll pill strip.
        The "TOOLS" accordion header and the per-item "+" expanders are dead
        weight on phones (descriptions are hidden), so drop them and make the
@@ -2299,7 +2299,9 @@
     .hero-headline { font-size: 1.65rem !important; }
     h2 { font-size: 1.45rem !important; }
     .hero-sub { font-size: 14px; }
-    .nav-logo-img { height: 64px; }
+    /* Logo must fit the 40px mobile nav — a 64px logo overflowed into the
+       fixed ticker and looked cluttered. Keep it inside the bar. */
+    .nav-logo-img { height: 30px; }
 
     /* Plan card pricing summary becomes a single column */
     .plan-pricing-meta { flex-wrap: wrap; gap: 4px 10px; }
