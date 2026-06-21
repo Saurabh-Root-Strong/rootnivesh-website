@@ -1330,11 +1330,11 @@
     .snav-section-body,
     .snav-section-body.open {
       max-height: none; overflow-x: auto; overflow-y: hidden;
-      display: flex; flex-wrap: nowrap; gap: 8px;
-      padding: 12px 14px; -webkit-overflow-scrolling: touch;
-      scroll-snap-type: x proximity;
+      display: flex; flex-wrap: nowrap; align-items: center; gap: 8px;
+      padding: 12px 14px 16px; -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x proximity; scrollbar-width: none;
     }
-    .snav-section-body::-webkit-scrollbar { display: none; }
+    .snav-section-body::-webkit-scrollbar { display: none; height: 0; }
     .snav-item {
       flex: 0 0 auto; white-space: nowrap; scroll-snap-align: start;
       justify-content: center; gap: 0;
@@ -2676,7 +2676,7 @@
   /* Phone-size tweaks for the horizontal pill strip (base layout is in the
      900px block above). Tighten pills + content header on small screens. */
   @media (max-width: 640px) {
-    .snav-section-body { padding: 10px 12px; gap: 7px; }
+    .snav-section-body { padding: 10px 12px 16px; gap: 7px; }
     .snav-item { padding: 8px 14px; }
     .snav-item-label { font-size: 12.5px; }
     .snav-content-header h2 { font-size: 1.3rem; }
