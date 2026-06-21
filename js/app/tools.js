@@ -34,27 +34,48 @@ function toolNum(id) { const el = document.getElementById(id); return el ? parse
    _donutChart(segments, centerMain, centerSub): segments = [{label,value,color,disp}]
    _barChart(bars): bars = [{label,value,color,disp}] ---- */
 const CHART_COLORS = ['#E5A50A', '#4aa3ff', '#2ecc71', '#a78bfa', '#2dd4bf', '#f59e0b', '#ff6b6b', '#8A9BB0'];
+let _dcSeq = 0;
+// Hover-highlight: dims the other segments, emphasises the matched slice and
+// tints its legend row. Wired from inline handlers on both the path and the
+// legend row so hovering either side highlights the pair.
+function _donutHL(cid, i, on) {
+  const root = document.getElementById(cid);
+  if (!root) return;
+  root.querySelectorAll('.dc-seg').forEach(el => {
+    const m = el.getAttribute('data-i') === String(i);
+    el.style.opacity = on ? (m ? '1' : '0.28') : '1';
+    el.style.transform = on && m ? 'scale(1.04)' : 'scale(1)';
+  });
+  root.querySelectorAll('.dc-leg').forEach(el => {
+    const m = el.getAttribute('data-i') === String(i);
+    el.style.background = on && m ? 'rgba(201,168,76,0.12)' : 'transparent';
+  });
+}
 function _donutChart(segments, centerMain, centerSub) {
   const segs = segments.filter(s => s.value > 0);
   const total = segs.reduce((s, x) => s + x.value, 0) || 1;
   const cx = 90, cy = 90, r = 72, rin = 46;
+  const cid = 'dc' + (_dcSeq++);
+  // Inline hover hooks shared by a segment and its legend row.
+  const hov = i => `onmouseenter="_donutHL('${cid}',${i},1)" onmouseleave="_donutHL('${cid}',${i},0)"`;
+  const segStyle = 'style="transform-origin:90px 90px;transition:opacity .15s ease,transform .15s ease;cursor:pointer"';
   let ang = -Math.PI / 2, paths = '';
   if (segs.length === 1) {
     // Single slice → full ring (a 360° arc path is degenerate).
-    paths = `<circle cx="${cx}" cy="${cy}" r="${(r + rin) / 2}" fill="none" stroke="${segs[0].color}" stroke-width="${r - rin}"/>`;
+    paths = `<circle class="dc-seg" data-i="0" ${hov(0)} ${segStyle} cx="${cx}" cy="${cy}" r="${(r + rin) / 2}" fill="none" stroke="${segs[0].color}" stroke-width="${r - rin}"/>`;
   } else {
-    segs.forEach(seg => {
+    segs.forEach((seg, i) => {
       const frac = seg.value / total, a2 = ang + frac * 2 * Math.PI, large = frac > 0.5 ? 1 : 0;
       const x1 = cx + r * Math.cos(ang), y1 = cy + r * Math.sin(ang);
       const x2 = cx + r * Math.cos(a2), y2 = cy + r * Math.sin(a2);
       const xi2 = cx + rin * Math.cos(a2), yi2 = cy + rin * Math.sin(a2);
       const xi1 = cx + rin * Math.cos(ang), yi1 = cy + rin * Math.sin(ang);
-      paths += `<path d="M${x1.toFixed(2)} ${y1.toFixed(2)} A${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} L${xi2.toFixed(2)} ${yi2.toFixed(2)} A${rin} ${rin} 0 ${large} 0 ${xi1.toFixed(2)} ${yi1.toFixed(2)} Z" fill="${seg.color}"/>`;
+      paths += `<path class="dc-seg" data-i="${i}" ${hov(i)} ${segStyle} d="M${x1.toFixed(2)} ${y1.toFixed(2)} A${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} L${xi2.toFixed(2)} ${yi2.toFixed(2)} A${rin} ${rin} 0 ${large} 0 ${xi1.toFixed(2)} ${yi1.toFixed(2)} Z" fill="${seg.color}"/>`;
       ang = a2;
     });
   }
-  const legend = segs.map(s => `<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;margin-bottom:7px"><span style="width:11px;height:11px;border-radius:3px;background:${s.color};display:inline-block;flex:none"></span><span style="color:var(--grey2)">${s.label}</span><span style="margin-left:auto;color:var(--white);font-weight:600">${s.disp != null ? s.disp : s.value}</span></div>`).join('');
-  return `<div style="display:flex;gap:22px;align-items:center;flex-wrap:wrap;justify-content:center">
+  const legend = segs.map((s, i) => `<div class="dc-leg" data-i="${i}" ${hov(i)} style="display:flex;align-items:center;gap:8px;font-size:12.5px;padding:4px 6px;margin:0 -6px;border-radius:7px;cursor:pointer;transition:background .15s ease"><span style="width:11px;height:11px;border-radius:3px;background:${s.color};display:inline-block;flex:none"></span><span style="color:var(--grey2)">${s.label}</span><span style="margin-left:auto;color:var(--white);font-weight:600">${s.disp != null ? s.disp : s.value}</span></div>`).join('');
+  return `<div id="${cid}" style="display:flex;gap:22px;align-items:center;flex-wrap:wrap;justify-content:center">
     <svg viewBox="0 0 180 180" width="172" height="172" style="flex:none">${paths}
       <text x="90" y="88" text-anchor="middle" fill="var(--white)" font-size="17" font-weight="700">${centerMain || ''}</text>
       <text x="90" y="106" text-anchor="middle" fill="var(--grey)" font-size="10">${centerSub || ''}</text>
