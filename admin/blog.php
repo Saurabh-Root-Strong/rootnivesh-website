@@ -89,25 +89,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['action'] ?? ''), 
         $readMin = ($_POST['read_minutes'] ?? '') !== ''
                  ? max(1, intval($_POST['read_minutes'])) : blog_read_minutes($body);
 
+        // Publish date — accepts a datetime-local ("Y-m-dTH:i") or a plain date.
+        // Blank = leave as-is on edit, or default to now on a new post.
+        $pubIn = trim($_POST['published_at'] ?? '');
+        $publishedAt = null;
+        if ($pubIn !== '') {
+            $ts = strtotime($pubIn);
+            if ($ts) $publishedAt = date('Y-m-d H:i:s', $ts);
+        }
+
         if ($id > 0) {
-            $pdo->prepare(
-                'UPDATE posts SET slug=:slug, title=:title, category=:category, excerpt=:excerpt,
-                        cover_image=:cover, body=:body, read_minutes=:rm, status=:status
-                 WHERE id=:id'
-            )->execute([
+            $sql = 'UPDATE posts SET slug=:slug, title=:title, category=:category, excerpt=:excerpt,
+                        cover_image=:cover, body=:body, read_minutes=:rm, status=:status';
+            $args = [
                 ':slug' => $slug, ':title' => $title, ':category' => $category,
                 ':excerpt' => $excerpt ?: null, ':cover' => $cover ?: null, ':body' => $body,
                 ':rm' => $readMin, ':status' => $status, ':id' => $id,
-            ]);
+            ];
+            if ($publishedAt !== null) { $sql .= ', published_at=:pub'; $args[':pub'] = $publishedAt; }
+            $sql .= ' WHERE id=:id';
+            $pdo->prepare($sql)->execute($args);
             $flash = 'Post updated (#' . $id . ').';
         } else {
             $pdo->prepare(
-                'INSERT INTO posts (slug, title, category, excerpt, cover_image, body, author, read_minutes, status)
-                 VALUES (:slug, :title, :category, :excerpt, :cover, :body, :author, :rm, :status)'
+                'INSERT INTO posts (slug, title, category, excerpt, cover_image, body, author, read_minutes, status, published_at)
+                 VALUES (:slug, :title, :category, :excerpt, :cover, :body, :author, :rm, :status, :pub)'
             )->execute([
                 ':slug' => $slug, ':title' => $title, ':category' => $category,
                 ':excerpt' => $excerpt ?: null, ':cover' => $cover ?: null, ':body' => $body,
                 ':author' => admin_display() ?: admin_user(), ':rm' => $readMin, ':status' => $status,
+                ':pub' => $publishedAt ?: date('Y-m-d H:i:s'),
             ]);
             $flash = 'Post published (#' . $pdo->lastInsertId() . ').';
         }
@@ -140,7 +151,7 @@ $catLabels = ['education' => 'Education', 'strategy' => 'Strategy', 'markets' =>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>RootNivesh Admin — Blog</title>
-<link rel="stylesheet" href="admin.css?v=2">
+<link rel="stylesheet" href="admin.css?v=3">
 </head>
 <body class="admin-body">
 <div class="admin-layout">
@@ -189,6 +200,10 @@ $catLabels = ['education' => 'Education', 'strategy' => 'Strategy', 'markets' =>
               <option value="published" <?php echo (!$editing || $editing['status'] === 'published') ? 'selected' : ''; ?>>Published (live)</option>
               <option value="draft" <?php echo ($editing && $editing['status'] === 'draft') ? 'selected' : ''; ?>>Draft (hidden)</option>
             </select>
+          </label>
+          <label>Publish date — blank = now
+            <input type="datetime-local" name="published_at"
+                   value="<?php echo ($editing && !empty($editing['published_at'])) ? date('Y-m-d\TH:i', strtotime($editing['published_at'])) : ''; ?>">
           </label>
         </div>
 

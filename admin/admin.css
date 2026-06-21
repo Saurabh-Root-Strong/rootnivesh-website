@@ -87,8 +87,11 @@
 .admin-form input[type="text"],
 .admin-form input[type="number"],
 .admin-form input[type="password"],
+.admin-form input[type="datetime-local"],
+.admin-form input[type="date"],
 .admin-form select,
 .admin-form textarea {
+  color-scheme: dark;
   background: rgba(5,16,31,0.7);
   border: 1px solid var(--border);
   border-radius: 8px;
