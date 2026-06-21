@@ -57,6 +57,8 @@ function showPage(id, fromPopState) {
 // Browser back / forward buttons
 window.addEventListener('popstate', function (e) {
   const path = window.location.pathname;
+  const art = path.match(/^\/blog\/(.+)$/);
+  if (art) { openArticle(encodeURIComponent(decodeURIComponent(art[1])), true); return; }
   const page = PATH_TO_PAGE[path] || 'home';
   showPage(page, true);
 });
@@ -64,6 +66,8 @@ window.addEventListener('popstate', function (e) {
 // Resolve the initial page from the URL once everything is parsed.
 function resolveInitialPage() {
   const path = window.location.pathname;
+  const art = path.match(/^\/blog\/(.+)$/);
+  if (art) { openArticle(encodeURIComponent(decodeURIComponent(art[1])), true); return; }
   const page = PATH_TO_PAGE[path];
   if (page && page !== 'home') showPage(page, true);
   else { if (PAGE_TITLES.home) document.title = PAGE_TITLES.home; updateRouteMeta('home'); }
@@ -165,6 +169,7 @@ function initPage(id) {
     if (lw) lw.style.display = 'none';
     loadPerformance('');
   }
+  if (id === 'blog') { showBlogListView(); loadBlogList(); }
   if (id === 'ipo') { fetchIpo(currentIpoTab); }
   if (id === 'contact') resetContactForm();
 }
@@ -946,14 +951,146 @@ function filterCourses(level, btn) {
   renderCourses(level);
 }
 
-/* ===== BLOG — category filter (cards have data-blog-cat="...") ===== */
+/* ===== BLOG — admin-managed posts (posts.php) ===== */
+let blogPosts = null;            // cached list payload
+let blogCurrentCat = 'all';
+const BLOG_CAT_LABELS = { education: 'Education', strategy: 'Strategy', markets: 'Markets', quant: 'Quant Research' };
+function blogFmtDate(iso) {
+  const d = new Date((iso || '').replace(' ', 'T'));
+  return isNaN(d) ? '' : d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function loadBlogList() {
+  const grid = document.getElementById('blogGrid');
+  if (!grid) return;
+  grid.innerHTML = '<p class="blog-loading">⟳ Loading articles…</p>';
+  fetch('/posts.php', { credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(d => { blogPosts = d.posts || []; renderBlogList(); })
+    .catch(() => { grid.innerHTML = '<p class="blog-loading">Could not load articles right now.</p>'; });
+}
+
+function renderBlogList() {
+  const grid = document.getElementById('blogGrid');
+  if (!grid || !blogPosts) return;
+  const list = blogCurrentCat === 'all' ? blogPosts : blogPosts.filter(p => p.category === blogCurrentCat);
+  if (!list.length) { grid.innerHTML = '<p class="blog-loading">No articles in this category yet.</p>'; return; }
+  grid.innerHTML = list.map(p => {
+    const cat = BLOG_CAT_LABELS[p.category] || p.category;
+    const cover = p.cover_image
+      ? `<div class="blog-card2-cover" style="background-image:url('${encodeURI(p.cover_image)}')"></div>`
+      : `<div class="blog-card2-cover blog-card2-cover--none">📈</div>`;
+    const read = p.read_minutes ? `${p.read_minutes} min read` : '';
+    return `<article class="blog-card2" onclick="openArticle('${encodeURIComponent(p.slug)}')">
+      ${cover}
+      <div class="blog-card2-body">
+        <span class="blog-card2-cat">${escapeHtml(cat)}</span>
+        <h3>${escapeHtml(p.title)}</h3>
+        <p>${escapeHtml(p.excerpt || '')}</p>
+        <div class="blog-card2-meta"><span>${blogFmtDate(p.published_at)}</span>${read ? `<span>·</span><span>${read}</span>` : ''}</div>
+      </div>
+    </article>`;
+  }).join('');
+}
+
 function filterBlogs(cat, btn) {
   document.querySelectorAll('#blogTabs .tab').forEach(t => t.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  document.querySelectorAll('#blogGrid .blog-card').forEach(card => {
-    const c = card.getAttribute('data-blog-cat');
-    card.style.display = (cat === 'all' || c === cat) ? '' : 'none';
+  blogCurrentCat = cat;
+  if (blogPosts) renderBlogList(); else loadBlogList();
+}
+
+/* Show the list view (used on normal nav to the blog page). */
+function showBlogListView() {
+  const list = document.getElementById('blogListView');
+  const view = document.getElementById('blogArticleView');
+  const hero = document.getElementById('blogHero');
+  if (view) { view.style.display = 'none'; view.innerHTML = ''; }
+  if (list) list.style.display = '';
+  if (hero) hero.style.display = '';
+  blogCurrentCat = 'all';
+  document.querySelectorAll('#blogTabs .tab').forEach((b, i) => b.classList.toggle('active', i === 0));
+}
+
+/* lite-markdown → HTML + a heading list for the "In this article" TOC.
+   ## → h2, ### → h3, blank line separates paragraphs, **x** → bold. */
+function blogRenderBody(raw) {
+  const lines = String(raw || '').replace(/\r\n/g, '\n').split('\n');
+  const toc = []; let html = ''; let para = []; let n = 0;
+  const inline = s => escapeHtml(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  const flush = () => { if (para.length) { html += '<p>' + inline(para.join(' ')) + '</p>'; para = []; } };
+  lines.forEach(line => {
+    const t = line.trim();
+    const h3 = t.match(/^###\s+(.*)/), h2 = t.match(/^##\s+(.*)/);
+    if (h3) { flush(); const id = 'sec-' + (++n); html += `<h3 id="${id}">${inline(h3[1])}</h3>`; toc.push({ id, text: h3[1], lvl: 3 }); }
+    else if (h2) { flush(); const id = 'sec-' + (++n); html += `<h2 id="${id}">${inline(h2[1])}</h2>`; toc.push({ id, text: h2[1], lvl: 2 }); }
+    else if (t === '') { flush(); }
+    else { para.push(t); }
   });
+  flush();
+  return { html, toc };
+}
+
+function openArticle(slugEnc, fromPopState) {
+  const slug = decodeURIComponent(slugEnc);
+  // Activate the blog page shell directly (skip initPage's list reset).
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const bp = document.getElementById('page-blog'); if (bp) bp.classList.add('active');
+  const list = document.getElementById('blogListView');
+  const view = document.getElementById('blogArticleView');
+  const hero = document.getElementById('blogHero');
+  if (list) list.style.display = 'none';
+  if (hero) hero.style.display = 'none';
+  if (view) { view.style.display = ''; view.innerHTML = '<p class="blog-loading">⟳ Loading…</p>'; }
+  if (!fromPopState) history.pushState({ page: 'blog', slug }, '', '/blog/' + slug);
+  window.scrollTo(0, 0);
+  // Close mobile menu if open.
+  const mm = document.getElementById('mobileMenu');
+  if (mm && mm.classList.contains('open')) { mm.classList.remove('open'); const nv = document.getElementById('mainNav'); if (nv) nv.classList.remove('menu-open'); }
+  fetch('/posts.php?slug=' + encodeURIComponent(slug), { credentials: 'same-origin' })
+    .then(r => { if (!r.ok) throw 0; return r.json(); })
+    .then(d => renderArticle(d.post))
+    .catch(() => { if (view) view.innerHTML = '<div class="article-back"><a onclick="backToBlog()">← Back to blog</a></div><p class="blog-loading">Article not found.</p>'; });
+}
+
+function renderArticle(post) {
+  const view = document.getElementById('blogArticleView');
+  if (!view || !post) return;
+  const { html, toc } = blogRenderBody(post.body);
+  const cat = BLOG_CAT_LABELS[post.category] || post.category;
+  const read = post.read_minutes ? `${post.read_minutes} min read` : '';
+  const cover = post.cover_image
+    ? `<div class="article-cover"><img src="${encodeURI(post.cover_image)}" alt="${escapeHtml(post.title)}" loading="lazy"></div>` : '';
+  const tocHtml = toc.length ? `<aside class="article-toc">
+      <div class="article-toc-title">In this article</div>
+      <ul>${toc.map(h => `<li class="toc-l${h.lvl}"><a onclick="blogScrollTo('${h.id}')">${escapeHtml(h.text)}</a></li>`).join('')}</ul>
+    </aside>` : '';
+  document.title = post.title + ' | RootNivesh Research';
+  view.innerHTML = `
+    <div class="article-back"><a onclick="backToBlog()">← Back to blog</a></div>
+    <div class="article-wrap">
+      ${tocHtml}
+      <article class="article-body">
+        <span class="blog-card2-cat">${escapeHtml(cat)}</span>
+        <h1>${escapeHtml(post.title)}</h1>
+        <div class="article-meta">${post.author ? escapeHtml(post.author) + ' · ' : ''}${blogFmtDate(post.published_at)}${read ? ' · ' + read : ''}</div>
+        ${cover}
+        <div class="article-content">${html}</div>
+        <div class="article-cta">
+          <a class="btn btn-gold" href="https://wa.me/917467094575?text=Hi%20RootNivesh%2C%20I%20read%20your%20article%20and%20want%20to%20know%20more%20about%20your%20research." target="_blank" rel="noopener">Get research on WhatsApp →</a>
+        </div>
+      </article>
+    </div>`;
+}
+
+function blogScrollTo(id) { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+
+function backToBlog() {
+  showBlogListView();
+  history.pushState({ page: 'blog' }, '', '/blog');
+  document.title = PAGE_TITLES.blog || 'Research Blog | RootNivesh Research';
+  if (blogPosts) renderBlogList(); else loadBlogList();
+  window.scrollTo(0, 0);
 }
 
 /* ===== CALLS — render only (callsData lives in data.js) ===== */

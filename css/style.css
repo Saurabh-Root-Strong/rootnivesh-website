@@ -2850,3 +2850,55 @@
   padding: 9px; border-radius: 8px; text-decoration: none; font-size: 13px;
 }
 .call-wa-btn:hover { background: #1FBE5A; }
+
+/* ===================== BLOG ===================== */
+.blog-loading { text-align: center; color: var(--grey); padding: 40px 0; font-family: 'Space Mono', monospace; }
+
+/* Listing grid + cards (image-led, like a real blog) */
+.blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; margin-top: 8px; }
+.blog-card2 {
+  background: var(--card, #0E1726); border: 1px solid var(--border, rgba(255,255,255,0.08));
+  border-radius: 14px; overflow: hidden; cursor: pointer; display: flex; flex-direction: column;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.blog-card2:hover { transform: translateY(-4px); border-color: var(--gold, #E5A50A); box-shadow: 0 14px 34px rgba(0,0,0,0.35); }
+.blog-card2-cover { height: 184px; background-size: cover; background-position: center; background-color: #0A1220; }
+.blog-card2-cover--none { display: flex; align-items: center; justify-content: center; font-size: 44px;
+  background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(201,168,76,0.03)); }
+.blog-card2-body { padding: 18px 18px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.blog-card2-cat { align-self: flex-start; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase;
+  font-weight: 700; color: var(--gold, #E5A50A); background: rgba(201,168,76,0.10);
+  border: 1px solid rgba(201,168,76,0.30); padding: 3px 9px; border-radius: 999px; }
+.blog-card2-body h3 { font-size: 1.12rem; line-height: 1.35; margin: 2px 0 0; }
+.blog-card2-body p { font-size: 13px; color: var(--grey2, #9FB0C3); line-height: 1.6; margin: 0; flex: 1; }
+.blog-card2-meta { display: flex; gap: 8px; font-size: 11.5px; color: var(--grey, #7A8AA0);
+  font-family: 'Space Mono', monospace; margin-top: 4px; }
+
+/* Article reading view + "In this article" TOC */
+.article-back { margin-bottom: 18px; }
+.article-back a { color: var(--gold, #E5A50A); cursor: pointer; font-weight: 600; font-size: 14px; }
+.article-back a:hover { text-decoration: underline; }
+.article-wrap { display: grid; grid-template-columns: 240px 1fr; gap: 40px; align-items: start; }
+.article-toc { position: sticky; top: 110px; border-left: 2px solid var(--border, rgba(255,255,255,0.10)); padding-left: 16px; }
+.article-toc-title { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--grey, #7A8AA0); margin-bottom: 12px; font-weight: 700; }
+.article-toc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.article-toc li.toc-l3 { padding-left: 14px; }
+.article-toc a { color: var(--grey2, #9FB0C3); cursor: pointer; font-size: 13px; line-height: 1.45; transition: color .15s; }
+.article-toc a:hover { color: var(--gold, #E5A50A); }
+.article-body { max-width: 760px; }
+.article-body h1 { font-size: clamp(1.8rem, 3.2vw, 2.6rem); line-height: 1.18; margin: 10px 0 0; }
+.article-meta { color: var(--grey, #7A8AA0); font-size: 13px; font-family: 'Space Mono', monospace; margin: 12px 0 0; }
+.article-cover { margin: 22px 0 4px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border, rgba(255,255,255,0.08)); }
+.article-cover img { display: block; width: 100%; height: auto; }
+.article-content { margin-top: 18px; }
+.article-content h2 { font-size: 1.5rem; margin: 34px 0 12px; scroll-margin-top: 100px; }
+.article-content h3 { font-size: 1.2rem; margin: 26px 0 10px; scroll-margin-top: 100px; }
+.article-content p { font-size: 15.5px; line-height: 1.85; color: var(--grey2, #C2D0DF); margin: 0 0 18px; }
+.article-content strong { color: var(--white, #F2F6FB); }
+.article-cta { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border, rgba(255,255,255,0.08)); }
+
+@media (max-width: 820px) {
+  .article-wrap { grid-template-columns: 1fr; gap: 20px; }
+  .article-toc { position: static; border-left: none; border-top: 1px solid var(--border, rgba(255,255,255,0.10));
+    padding-left: 0; padding-top: 16px; order: 2; }
+}

@@ -64,3 +64,27 @@ CREATE TABLE IF NOT EXISTS users (
   created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   last_login_at DATETIME     DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================================
+-- Blog posts. Each article the team writes from /admin/blog.php.
+-- `body` is lite-markdown plain text (## Heading, blank-line paragraphs,
+-- **bold**) — the public site parses it into HTML + a TOC. No HTML
+-- knowledge needed by the team.
+-- =============================================================
+CREATE TABLE IF NOT EXISTS posts (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  slug          VARCHAR(200) NOT NULL UNIQUE,
+  title         VARCHAR(255) NOT NULL,
+  category      VARCHAR(50)  NOT NULL DEFAULT 'markets',
+  excerpt       VARCHAR(500) DEFAULT NULL,
+  cover_image   VARCHAR(500) DEFAULT NULL,   -- image URL
+  body          MEDIUMTEXT,
+  author        VARCHAR(100) DEFAULT NULL,
+  read_minutes  INT          DEFAULT NULL,
+  status        ENUM('draft','published') NOT NULL DEFAULT 'published',
+  published_at  DATETIME     DEFAULT CURRENT_TIMESTAMP,
+  created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_status (status),
+  INDEX idx_published (published_at DESC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

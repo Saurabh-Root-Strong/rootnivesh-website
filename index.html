@@ -183,7 +183,7 @@
 <link rel="dns-prefetch" href="https://www.bseindia.com">
 <link rel="dns-prefetch" href="https://www.nseindia.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=88">
+<link rel="stylesheet" href="css/style.css?v=89">
 </head>
 <body>
 
@@ -1021,7 +1021,7 @@
 
 <!-- ===================== BLOG PAGE ===================== -->
 <div class="page" id="page-blog">
-  <div class="page-hero">
+  <div class="page-hero" id="blogHero">
     <div class="container">
       <div class="section-tag">Research Blogs</div>
       <h1>Insights from the <em>Research Desk</em></h1>
@@ -1033,6 +1033,9 @@
   <section>
     <div class="container">
 
+      <!-- ===== BLOG LIST VIEW ===== -->
+      <div id="blogListView">
+
       <!-- Filter tabs -->
       <div class="tabs" id="blogTabs">
         <button class="tab active" onclick="filterBlogs('all', this)">All</button>
@@ -1042,7 +1045,12 @@
         <button class="tab" onclick="filterBlogs('quant', this)">Quant Research</button>
       </div>
 
-      <div class="cards-grid" id="blogGrid">
+      <div class="blog-grid" id="blogGrid">
+        <p class="blog-loading">⟳ Loading articles…</p>
+      </div>
+
+      <!-- Legacy sample cards kept hidden; live posts now come from posts.php -->
+      <div hidden aria-hidden="true">
 
         <article class="card blog-card" data-blog-cat="education">
           <div class="card-tag tag-free">EDUCATION</div>
@@ -1217,6 +1225,11 @@
           </a>
         </div>
       </div>
+
+      </div><!-- /#blogListView -->
+
+      <!-- ===== BLOG ARTICLE VIEW (single post + TOC) ===== -->
+      <div id="blogArticleView" style="display:none"></div>
 
     </div>
   </section>
@@ -2029,8 +2042,8 @@
      Order matters — data must load first.
      Bump the ?v= number whenever you change either file to bust
      long-cached copies on visitors' phones. -->
-<script src="js/data.js?v=41"></script>
-<script src="js/script.js?v=64"></script>
+<script src="js/data.js?v=42"></script>
+<script src="js/script.js?v=65"></script>
 
 
 <section style="padding:40px 20px; max-width:900px; margin:auto; line-height:1.7;">
