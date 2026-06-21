@@ -535,7 +535,11 @@ window.addEventListener('DOMContentLoaded', () => {
   renderCourses('all');
   renderPlans();
   renderCalls('intraday');
-  fetchIpo('open');
+  // NOTE: do NOT pre-fetch IPOs here. fetchIpo() kicks off
+  // autoFillIpoBusinessCells(), a background crawler that fires many sequential
+  // proxy requests (NSE + Chittorgarh) per IPO — that kept the browser tab in a
+  // "loading" state (busy cursor) on EVERY page. The IPO page loads its own data
+  // lazily via initPage('ipo') when the visitor actually opens it.
   if (typeof initToolRows === 'function') initToolRows();
   observeFadeIns();
   startCarousel();
