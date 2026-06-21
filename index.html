@@ -276,23 +276,7 @@
     </div>
   </div>
 
-  <!-- Calls accordion -->
-  <div class="mob-group" id="mob-group-calls">
-    <button class="mob-group-header" onclick="toggleMobGroup('mob-group-calls')">
-      <span class="mob-link-icon">📞</span>
-      <span class="mob-group-title">Membership</span>
-      <span class="mob-chevron">▾</span>
-    </button>
-    <div class="mob-group-body">
-      <div class="mob-group-section">Short Term</div>
-      <a class="mob-sub" onclick="megaGoCall('intraday')"><span>📈</span><span>Intraday</span></a>
-      <a class="mob-sub" onclick="megaGoCall('swing')"><span>🔄</span><span>Swing</span></a>
-      <a class="mob-sub" onclick="megaGoCall('positional')"><span>📊</span><span>Positional</span></a>
-      <div class="mob-group-section">Long Term</div>
-      <a class="mob-sub" onclick="megaGoCall('value')"><span>💎</span><span>Value Based</span></a>
-      <a class="mob-sub" onclick="megaGoCall('monthly')"><span>📅</span><span>Monthly Based</span></a>
-    </div>
-  </div>
+  <a class="mob-link" onclick="showPage('calls')"><span class="mob-link-icon">📞</span><span>Membership</span></a>
 
   <a class="mob-link" onclick="showPage('performance')"><span class="mob-link-icon">🏆</span><span>Performance</span></a>
 
