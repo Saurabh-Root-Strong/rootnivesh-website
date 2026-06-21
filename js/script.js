@@ -93,6 +93,65 @@ function updateRouteMeta(id) {
   setAttr('meta[property="og:description"]', 'content', desc);
   setAttr('meta[name="twitter:title"]', 'content', title);
   setAttr('meta[name="twitter:description"]', 'content', desc);
+  setAttr('meta[property="og:type"]', 'content', 'website');
+  removeArticleSchema();
+}
+
+/* Per-article SEO. Honest, content-matched tags — the description is the
+   real excerpt, the image is the real cover, dates/author are the real
+   record. No keyword stuffing: Google rewards content that matches intent,
+   and penalises manipulated metadata. */
+function setArticleSeo(post) {
+  if (!post) return;
+  const url = SITE_ORIGIN + '/blog/' + encodeURIComponent(post.slug);
+  const desc = (post.excerpt || '').toString().slice(0, 300);
+  const title = post.title + ' | RootNivesh Research';
+  const img = post.cover_image || (SITE_ORIGIN + '/images/logo.png');
+  const setAttr = (sel, attr, val) => { const el = document.head.querySelector(sel); if (el) el.setAttribute(attr, val); };
+
+  document.title = title;
+  setAttr('link[rel="canonical"]', 'href', url);
+  setAttr('meta[name="description"]', 'content', desc);
+  setAttr('meta[property="og:type"]', 'content', 'article');
+  setAttr('meta[property="og:url"]', 'content', url);
+  setAttr('meta[property="og:title"]', 'content', post.title);
+  setAttr('meta[property="og:description"]', 'content', desc);
+  setAttr('meta[property="og:image"]', 'content', img);
+  setAttr('meta[name="twitter:title"]', 'content', post.title);
+  setAttr('meta[name="twitter:description"]', 'content', desc);
+  setAttr('meta[name="twitter:image"]', 'content', img);
+
+  // BlogPosting structured data — only fields we can truthfully fill.
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    'mainEntityOfPage': { '@type': 'WebPage', '@id': url },
+    'headline': post.title,
+    'description': desc,
+    'image': img,
+    'datePublished': post.published_at || undefined,
+    'dateModified': post.updated_at || post.published_at || undefined,
+    'author': { '@type': 'Organization', 'name': post.author || 'RootNivesh Research', 'url': SITE_ORIGIN + '/' },
+    'publisher': {
+      '@type': 'Organization',
+      'name': 'RootNivesh Research',
+      'logo': { '@type': 'ImageObject', 'url': SITE_ORIGIN + '/images/logo.png' }
+    },
+    'isPartOf': { '@type': 'Blog', 'name': 'RootNivesh Research Blog', '@id': SITE_ORIGIN + '/blog' }
+  };
+  Object.keys(schema).forEach(k => schema[k] === undefined && delete schema[k]);
+
+  removeArticleSchema();
+  const s = document.createElement('script');
+  s.type = 'application/ld+json';
+  s.id = 'article-schema';
+  s.textContent = JSON.stringify(schema);
+  document.head.appendChild(s);
+}
+
+function removeArticleSchema() {
+  const old = document.getElementById('article-schema');
+  if (old) old.remove();
 }
 
 /* ===== MEGA MENU ===== */
@@ -1072,7 +1131,7 @@ function renderArticle(post) {
       <div class="article-toc-title">In this article</div>
       <ul>${toc.map(h => `<li class="toc-l${h.lvl}"><a onclick="blogScrollTo('${h.id}')">${escapeHtml(h.text)}</a></li>`).join('')}</ul>
     </aside>` : '';
-  document.title = post.title + ' | RootNivesh Research';
+  setArticleSeo(post);
   view.innerHTML = `
     <div class="article-back"><a onclick="backToBlog()">← Back to blog</a></div>
     <div class="article-wrap">
@@ -1096,6 +1155,7 @@ function backToBlog() {
   showBlogListView();
   history.pushState({ page: 'blog' }, '', '/blog');
   document.title = PAGE_TITLES.blog || 'Research Blog | RootNivesh Research';
+  updateRouteMeta('blog'); // restore blog-page meta + drop the article schema
   if (blogPosts) renderBlogList(); else loadBlogList();
   window.scrollTo(0, 0);
 }

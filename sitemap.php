@@ -1,0 +1,68 @@
+<?php
+/* ============================================================
+   sitemap.php — dynamic XML sitemap.
+   Served at /sitemap.xml via an .htaccess rewrite. Lists every
+   indexable static route plus every PUBLISHED blog post, so
+   Google discovers new articles the moment the team publishes.
+   ============================================================ */
+header('Content-Type: application/xml; charset=utf-8');
+header('Cache-Control: public, max-age=3600');
+
+$ORIGIN = 'https://rootnivesh.in';
+
+/* Static, indexable routes (path => changefreq, priority). Legal pages
+   and gated/app routes are intentionally excluded. */
+$static = [
+    '/'            => ['weekly',  '1.0'],
+    '/ipo'         => ['daily',   '0.8'],
+    '/membership'  => ['weekly',  '0.9'],
+    '/performance' => ['daily',   '0.8'],
+    '/reports'     => ['weekly',  '0.7'],
+    '/tools'       => ['monthly', '0.6'],
+    '/blog'        => ['daily',   '0.8'],
+    '/about'       => ['monthly', '0.5'],
+    '/contact'     => ['monthly', '0.5'],
+];
+
+$today = date('Y-m-d');
+
+/* Pull published posts for per-article URLs. Fail soft — a DB hiccup
+   should still leave a valid static sitemap. */
+$posts = [];
+try {
+    require_once __DIR__ . '/admin/db.php';
+    $rows = db()->query(
+        "SELECT slug, COALESCE(updated_at, published_at, created_at) AS lastmod
+         FROM posts WHERE status = 'published' ORDER BY published_at DESC"
+    )->fetchAll();
+    foreach ($rows as $r) {
+        if (!empty($r['slug'])) $posts[] = $r;
+    }
+} catch (Throwable $e) {
+    // Static sitemap is still served below.
+}
+
+echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+
+foreach ($static as $path => $meta) {
+    echo "  <url>\n";
+    echo "    <loc>" . htmlspecialchars($ORIGIN . $path, ENT_XML1) . "</loc>\n";
+    echo "    <lastmod>$today</lastmod>\n";
+    echo "    <changefreq>{$meta[0]}</changefreq>\n";
+    echo "    <priority>{$meta[1]}</priority>\n";
+    echo "  </url>\n";
+}
+
+foreach ($posts as $p) {
+    $loc  = $ORIGIN . '/blog/' . rawurlencode($p['slug']);
+    $lm   = $p['lastmod'] ? date('Y-m-d', strtotime($p['lastmod'])) : $today;
+    echo "  <url>\n";
+    echo "    <loc>" . htmlspecialchars($loc, ENT_XML1) . "</loc>\n";
+    echo "    <lastmod>$lm</lastmod>\n";
+    echo "    <changefreq>monthly</changefreq>\n";
+    echo "    <priority>0.7</priority>\n";
+    echo "  </url>\n";
+}
+
+echo '</urlset>' . "\n";
