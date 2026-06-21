@@ -360,6 +360,40 @@ function call_rr_gain($c) {
     return [$rr, $gain];
 }
 
+/* ---------- Live status from the monitor's last seen price ----------
+   Returns null if the engine hasn't priced this call yet. Otherwise an array
+   the card renders: last price, % vs entry, next unhit target + how far, SL +
+   cushion, and how long ago it was checked. */
+function call_live_status($c) {
+    if (!isset($c['last_price']) || $c['last_price'] === null || $c['last_price'] === '') return null;
+    $last  = floatval($c['last_price']);
+    $entry = floatval($c['entry_price']);
+    $isBuy = $c['action'] === 'BUY';
+    $tl = call_targets_list($c);
+    $hit = max(0, min(intval($c['targets_hit']), count($tl)));
+
+    $pnl = $entry > 0 ? round(($isBuy ? ($last - $entry) : ($entry - $last)) / $entry * 100, 2) : null;
+
+    // Next target still to hit = the one at index = targets_hit.
+    $nextT = null; $nextAway = null;
+    if ($hit < count($tl)) {
+        $nextT = $tl[$hit];
+        $nextAway = $last > 0 ? round(($isBuy ? ($nextT - $last) : ($last - $nextT)) / $last * 100, 2) : null;
+    }
+
+    // SL cushion: how far price sits the safe side of the stop (negative = breached).
+    $sl = $c['stop_loss'] !== null ? floatval($c['stop_loss']) : null;
+    $slCushion = ($sl !== null && $last > 0) ? round(($isBuy ? ($last - $sl) : ($sl - $last)) / $last * 100, 2) : null;
+
+    // Minutes since the monitor last checked.
+    $ago = null;
+    if (!empty($c['last_checked_at'])) {
+        $secs = time() - strtotime($c['last_checked_at']);
+        $ago = $secs < 90 ? 'just now' : ($secs < 3600 ? round($secs / 60) . 'm ago' : round($secs / 3600) . 'h ago');
+    }
+    return compact('last', 'pnl', 'nextT', 'nextAway', 'sl', 'slCushion', 'ago');
+}
+
 /* ---------- Build a pre-filled WhatsApp share message for a call ---------- */
 function build_wa_message($c) {
     $arrow = $c['action'] === 'BUY' ? '🟢' : '🔴';
@@ -548,6 +582,31 @@ function build_wa_message($c) {
             <?php if ($c['exit_price']   !== null): ?>· Exit ₹<?php echo number_format($c['exit_price'], 2); ?><?php endif; ?>
             <?php if ($c['pnl_pct']      !== null): ?>· PnL <strong><?php echo ($c['pnl_pct'] >= 0 ? '+' : '') . number_format($c['pnl_pct'], 2); ?>%</strong><?php endif; ?>
           </div>
+          <?php if ($c['status'] === 'open') { $live = call_live_status($c); if ($live !== null): ?>
+            <div class="admin-call-live" style="margin-top:6px; padding:8px 10px; border-radius:8px; background:rgba(255,255,255,0.03); border:1px solid var(--border); font-size:13px; color:#C7D2DE">
+              <span title="Live price from the price-watch engine">📡 LTP
+                <strong style="color:<?php echo ($live['pnl'] !== null && $live['pnl'] >= 0) ? '#3FB950' : '#E05656'; ?>">₹<?php echo number_format($live['last'], 2); ?></strong>
+                <?php if ($live['pnl'] !== null): ?>
+                  <span style="color:<?php echo $live['pnl'] >= 0 ? '#3FB950' : '#E05656'; ?>">(<?php echo ($live['pnl'] >= 0 ? '+' : '') . $live['pnl']; ?>% vs entry)</span>
+                <?php endif; ?>
+              </span>
+              <?php if ($live['nextT'] !== null): ?>
+                · Next T ₹<?php echo number_format($live['nextT'], 2); ?>
+                <?php if ($live['nextAway'] !== null): ?>
+                  <span style="color:#8A9BB0"><?php echo $live['nextAway'] > 0 ? $live['nextAway'] . '% away' : 'reached'; ?></span>
+                <?php endif; ?>
+              <?php else: ?>
+                · <span style="color:#3FB950">all targets reached</span>
+              <?php endif; ?>
+              <?php if ($live['sl'] !== null): ?>
+                · SL ₹<?php echo number_format($live['sl'], 2); ?>
+                <?php if ($live['slCushion'] !== null): ?>
+                  <span style="color:<?php echo $live['slCushion'] <= 0 ? '#E05656' : ($live['slCushion'] < 1 ? '#E0A106' : '#8A9BB0'); ?>"><?php echo $live['slCushion'] <= 0 ? 'BREACHED' : $live['slCushion'] . '% cushion'; ?></span>
+                <?php endif; ?>
+              <?php endif; ?>
+              <?php if ($live['ago'] !== null): ?><span style="color:#7C8B9C; margin-left:4px">· checked <?php echo $live['ago']; ?></span><?php endif; ?>
+            </div>
+          <?php endif; } ?>
           <?php if (!empty($c['thesis'])): ?>
             <div class="admin-call-thesis"><?php echo nl2br(htmlspecialchars($c['thesis'])); ?></div>
           <?php endif; ?>
