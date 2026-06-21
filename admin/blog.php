@@ -27,6 +27,31 @@ function blog_read_minutes($body) {
     return max(1, (int) round($words / 200));
 }
 
+/* Handle a cover-image file upload. Validates it's a real image, gives it a
+   random safe name, stores it under /uploads/blog/, returns the public URL. */
+function blog_handle_upload($file) {
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+        return ['ok' => false, 'error' => 'Upload failed (code ' . ($file['error'] ?? '?') . ').'];
+    }
+    if ($file['size'] > 5 * 1024 * 1024) {
+        return ['ok' => false, 'error' => 'Image too large (max 5 MB).'];
+    }
+    $info = @getimagesize($file['tmp_name']);   // real image check, not the client mime
+    if (!$info) return ['ok' => false, 'error' => 'That file is not a valid image.'];
+    $extByMime = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp', 'image/gif' => 'gif'];
+    $ext = $extByMime[$info['mime']] ?? '';
+    if ($ext === '') return ['ok' => false, 'error' => 'Use a JPG, PNG, WEBP or GIF image.'];
+    $dir = dirname(__DIR__) . '/uploads/blog';
+    if (!is_dir($dir) && !@mkdir($dir, 0755, true)) {
+        return ['ok' => false, 'error' => 'Could not create the upload folder.'];
+    }
+    $name = 'post-' . date('Ymd-His') . '-' . bin2hex(random_bytes(4)) . '.' . $ext;
+    if (!@move_uploaded_file($file['tmp_name'], $dir . '/' . $name)) {
+        return ['ok' => false, 'error' => 'Could not save the uploaded image.'];
+    }
+    return ['ok' => true, 'url' => '/uploads/blog/' . $name];
+}
+
 // CSRF gate on every POST.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrf_verify()) {
@@ -44,6 +69,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['action'] ?? ''), 
         $category = $_POST['category'] ?? 'markets';
         $excerpt  = trim($_POST['excerpt'] ?? '');
         $cover    = trim($_POST['cover_image'] ?? '');
+        // An uploaded file wins over the URL field; keep the old cover if neither given on edit.
+        if (!empty($_FILES['cover_file']['name']) && is_uploaded_file($_FILES['cover_file']['tmp_name'] ?? '')) {
+            $up = blog_handle_upload($_FILES['cover_file']);
+            if (!$up['ok']) throw new RuntimeException($up['error']);
+            $cover = $up['url'];
+        }
         $body     = trim($_POST['body'] ?? '');
         $status   = ($_POST['status'] ?? 'published') === 'draft' ? 'draft' : 'published';
         $allowedCats = ['education', 'strategy', 'markets', 'quant'];
@@ -131,7 +162,7 @@ $catLabels = ['education' => 'Education', 'strategy' => 'Strategy', 'markets' =>
         “In this article” menu), leave a blank line between paragraphs, and wrap text in
         <strong>**double asterisks**</strong> for bold. No HTML needed.
       </p>
-      <form method="post" class="admin-form">
+      <form method="post" class="admin-form" enctype="multipart/form-data">
         <?php echo csrf_field(); ?>
         <input type="hidden" name="action" value="<?php echo $editing ? 'edit' : 'add'; ?>">
         <?php if ($editing): ?><input type="hidden" name="id" value="<?php echo intval($editing['id']); ?>"><?php endif; ?>
@@ -161,8 +192,17 @@ $catLabels = ['education' => 'Education', 'strategy' => 'Strategy', 'markets' =>
           </label>
         </div>
 
-        <label>Cover image URL
-          <input type="url" name="cover_image" placeholder="https://… (paste an image link)"
+        <label>Cover image — upload from your device
+          <input type="file" name="cover_file" accept="image/jpeg,image/png,image/webp,image/gif">
+        </label>
+        <?php if ($editing && !empty($editing['cover_image'])): ?>
+          <div style="display:flex; align-items:center; gap:12px; margin-top:-4px">
+            <img src="<?php echo htmlspecialchars($editing['cover_image']); ?>" alt="" style="height:54px; border-radius:6px; border:1px solid var(--border)">
+            <span style="color:#8A9BB0; font-size:12px">Current cover. Upload a new file or change the link below to replace it.</span>
+          </div>
+        <?php endif; ?>
+        <label>…or paste an image URL (optional)
+          <input type="url" name="cover_image" placeholder="https://… (leave blank if you uploaded a file)"
                  value="<?php echo $editing ? htmlspecialchars($editing['cover_image']) : ''; ?>">
         </label>
 
