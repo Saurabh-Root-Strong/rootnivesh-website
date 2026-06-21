@@ -106,7 +106,7 @@ function setArticleSeo(post) {
   const url = SITE_ORIGIN + '/blog/' + encodeURIComponent(post.slug);
   const desc = (post.excerpt || '').toString().slice(0, 300);
   const title = post.title + ' | RootNivesh Research';
-  const img = post.cover_image || (SITE_ORIGIN + '/images/logo.png');
+  const img = post.cover_image || (SITE_ORIGIN + '/images/og-image.png?v=2');
   const setAttr = (sel, attr, val) => { const el = document.head.querySelector(sel); if (el) el.setAttribute(attr, val); };
 
   document.title = title;
