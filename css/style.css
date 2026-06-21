@@ -14,6 +14,11 @@
     --green: #2ECC71;
     --red: #E74C3C;
     --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Fixed-header geometry. The mobile overrides live in the <=640 block;
+       nav height, ticker offset and overlay tops all derive from these so
+       the compact mobile header can't be accidentally un-done elsewhere. */
+    --nav-h: 92px;
+    --tk-h: 28px;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -33,7 +38,7 @@
     backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center; justify-content: space-between;
-    height: 92px;
+    height: var(--nav-h);
     transition: var(--transition);
   }
   .nav-logo {
@@ -97,7 +102,7 @@
 
   /* ── MEGA MENU ── */
   .mega-menu {
-    display: none; position: fixed; top: 120px; left: 0; width: 100%;
+    display: none; position: fixed; top: calc(var(--nav-h) + var(--tk-h)); left: 0; width: 100%;
     background: #07131F; border-bottom: 2px solid var(--border2);
     box-shadow: 0 24px 60px rgba(0,0,0,0.6);
     z-index: 1001; animation: ddFade 0.2s ease;
@@ -197,9 +202,9 @@
   }
   .mobile-menu {
     display: none; position: fixed;
-    top: 120px; left: 0; right: 0;
-    height: calc(100vh - 120px);
-    height: calc(100dvh - 120px); /* dvh handles iOS dynamic toolbar */
+    top: calc(var(--nav-h) + var(--tk-h)); left: 0; right: 0;
+    height: calc(100vh - (var(--nav-h) + var(--tk-h)));
+    height: calc(100dvh - (var(--nav-h) + var(--tk-h))); /* dvh handles iOS dynamic toolbar */
     background: #07131F;
     border-top: 1px solid var(--border);
     padding: 8px 12px calc(24px + env(safe-area-inset-bottom));
@@ -353,9 +358,9 @@
      all page content. Pages get a top offset of 36px (the ticker height) so
      content doesn't slide under the ticker. */
   .ticker-tape {
-    position: fixed; top: 92px; left: 0; width: 100%;
+    position: fixed; top: var(--nav-h); left: 0; width: 100%;
     background: rgba(5,12,22,0.92); border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; height: 28px; overflow: hidden; z-index: 999;
+    display: flex; align-items: center; height: var(--tk-h); overflow: hidden; z-index: 999;
   }
   .page { padding-top: 28px; } /* clears the fixed ticker */
   .ticker-live-bar {
@@ -1175,8 +1180,8 @@
     border-right: 1px solid var(--border);
     padding: 32px 0;
     position: sticky;
-    top: 120px;
-    height: calc(100vh - 120px);
+    top: calc(var(--nav-h) + var(--tk-h));
+    height: calc(100vh - (var(--nav-h) + var(--tk-h)));
     overflow-y: auto;
   }
   .snav-wrap::-webkit-scrollbar { width: 4px; }
@@ -1314,7 +1319,7 @@
 
   @media (max-width: 900px) {
     .page-split { grid-template-columns: 1fr; }
-    #page-tools .page-split { padding-top: 72px; }
+    #page-tools .page-split { padding-top: 58px; }
     /* Mobile: turn the desktop sidebar into a horizontal-scroll pill strip.
        The "TOOLS" accordion header and the per-item "+" expanders are dead
        weight on phones (descriptions are hidden), so drop them and make the
@@ -2213,13 +2218,14 @@
 
   /* Phone — typography, hero, tables, and grids tighten further */
   @media (max-width: 640px) {
+    /* Compact mobile header — every offset derives from these. */
+    :root { --nav-h: 48px; --tk-h: 26px; }
     section { padding: 44px 0; }
     .container { padding: 0 1rem; }
-    nav { padding: 0 1rem; height: 40px; }
+    nav { padding: 0 1rem; }
     .nav-logo-img { height: 36px; }
     .hamburger { width: 24px; height: 24px; gap: 4px; padding: 2px; }
     .hamburger span { width: 18px; }
-    .ticker-tape { top: 40px; height: 26px; }
     .hero { padding-top: 56px; }
     .page { padding-top: 26px; } /* match mobile ticker height */
 
@@ -2608,17 +2614,19 @@
      - Smooth tap highlights
      ==================================================================== */
 
-  /* Honor the notch and home-indicator on iPhone */
+  /* Honor the notch and home-indicator on iPhone. These add the safe-area
+     inset ON TOP OF the responsive --nav-h/--tk-h so they never clobber the
+     compact mobile header. */
   nav {
     padding-left: max(1.25rem, env(safe-area-inset-left));
     padding-right: max(1.25rem, env(safe-area-inset-right));
     padding-top: env(safe-area-inset-top);
-    height: calc(92px + env(safe-area-inset-top, 0px));
+    height: calc(var(--nav-h) + env(safe-area-inset-top, 0px));
   }
-  .ticker-tape { top: calc(92px + env(safe-area-inset-top, 0px)); }
-  .mega-menu  { top: calc(120px + env(safe-area-inset-top, 0px)); }
+  .ticker-tape { top: calc(var(--nav-h) + env(safe-area-inset-top, 0px)); }
+  .mega-menu  { top: calc(var(--nav-h) + var(--tk-h) + env(safe-area-inset-top, 0px)); }
   .mobile-menu {
-    top: calc(120px + env(safe-area-inset-top, 0px));
+    top: calc(var(--nav-h) + var(--tk-h) + env(safe-area-inset-top, 0px));
     padding-bottom: calc(16px + env(safe-area-inset-bottom));
   }
   footer {
