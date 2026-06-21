@@ -1311,18 +1311,44 @@
 
   @media (max-width: 900px) {
     .page-split { grid-template-columns: 1fr; }
+    /* Mobile: turn the desktop sidebar into a horizontal-scroll pill strip.
+       The "TOOLS" accordion header and the per-item "+" expanders are dead
+       weight on phones (descriptions are hidden), so drop them and make the
+       tool list a single tappable row of pills. */
     .snav-wrap {
-      position: static; height: auto;
-      display: flex; flex-wrap: wrap; padding: 16px;
-      gap: 4px; border-right: none; border-bottom: 1px solid var(--border);
+      position: static; height: auto; overflow: visible;
+      padding: 0; background: #07131F;
+      border-right: none; border-bottom: 1px solid var(--border);
     }
-    .snav-section { margin-bottom: 4px; }
-    .snav-section-header { padding: 8px 12px 6px; }
+    .snav-section { margin: 0; }
+    .snav-section-header { display: none; }
     .snav-divider { display: none; }
-    .snav-item { padding: 9px 12px; border-radius: 8px; border-left: none; }
-    .snav-item.active { border-left: none; border: 1px solid var(--border2); }
+    .snav-section-body,
+    .snav-section-body.open {
+      max-height: none; overflow-x: auto; overflow-y: hidden;
+      display: flex; flex-wrap: nowrap; gap: 8px;
+      padding: 12px 14px; -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x proximity;
+    }
+    .snav-section-body::-webkit-scrollbar { display: none; }
+    .snav-item {
+      flex: 0 0 auto; white-space: nowrap; scroll-snap-align: start;
+      justify-content: center; gap: 0;
+      padding: 9px 16px; border-radius: 999px; border: 1px solid var(--border2);
+      border-left: 1px solid var(--border2); background: rgba(255,255,255,0.03);
+    }
+    .snav-item.active {
+      border-left: 1px solid var(--gold); border-color: var(--gold);
+      background: rgba(201,168,76,0.14);
+    }
+    .snav-item-label { font-size: 13px; }
+    .snav-plus { display: none; }
     .snav-sub { display: none; }
-    .snav-content { padding: 24px 20px; }
+    .snav-content { padding: 24px 18px; }
+    /* Trim the oversized hero so the calculators sit higher on screen. */
+    .tools-hero { padding: 80px 0 18px !important; }
+    .tools-hero h1 { font-size: 1.8rem !important; }
+    .tools-hero p { font-size: 13px !important; }
   }
 
   /* ====== FII / DII TALLY WIDGET ====== */
@@ -2217,9 +2243,9 @@
     .fiidii-master-grid { grid-template-columns: 1fr !important; }
     .hist-scroll { max-height: 240px; }
 
-    /* Sidebar nav (Calls / Tools pages) — already collapses at 900px,
-       but the wrap items wrap to a row that can spill; force a single column. */
-    .snav-wrap { padding: 12px; }
+    /* Sidebar nav (Calls / Tools pages) — pill strip handles its own padding
+       via .snav-section-body; keep the wrap edge-to-edge. */
+    .snav-wrap { padding: 0; }
     .snav-content { padding: 20px 14px; }
 
     /* Premium plan cards already stack at 768px — extra padding tighten */
@@ -2626,21 +2652,14 @@
     .hero-media { box-shadow: 0 12px 24px rgba(0,0,0,0.35); }
   }
 
-  /* The Calls/Tools sidebar collapses to a single-row strip at <=900px.
-     On a 393px iPhone it can wrap into a tall stack — make it scroll
-     horizontally instead so the content area starts higher up. */
+  /* Phone-size tweaks for the horizontal pill strip (base layout is in the
+     900px block above). Tighten pills + content header on small screens. */
   @media (max-width: 640px) {
-    .snav-wrap {
-      display: flex; flex-wrap: nowrap; overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      gap: 6px; padding: 10px 12px;
-      scroll-snap-type: x proximity;
-    }
-    .snav-wrap > * { flex: 0 0 auto; scroll-snap-align: start; }
-    .snav-wrap::-webkit-scrollbar { display: none; }
-    .snav-section { flex: 0 0 auto; }
-    .snav-item { white-space: nowrap; }
+    .snav-section-body { padding: 10px 12px; gap: 7px; }
+    .snav-item { padding: 8px 14px; }
+    .snav-item-label { font-size: 12.5px; }
     .snav-content-header h2 { font-size: 1.3rem; }
+    .snav-content-header { gap: 8px; margin-bottom: 20px; padding-bottom: 14px; }
   }
 
   /* Smaller card-meta text on phones to keep meta row on a single line */
