@@ -71,6 +71,20 @@ function rn_num_list($raw) {
     return array_map('floatval', $m[0]);
 }
 
+/* Price fingerprint of a call: symbol+action+entry+targets+stops. Order-
+   insensitive on the level lists. Same setup -> same key -> never re-alert.
+   Any level edited (incl. a trailed stop or re-posted entry) -> new key -> the
+   engine treats it as a fresh, alertable setup. */
+function rn_setup_key($sym, $action, $entry, $targetsRaw, $stopsRaw) {
+    $t = rn_num_list($targetsRaw); sort($t, SORT_NUMERIC);
+    $s = rn_num_list($stopsRaw);   sort($s, SORT_NUMERIC);
+    $fmt = function ($x) { return number_format((float) $x, 2, '.', ''); };
+    $norm = strtoupper(trim((string) $sym)) . '|' . $action . '|' . $fmt($entry)
+          . '|' . implode(',', array_map($fmt, $t))
+          . '|' . implode(',', array_map($fmt, $s));
+    return md5($norm);
+}
+
 /* ---- pull every open call ---- */
 $calls = $pdo->query(
     "SELECT id, action, symbol, yahoo_symbol, entry_price, target_price, targets,
@@ -83,16 +97,30 @@ $checked = 0; $priced = 0; $newAlerts = 0; $details = [];
 
 $insAlert = $pdo->prepare(
     "INSERT IGNORE INTO call_alerts
-        (call_id, symbol, action, kind, level_index, level_price, trigger_price, entry_price, pnl_pct)
-     VALUES (:cid, :sym, :act, :kind, :lvl, :lvlp, :trig, :entry, :pnl)"
+        (call_id, symbol, action, kind, level_index, level_price, trigger_price, entry_price, pnl_pct, setup_key)
+     VALUES (:cid, :sym, :act, :kind, :lvl, :lvlp, :trig, :entry, :pnl, :skey)"
 );
 $updSnap = $pdo->prepare(
     "UPDATE calls SET last_price = :p, last_checked_at = NOW() WHERE id = :id"
+);
+// Existing alerts for a price-setup — used to decide if it's already "closed".
+$setupAlerts = $pdo->prepare(
+    "SELECT kind, level_index FROM call_alerts WHERE setup_key = :k"
 );
 
 foreach ($calls as $c) {
     $checked++;
     $sym   = $c['symbol'];
+    $isBuy = $c['action'] === 'BUY';
+    $entry = floatval($c['entry_price']);
+    $targetsRaw = !empty($c['targets'])     ? $c['targets']     : ($c['target_price'] ?? '');
+    $stopsRaw   = !empty($c['stop_losses']) ? $c['stop_losses'] : ($c['stop_loss']    ?? '');
+    $tl = rn_num_list($targetsRaw);
+    $slList = rn_num_list($stopsRaw);
+    $stop   = count($slList) ? $slList[0] : null;   // primary stop = first in the list
+    // One fingerprint for this exact price-setup. Drives all dedup below.
+    $setupKey = rn_setup_key($sym, $c['action'], $entry, $targetsRaw, $stopsRaw);
+
     // Confirmed ticker (yahoo_symbol) wins; else auto-derive from the symbol.
     $ticker = rn_resolve_ticker($sym, $c['yahoo_symbol'] ?? null);
     if ($ticker !== null && !array_key_exists($ticker, $priceCache)) {
@@ -102,10 +130,11 @@ foreach ($calls as $c) {
 
     if ($price === null) {
         // Never fail silently: raise ONE visible "can't price" alert so the
-        // team can set the right NSE ticker. Deduped by the unique key.
+        // team can set the right NSE ticker. Deduped per setup.
         $insAlert->execute([
             ':cid' => $c['id'], ':sym' => $sym, ':act' => $c['action'], ':kind' => 'no_price',
             ':lvl' => 0, ':lvlp' => null, ':trig' => null, ':entry' => $c['entry_price'], ':pnl' => null,
+            ':skey' => $setupKey,
         ]);
         if ($insAlert->rowCount() > 0) { $newAlerts++; }
         $details[] = ['call' => $c['id'], 'symbol' => $sym, 'ticker' => $ticker, 'price' => null];
@@ -115,12 +144,22 @@ foreach ($calls as $c) {
 
     $updSnap->execute([':p' => $price, ':id' => $c['id']]);
 
-    $isBuy = $c['action'] === 'BUY';
-    $entry = floatval($c['entry_price']);
-    $tl = rn_num_list(!empty($c['targets']) ? $c['targets'] : ($c['target_price'] ?? ''));
-    // primary stop = first number in the SL list, else stop_loss column
-    $slList = rn_num_list(!empty($c['stop_losses']) ? $c['stop_losses'] : ($c['stop_loss'] ?? ''));
-    $stop   = count($slList) ? $slList[0] : null;
+    // ── "Closed" gate ──────────────────────────────────────────────
+    // If this exact setup already stopped out OR hit its final target, the
+    // position is logically closed — emit no further target/stop alerts for
+    // it (a post-stop rebound to a target must not ping). Alerting only
+    // resumes if a level changes, which yields a different setup_key.
+    $N = count($tl);
+    $setupAlerts->execute([':k' => $setupKey]);
+    $closed = false;
+    foreach ($setupAlerts->fetchAll() as $e) {
+        if ($e['kind'] === 'stop_hit') { $closed = true; break; }
+        if ($e['kind'] === 'target_hit' && $N > 0 && intval($e['level_index']) >= $N) { $closed = true; break; }
+    }
+    if ($closed) {
+        $details[] = ['call' => $c['id'], 'symbol' => $sym, 'closed' => true, 'price' => $price];
+        continue;
+    }
 
     $pnlAt = function ($p) use ($isBuy, $entry) {
         return ($entry > 0) ? round(($isBuy ? ($p - $entry) : ($entry - $p)) / $entry * 100, 2) : null;
@@ -137,6 +176,7 @@ foreach ($calls as $c) {
         $insAlert->execute([
             ':cid' => $c['id'], ':sym' => $sym, ':act' => $c['action'], ':kind' => 'target_hit',
             ':lvl' => $k, ':lvlp' => $lvl, ':trig' => $price, ':entry' => $entry, ':pnl' => $pnlAt($price),
+            ':skey' => $setupKey,
         ]);
         if ($insAlert->rowCount() > 0) { $newAlerts++; $details[] = ['call' => $c['id'], 'symbol' => $sym, 'target' => $k, 'price' => $price]; }
     }
@@ -148,6 +188,7 @@ foreach ($calls as $c) {
             $insAlert->execute([
                 ':cid' => $c['id'], ':sym' => $sym, ':act' => $c['action'], ':kind' => 'stop_hit',
                 ':lvl' => 0, ':lvlp' => $stop, ':trig' => $price, ':entry' => $entry, ':pnl' => $pnlAt($price),
+                ':skey' => $setupKey,
             ]);
             if ($insAlert->rowCount() > 0) { $newAlerts++; $details[] = ['call' => $c['id'], 'symbol' => $sym, 'stop' => $stop, 'price' => $price]; }
         }

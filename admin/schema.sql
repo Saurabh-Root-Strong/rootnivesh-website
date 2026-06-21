@@ -101,15 +101,24 @@ CREATE TABLE IF NOT EXISTS call_alerts (
   created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   sent_at       DATETIME DEFAULT NULL,
   handled_by    VARCHAR(50) DEFAULT NULL,
-  -- One alert per call + kind + level. Re-polls that see the same breach
+  -- Price fingerprint of the call (symbol+action+entry+targets+stops). Dedup
+  -- is per SETUP, not per row: an identical re-post never re-alerts, but if
+  -- any level changes the fingerprint changes and alerting resumes.
+  setup_key     CHAR(32) DEFAULT NULL,
+  -- One alert per price-setup + kind + level. Re-polls that see the same breach
   -- are ignored by the engine (INSERT IGNORE on this unique key).
-  UNIQUE KEY uniq_call_kind_level (call_id, kind, level_index),
+  UNIQUE KEY uniq_setup_kind_level (setup_key, kind, level_index),
   INDEX idx_status (status),
   INDEX idx_created (created_at DESC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- If you created call_alerts BEFORE the 'no_price' kind existed, widen it once:
 --   ALTER TABLE call_alerts MODIFY kind ENUM('target_hit','stop_hit','no_price') NOT NULL;
+-- If you created call_alerts with the OLD per-row unique key, migrate to the
+-- per-setup key once (safe to run; existing test rows keep a NULL setup_key):
+--   ALTER TABLE call_alerts ADD COLUMN setup_key CHAR(32) DEFAULT NULL AFTER handled_by;
+--   ALTER TABLE call_alerts DROP INDEX uniq_call_kind_level;
+--   ALTER TABLE call_alerts ADD UNIQUE KEY uniq_setup_kind_level (setup_key, kind, level_index);
 
 -- Snapshot of the last price the monitor saw, per call (display only).
 -- For EXISTING installs run these two once (ignore "duplicate column"):
