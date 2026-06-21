@@ -2879,7 +2879,10 @@
 .article-back a { color: var(--gold, #E5A50A); cursor: pointer; font-weight: 600; font-size: 14px; }
 .article-back a:hover { text-decoration: underline; }
 .article-wrap { display: grid; grid-template-columns: 240px 1fr; gap: 40px; align-items: start; }
-.article-toc { position: sticky; top: 110px; border-left: 2px solid var(--border, rgba(255,255,255,0.10)); padding-left: 16px; }
+.article-toc { position: sticky; top: 130px; border-left: 2px solid var(--border, rgba(255,255,255,0.10)); padding-left: 16px;
+  max-height: calc(100vh - 150px); overflow-y: auto; overscroll-behavior: contain; }
+.article-toc::-webkit-scrollbar { width: 6px; }
+.article-toc::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.14); border-radius: 3px; }
 .article-toc-title { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--grey, #7A8AA0); margin-bottom: 12px; font-weight: 700; }
 .article-toc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
 .article-toc li.toc-l3 { padding-left: 14px; }
