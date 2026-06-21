@@ -224,26 +224,6 @@
                 <span class="mega-sub-go" onclick="megaGoTool('brokerage')">Open Calculator →</span>
               </div>
             </div>
-            <div class="mega-row" onclick="megaGoTool('options')">
-              <span class="mega-row-label">Options Profit &amp; Strategy Builder</span>
-              <div class="mega-plus" onclick="megaToggleSub(event,'msub-options')">+</div>
-            </div>
-            <div class="mega-sub" id="msub-options">
-              <div class="mega-sub-inner">
-                <p>Build any F&amp;O strategy and see max profit, max loss, breakevens and the payoff chart.</p>
-                <span class="mega-sub-go" onclick="megaGoTool('options')">Open Calculator →</span>
-              </div>
-            </div>
-            <div class="mega-row" onclick="megaGoTool('average')">
-              <span class="mega-row-label">Stock Average Calculator</span>
-              <div class="mega-plus" onclick="megaToggleSub(event,'msub-average')">+</div>
-            </div>
-            <div class="mega-sub" id="msub-average">
-              <div class="mega-sub-inner">
-                <p>Average across multiple buys to get your true average cost price and total holding.</p>
-                <span class="mega-sub-go" onclick="megaGoTool('average')">Open Calculator →</span>
-              </div>
-            </div>
             <div class="mega-row" onclick="megaGoTool('sip')">
               <span class="mega-row-label">SIP Calculator</span>
               <div class="mega-plus" onclick="megaToggleSub(event,'msub-sip')">+</div>
@@ -254,14 +234,24 @@
                 <span class="mega-sub-go" onclick="megaGoTool('sip')">Open Calculator →</span>
               </div>
             </div>
-            <div class="mega-row" onclick="megaGoTool('returns')">
-              <span class="mega-row-label">CAGR / XIRR / Lumpsum</span>
-              <div class="mega-plus" onclick="megaToggleSub(event,'msub-returns')">+</div>
+            <div class="mega-row" onclick="megaGoTool('options')">
+              <span class="mega-row-label">F&amp;O Calculator</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-options')">+</div>
             </div>
-            <div class="mega-sub" id="msub-returns">
+            <div class="mega-sub" id="msub-options">
               <div class="mega-sub-inner">
-                <p>CAGR, date-accurate XIRR, and SIP-vs-lumpsum compared side by side.</p>
-                <span class="mega-sub-go" onclick="megaGoTool('returns')">Open Calculator →</span>
+                <p>Build any options/futures strategy and see max profit, max loss, breakevens and the payoff chart.</p>
+                <span class="mega-sub-go" onclick="megaGoTool('options')">Open Calculator →</span>
+              </div>
+            </div>
+            <div class="mega-row" onclick="megaGoTool('emi')">
+              <span class="mega-row-label">EMI Calculator</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-emi')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-emi">
+              <div class="mega-sub-inner">
+                <p>Calculate monthly EMI, total interest payable and principal breakdown for any loan type.</p>
+                <span class="mega-sub-go" onclick="megaGoTool('emi')">Open Calculator →</span>
               </div>
             </div>
             <div class="mega-row" onclick="megaGoTool('currency')">
@@ -274,14 +264,24 @@
                 <span class="mega-sub-go" onclick="megaGoTool('currency')">Open Calculator →</span>
               </div>
             </div>
-            <div class="mega-row" onclick="megaGoTool('emi')">
-              <span class="mega-row-label">EMI Calculator</span>
-              <div class="mega-plus" onclick="megaToggleSub(event,'msub-emi')">+</div>
+            <div class="mega-row" onclick="megaGoTool('returns')">
+              <span class="mega-row-label">CAGR / XIRR / Lumpsum</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-returns')">+</div>
             </div>
-            <div class="mega-sub" id="msub-emi">
+            <div class="mega-sub" id="msub-returns">
               <div class="mega-sub-inner">
-                <p>Calculate monthly EMI, total interest payable and principal breakdown for any loan type.</p>
-                <span class="mega-sub-go" onclick="megaGoTool('emi')">Open Calculator →</span>
+                <p>CAGR, date-accurate XIRR, and SIP-vs-lumpsum compared side by side.</p>
+                <span class="mega-sub-go" onclick="megaGoTool('returns')">Open Calculator →</span>
+              </div>
+            </div>
+            <div class="mega-row" onclick="megaGoTool('average')">
+              <span class="mega-row-label">Stock Average Calculator</span>
+              <div class="mega-plus" onclick="megaToggleSub(event,'msub-average')">+</div>
+            </div>
+            <div class="mega-sub" id="msub-average">
+              <div class="mega-sub-inner">
+                <p>Average across multiple buys to get your true average cost price and total holding.</p>
+                <span class="mega-sub-go" onclick="megaGoTool('average')">Open Calculator →</span>
               </div>
             </div>
           </div>
@@ -318,12 +318,12 @@
     </button>
     <div class="mob-group-body">
       <a class="mob-sub" onclick="megaGoTool('brokerage')"><span>🧾</span><span>Brokerage Calculator</span></a>
-      <a class="mob-sub" onclick="megaGoTool('options')"><span>⚖️</span><span>Options Builder</span></a>
-      <a class="mob-sub" onclick="megaGoTool('average')"><span>📊</span><span>Stock Average Calculator</span></a>
       <a class="mob-sub" onclick="megaGoTool('sip')"><span>💰</span><span>SIP Calculator</span></a>
-      <a class="mob-sub" onclick="megaGoTool('returns')"><span>📈</span><span>CAGR / XIRR</span></a>
-      <a class="mob-sub" onclick="megaGoTool('currency')"><span>💱</span><span>Currency Converter</span></a>
+      <a class="mob-sub" onclick="megaGoTool('options')"><span>⚖️</span><span>F&amp;O Calculator</span></a>
       <a class="mob-sub" onclick="megaGoTool('emi')"><span>🏦</span><span>EMI Calculator</span></a>
+      <a class="mob-sub" onclick="megaGoTool('currency')"><span>💱</span><span>Currency Converter</span></a>
+      <a class="mob-sub" onclick="megaGoTool('returns')"><span>📈</span><span>CAGR / XIRR</span></a>
+      <a class="mob-sub" onclick="megaGoTool('average')"><span>📊</span><span>Stock Average Calculator</span></a>
     </div>
   </div>
 
@@ -1448,26 +1448,6 @@
               <span class="snav-sub-btn" onclick="snavSelectTool('brokerage',document.getElementById('snav-brokerage'))">Open Brokerage Calculator &#8594;</span>
             </div>
           </div>
-          <div class="snav-item" id="snav-options" onclick="snavSelectTool('options',this)">
-            <span class="snav-item-label">Options Profit Builder</span>
-            <div class="snav-plus" onclick="snavToggle(event,'sub-options','snav-options')">+</div>
-          </div>
-          <div class="snav-sub" id="sub-options">
-            <div class="snav-sub-inner">
-              <p>Build any F&amp;O strategy leg by leg and see max profit, max loss, breakevens and the payoff chart.</p>
-              <span class="snav-sub-btn" onclick="snavSelectTool('options',document.getElementById('snav-options'))">Open Options Calculator &#8594;</span>
-            </div>
-          </div>
-          <div class="snav-item" id="snav-average" onclick="snavSelectTool('average',this)">
-            <span class="snav-item-label">Stock Average Calculator</span>
-            <div class="snav-plus" onclick="snavToggle(event,'sub-average','snav-average')">+</div>
-          </div>
-          <div class="snav-sub" id="sub-average">
-            <div class="snav-sub-inner">
-              <p>Average down across multiple buys to get your true average cost price and total holding.</p>
-              <span class="snav-sub-btn" onclick="snavSelectTool('average',document.getElementById('snav-average'))">Open Average Calculator &#8594;</span>
-            </div>
-          </div>
           <div class="snav-item" id="snav-sip" onclick="snavSelectTool('sip',this)">
             <span class="snav-item-label">SIP Calculator</span>
             <div class="snav-plus" onclick="snavToggle(event,'sub-sip','snav-sip')">+</div>
@@ -1478,14 +1458,24 @@
               <span class="snav-sub-btn" onclick="snavSelectTool('sip',document.getElementById('snav-sip'))">Open SIP Calculator &#8594;</span>
             </div>
           </div>
-          <div class="snav-item" id="snav-returns" onclick="snavSelectTool('returns',this)">
-            <span class="snav-item-label">CAGR / XIRR / Lumpsum</span>
-            <div class="snav-plus" onclick="snavToggle(event,'sub-returns','snav-returns')">+</div>
+          <div class="snav-item" id="snav-options" onclick="snavSelectTool('options',this)">
+            <span class="snav-item-label">F&amp;O Calculator</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-options','snav-options')">+</div>
           </div>
-          <div class="snav-sub" id="sub-returns">
+          <div class="snav-sub" id="sub-options">
             <div class="snav-sub-inner">
-              <p>Measure returns the right way — CAGR, date-accurate XIRR, and SIP-vs-lumpsum side by side.</p>
-              <span class="snav-sub-btn" onclick="snavSelectTool('returns',document.getElementById('snav-returns'))">Open Returns Calculator &#8594;</span>
+              <p>Build any F&amp;O options/futures strategy leg by leg and see max profit, max loss, breakevens and the payoff chart.</p>
+              <span class="snav-sub-btn" onclick="snavSelectTool('options',document.getElementById('snav-options'))">Open F&amp;O Calculator &#8594;</span>
+            </div>
+          </div>
+          <div class="snav-item" id="snav-emi" onclick="snavSelectTool('emi',this)">
+            <span class="snav-item-label">EMI Calculator</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-emi','snav-emi')">+</div>
+          </div>
+          <div class="snav-sub" id="sub-emi">
+            <div class="snav-sub-inner">
+              <p>Calculate monthly EMI, total interest payable and principal breakdown for any loan type.</p>
+              <span class="snav-sub-btn" onclick="snavSelectTool('emi',document.getElementById('snav-emi'))">Open EMI Calculator &#8594;</span>
             </div>
           </div>
           <div class="snav-item" id="snav-currency" onclick="snavSelectTool('currency',this)">
@@ -1498,14 +1488,24 @@
               <span class="snav-sub-btn" onclick="snavSelectTool('currency',document.getElementById('snav-currency'))">Open Currency Converter &#8594;</span>
             </div>
           </div>
-          <div class="snav-item" id="snav-emi" onclick="snavSelectTool('emi',this)">
-            <span class="snav-item-label">EMI Calculator</span>
-            <div class="snav-plus" onclick="snavToggle(event,'sub-emi','snav-emi')">+</div>
+          <div class="snav-item" id="snav-returns" onclick="snavSelectTool('returns',this)">
+            <span class="snav-item-label">CAGR / XIRR / Lumpsum</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-returns','snav-returns')">+</div>
           </div>
-          <div class="snav-sub" id="sub-emi">
+          <div class="snav-sub" id="sub-returns">
             <div class="snav-sub-inner">
-              <p>Calculate monthly EMI, total interest payable and principal breakdown for any loan type.</p>
-              <span class="snav-sub-btn" onclick="snavSelectTool('emi',document.getElementById('snav-emi'))">Open EMI Calculator &#8594;</span>
+              <p>Measure returns the right way — CAGR, date-accurate XIRR, and SIP-vs-lumpsum side by side.</p>
+              <span class="snav-sub-btn" onclick="snavSelectTool('returns',document.getElementById('snav-returns'))">Open Returns Calculator &#8594;</span>
+            </div>
+          </div>
+          <div class="snav-item" id="snav-average" onclick="snavSelectTool('average',this)">
+            <span class="snav-item-label">Stock Average Calculator</span>
+            <div class="snav-plus" onclick="snavToggle(event,'sub-average','snav-average')">+</div>
+          </div>
+          <div class="snav-sub" id="sub-average">
+            <div class="snav-sub-inner">
+              <p>Average down across multiple buys to get your true average cost price and total holding.</p>
+              <span class="snav-sub-btn" onclick="snavSelectTool('average',document.getElementById('snav-average'))">Open Average Calculator &#8594;</span>
             </div>
           </div>
         </div>
@@ -1555,8 +1555,8 @@
       <div id="toolContent-options" style="display:none">
         <div class="snav-content-header">
           <div>
-            <div class="snav-breadcrumb">TOOLS &nbsp;/&nbsp; <span style="color:var(--gold)">OPTIONS STRATEGY BUILDER</span></div>
-            <h2>&#x2696;&#xFE0F; Options Profit Calculator &amp; Strategy Builder</h2>
+            <div class="snav-breadcrumb">TOOLS &nbsp;/&nbsp; <span style="color:var(--gold)">F&amp;O CALCULATOR</span></div>
+            <h2>&#x2696;&#xFE0F; F&amp;O Calculator &mdash; Options &amp; Futures Profit / Strategy Builder</h2>
             <p>Build any F&amp;O options strategy &mdash; covered call, bull call spread, straddle, strangle, iron condor &mdash; leg by leg, and instantly see net premium, maximum profit, maximum loss, breakeven points and the full expiry payoff chart. Works for NIFTY, BANK NIFTY and stock options with any lot size.</p>
           </div>
         </div>
@@ -2304,7 +2304,7 @@
      boot block (DOMContentLoaded) lives in market.js but only runs after all
      files have parsed, so every feature function is defined by then.
      Bump the ?v= number on any file you change to bust long-cached copies. -->
-<script src="js/data.js?v=48"></script>
+<script src="js/data.js?v=49"></script>
 <script src="js/app/core.js?v=76"></script>
 <script src="js/app/market.js?v=76"></script>
 <script src="js/app/content.js?v=76"></script>

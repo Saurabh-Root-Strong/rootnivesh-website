@@ -99,7 +99,7 @@ const callsMeta = {
 
 /* ----------- Backend / proxy config --------------------------------------- */
 const PROXY = '/proxy.php?url=';
-const TOOL_TYPES = ['brokerage', 'options', 'average', 'sip', 'returns', 'currency', 'emi'];
+const TOOL_TYPES = ['brokerage', 'sip', 'options', 'emi', 'currency', 'returns', 'average'];
 
 /* F&O index lot sizes — fallback used if /lots.php is unreachable. The live
    values (auto-refreshed weekly from NSE) come from lots.php; this just keeps
