@@ -30,6 +30,47 @@ function inr(n)  { return '₹' + Math.round(n).toLocaleString('en-IN'); }
 function inr2(n) { return '₹' + Number(n).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function toolNum(id) { const el = document.getElementById(id); return el ? parseFloat(el.value) : NaN; }
 
+/* ---- Lightweight inline-SVG charts (no library) ----
+   _donutChart(segments, centerMain, centerSub): segments = [{label,value,color,disp}]
+   _barChart(bars): bars = [{label,value,color,disp}] ---- */
+const CHART_COLORS = ['#E5A50A', '#4aa3ff', '#2ecc71', '#a78bfa', '#2dd4bf', '#f59e0b', '#ff6b6b', '#8A9BB0'];
+function _donutChart(segments, centerMain, centerSub) {
+  const segs = segments.filter(s => s.value > 0);
+  const total = segs.reduce((s, x) => s + x.value, 0) || 1;
+  const cx = 90, cy = 90, r = 72, rin = 46;
+  let ang = -Math.PI / 2, paths = '';
+  if (segs.length === 1) {
+    // Single slice → full ring (a 360° arc path is degenerate).
+    paths = `<circle cx="${cx}" cy="${cy}" r="${(r + rin) / 2}" fill="none" stroke="${segs[0].color}" stroke-width="${r - rin}"/>`;
+  } else {
+    segs.forEach(seg => {
+      const frac = seg.value / total, a2 = ang + frac * 2 * Math.PI, large = frac > 0.5 ? 1 : 0;
+      const x1 = cx + r * Math.cos(ang), y1 = cy + r * Math.sin(ang);
+      const x2 = cx + r * Math.cos(a2), y2 = cy + r * Math.sin(a2);
+      const xi2 = cx + rin * Math.cos(a2), yi2 = cy + rin * Math.sin(a2);
+      const xi1 = cx + rin * Math.cos(ang), yi1 = cy + rin * Math.sin(ang);
+      paths += `<path d="M${x1.toFixed(2)} ${y1.toFixed(2)} A${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} L${xi2.toFixed(2)} ${yi2.toFixed(2)} A${rin} ${rin} 0 ${large} 0 ${xi1.toFixed(2)} ${yi1.toFixed(2)} Z" fill="${seg.color}"/>`;
+      ang = a2;
+    });
+  }
+  const legend = segs.map(s => `<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;margin-bottom:7px"><span style="width:11px;height:11px;border-radius:3px;background:${s.color};display:inline-block;flex:none"></span><span style="color:var(--grey2)">${s.label}</span><span style="margin-left:auto;color:var(--white);font-weight:600">${s.disp != null ? s.disp : s.value}</span></div>`).join('');
+  return `<div style="display:flex;gap:22px;align-items:center;flex-wrap:wrap;justify-content:center">
+    <svg viewBox="0 0 180 180" width="172" height="172" style="flex:none">${paths}
+      <text x="90" y="88" text-anchor="middle" fill="var(--white)" font-size="17" font-weight="700">${centerMain || ''}</text>
+      <text x="90" y="106" text-anchor="middle" fill="var(--grey)" font-size="10">${centerSub || ''}</text>
+    </svg>
+    <div style="min-width:190px;flex:1">${legend}</div>
+  </div>`;
+}
+function _barChart(bars) {
+  const max = Math.max(...bars.map(b => b.value), 1);
+  return '<div style="display:flex;flex-direction:column;gap:14px;margin-top:4px">' +
+    bars.map(b => `<div>
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px"><span style="color:var(--grey2)">${b.label}</span><span style="color:var(--white);font-weight:600">${b.disp}</span></div>
+      <div style="background:rgba(255,255,255,0.06);border-radius:6px;height:16px;overflow:hidden"><div style="height:100%;width:${(b.value / max * 100).toFixed(1)}%;background:${b.color};transition:width .7s ease"></div></div>
+    </div>`).join('') + '</div>';
+}
+
 /* ============================================================
    EMI CALCULATOR
    ============================================================ */
@@ -52,6 +93,10 @@ function calcEMI() {
   document.getElementById('emiBar').style.width = prinPct + '%';
   document.getElementById('principalPct').textContent = prinPct + '%';
   document.getElementById('interestPctDisp').textContent = intPct + '%';
+  document.getElementById('emiChart').innerHTML = _donutChart([
+    { label: 'Principal', value: P,        color: '#E5A50A', disp: '₹' + fmt(P) },
+    { label: 'Interest',  value: totalInt, color: '#ff6b6b', disp: '₹' + fmt(totalInt) },
+  ], '₹' + fmt(emi), 'monthly EMI');
   document.getElementById('emiResult').classList.add('show');
 }
 
@@ -119,6 +164,15 @@ function calcBrokerage() {
     `<div style="display:flex;justify-content:space-between;padding:8px 0 0;font-weight:700"><span>Total charges</span><span style="color:var(--gold)">${inr2(charges)}</span></div>` +
     `<div style="margin-top:10px;font-size:12px;color:var(--grey2)">Breakeven: price must move <strong style="color:var(--white)">₹${beMove.toFixed(2)}</strong> (to ≈ <strong style="color:var(--white)">₹${bePrice.toFixed(2)}</strong>) just to cover costs.</div>` +
     `<div style="margin-top:6px;font-size:11px;color:var(--grey)">Statutory rates are estimates (post-Oct-2024 STT) and vary by broker/exchange. Verify on your contract note.</div>`;
+  document.getElementById('brkChart').innerHTML = _donutChart([
+    { label: 'Brokerage', value: brokerage, color: '#E5A50A', disp: inr2(brokerage) },
+    { label: 'STT / CTT', value: stt,       color: '#ff6b6b', disp: inr2(stt) },
+    { label: 'Exchange',  value: exch,      color: '#4aa3ff', disp: inr2(exch) },
+    { label: 'GST 18%',   value: gst,       color: '#a78bfa', disp: inr2(gst) },
+    { label: 'Stamp duty',value: stamp,     color: '#2dd4bf', disp: inr2(stamp) },
+    { label: 'SEBI',      value: sebi,      color: '#f59e0b', disp: inr2(sebi) },
+    { label: 'DP',        value: dp,        color: '#8A9BB0', disp: inr2(dp) },
+  ], '₹' + fmt(charges), 'total charges');
   document.getElementById('brkResult').classList.add('show');
 }
 
@@ -141,16 +195,19 @@ function addAvgRow(price, qty) {
 function calcAverage() {
   const prices = document.querySelectorAll('#avgRows .avg-price');
   const qtys   = document.querySelectorAll('#avgRows .avg-qty');
-  let totQty = 0, totCost = 0;
+  let totQty = 0, totCost = 0; const buys = [];
   for (let i = 0; i < prices.length; i++) {
     const p = parseFloat(prices[i].value), q = parseFloat(qtys[i].value);
-    if (p > 0 && q > 0) { totQty += q; totCost += p * q; }
+    if (p > 0 && q > 0) { totQty += q; totCost += p * q; buys.push({ p, q }); }
   }
   if (totQty === 0) return;
   const avg = totCost / totQty;
   document.getElementById('avgPrice').textContent = '₹' + avg.toFixed(2);
   document.getElementById('avgQty').textContent   = totQty.toLocaleString('en-IN');
   document.getElementById('avgInvest').textContent = '₹' + fmt(totCost);
+  document.getElementById('avgChart').innerHTML = _donutChart(
+    buys.map((b, i) => ({ label: `₹${b.p} × ${b.q}`, value: b.p * b.q, color: CHART_COLORS[i % CHART_COLORS.length], disp: '₹' + fmt(b.p * b.q) })),
+    '₹' + avg.toFixed(0), 'avg price');
   document.getElementById('avgResult').classList.add('show');
 }
 
@@ -394,6 +451,10 @@ function calcSIP() {
     'compounds to <strong style="color:var(--white)">₹' + fmt(fv) + '</strong>. ' +
     'Of that, <strong style="color:var(--green)">' + gainsPct + '%</strong> is pure return — ' +
     'your contributions are only ₹' + fmt(invested) + '.';
+  document.getElementById('sipChart').innerHTML = _donutChart([
+    { label: 'Invested', value: invested, color: '#4aa3ff', disp: '₹' + fmt(invested) },
+    { label: 'Gains',    value: gains,    color: '#2ecc71', disp: '₹' + fmt(gains) },
+  ], '₹' + fmt(fv), 'maturity');
   document.getElementById('sipResult').classList.add('show');
 }
 
@@ -418,6 +479,10 @@ function calcCAGR() {
   document.getElementById('cagrVal').textContent = cagr.toFixed(2) + '%';
   document.getElementById('cagrAbs').textContent = abs.toFixed(2) + '%';
   document.getElementById('cagrMult').textContent = (final / initial).toFixed(2) + 'x';
+  document.getElementById('cagrChart').innerHTML = _donutChart([
+    { label: 'Invested', value: initial,                 color: '#4aa3ff', disp: '₹' + fmt(initial) },
+    { label: 'Gains',    value: Math.max(0, final - initial), color: '#2ecc71', disp: '₹' + fmt(final - initial) },
+  ], cagr.toFixed(1) + '%', 'CAGR');
   document.getElementById('cagrResult').classList.add('show');
 }
 function calcLumpVsSip() {
@@ -441,6 +506,10 @@ function calcLumpVsSip() {
     verdict.style.display = 'block';
     verdict.innerHTML = `<strong style="color:var(--gold)">${winner}</strong> ends higher by <strong style="color:var(--white)">₹${fmt(diff)}</strong> at ${annualR}% over ${years} years. Lumpsum wins when you have the capital upfront and markets trend up; SIP wins by averaging through volatility.`;
   } else { verdict.style.display = 'none'; }
+  document.getElementById('lvChart').innerHTML = _barChart([
+    { label: 'SIP maturity',     value: sipFv,  color: '#E5A50A', disp: '₹' + fmt(sipFv) },
+    { label: 'Lumpsum maturity', value: lumpFv, color: '#4aa3ff', disp: '₹' + fmt(lumpFv) },
+  ]);
   document.getElementById('lvResult').classList.add('show');
 }
 let xirrRowCount = 0;
