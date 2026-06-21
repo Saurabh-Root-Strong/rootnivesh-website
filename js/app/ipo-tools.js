@@ -447,16 +447,6 @@ function renderPlanCard(p, openByDefault) {
    : p.type === 'service'      ? 'Premium Strategy'
    :                              'Personal Mastery');
 
-  // Header price signal — show the starting price right on the collapsed
-  // card so visitors see "from ₹299/mo" without expanding. Far more
-  // compelling than a vague value label on mobile.
-  let headerPrice = valueLabel;
-  if (p.type === 'subscription') {
-    const _t = Object.keys(p.pricing)[0];
-    const _m1 = p.pricing[_t][1];
-    if (typeof _m1 === 'number') headerPrice = 'from ' + fmtINR(_m1) + '/mo';
-  }
-
   // Optional fancy chips (e.g. "Index-Based", "Research Delivery") and
   // small ribbon (e.g. "LAUNCH OFFER") next to the plan name.
   const chipsHTML = (p.chips && p.chips.length)
@@ -506,7 +496,6 @@ function renderPlanCard(p, openByDefault) {
     +       '</div>'
     +     '</div>'
     +     '<div class="plan-toggle-right">'
-    +       '<span class="plan-toggle-price">' + headerPrice + '</span>'
     +       '<span class="plan-toggle-chev">▾</span>'
     +     '</div>'
     +   '</button>'
