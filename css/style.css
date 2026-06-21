@@ -828,6 +828,10 @@
     border: 1px solid var(--border2); border-radius: 12px; display: none;
   }
   .calc-result.show { display: block; }
+  /* Chart SVGs are display-only — keep a normal arrow cursor over them and
+     their text (SVG <text> otherwise shows a text/selection cursor). */
+  .calc-result svg, .calc-result svg * { cursor: default; }
+  .calc-result svg text { user-select: none; -webkit-user-select: none; }
   .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .result-item { text-align: center; }
   .result-item .r-val { font-family: 'Space Mono', monospace; font-size: 1.3rem; color: var(--gold); font-weight: 700; }
