@@ -1127,10 +1127,13 @@ function renderArticle(post) {
   const read = post.read_minutes ? `${post.read_minutes} min read` : '';
   const cover = post.cover_image
     ? `<div class="article-cover"><img src="${encodeURI(post.cover_image)}" alt="${escapeHtml(post.title)}" loading="lazy"></div>` : '';
-  const tocHtml = toc.length ? `<aside class="article-toc">
-      <div class="article-toc-title">In this article</div>
+  // Collapsible TOC: open on desktop (sticky sidebar), collapsed on mobile so
+  // the article title + body are visible immediately instead of a full list.
+  const tocOpen = !window.matchMedia('(max-width: 820px)').matches;
+  const tocHtml = toc.length ? `<details class="article-toc"${tocOpen ? ' open' : ''}>
+      <summary class="article-toc-title">In this article</summary>
       <ul>${toc.map(h => `<li class="toc-l${h.lvl}"><a onclick="blogScrollTo('${h.id}')">${escapeHtml(h.text)}</a></li>`).join('')}</ul>
-    </aside>` : '';
+    </details>` : '';
   setArticleSeo(post);
   view.innerHTML = `
     <div class="article-back"><a onclick="backToBlog()">← Back to blog</a></div>
