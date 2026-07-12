@@ -143,8 +143,25 @@ function gmp_band_text($raw) {
     return $fmt($vals[0]) . ' - ' . $fmt(end($vals));
 }
 
+/* Parse a tracker date to ISO (Y-m-d), or null. Handles ipopremium's
+   "Jul 16, 2026" and a couple of common fallbacks. Year is required — a
+   yearless range like ipowatch's "14-16 July" is deliberately NOT accepted,
+   because guessing the year is how a closed IPO ends up dated into the future. */
+function gmp_date_iso($raw) {
+    $s = trim((string) $raw);
+    if ($s === '' || $s === '-') return null;
+    foreach (['M j, Y', 'M d, Y', 'd M Y', 'd-M-Y', 'Y-m-d'] as $fmt) {
+        $d = DateTime::createFromFormat($fmt, $s);
+        $e = DateTime::getLastErrors();
+        if ($d instanceof DateTime && (!$e || ($e['warning_count'] === 0 && $e['error_count'] === 0))) {
+            return $d->format('Y-m-d');
+        }
+    }
+    return null;
+}
+
 /* Assemble one normalised row + its derived fields. */
-function gmp_row($name, $gmp, $capPrice, $type, $status, $updated, $bandRaw = null) {
+function gmp_row($name, $gmp, $capPrice, $type, $status, $updated, $bandRaw = null, $openRaw = null, $closeRaw = null) {
     $hasGmp = ($gmp !== null);
     $gain   = null;
     $est    = null;
@@ -168,6 +185,10 @@ function gmp_row($name, $gmp, $capPrice, $type, $status, $updated, $bandRaw = nu
         'type'          => $type ?: null,
         'status'        => $status ?: null,
         'updated'       => $updated ?: null,
+        // Issue dates (ISO). Present from ipopremium; let the frontend place a
+        // tracker-only issue into the right tab when NSE has not listed it yet.
+        'open_date'     => gmp_date_iso($openRaw),
+        'close_date'    => gmp_date_iso($closeRaw),
     ];
 }
 
@@ -216,7 +237,8 @@ function fetch_ipopremium() {
         $gmp  = gmp_num($c[2]);
         $band = gmp_cap_price($c[5]);           // "545-574"; 0-0 means unannounced
         if ($band !== null && $band <= 0) $band = null;
-        $rows[] = gmp_row($name, $gmp, $band, $c[1], null, null, $c[5]);
+        // c[3]=Open "Jul 14, 2026", c[4]=Close "Jul 16, 2026".
+        $rows[] = gmp_row($name, $gmp, $band, $c[1], null, null, $c[5], $c[3] ?? null, $c[4] ?? null);
     }
     return $rows;
 }
@@ -249,7 +271,9 @@ function gmp_merge($primary, $secondary) {
         // Fill anything else the primary simply doesn't have. GMP is NOT
         // overwritten — two trackers quote slightly different premiums and
         // mixing them would produce a number neither source published.
-        foreach (['cap_price', 'type', 'status', 'updated'] as $f) {
+        // Dates come from ipopremium; status from ipowatch. Each fills what the
+        // other lacks, so a merged row can carry both real dates and a status.
+        foreach (['cap_price', 'type', 'status', 'updated', 'open_date', 'close_date'] as $f) {
             if (($p[$f] === null || $p[$f] === '') && isset($s[$f]) && $s[$f] !== null && $s[$f] !== '') {
                 $p[$f] = $s[$f];
             }

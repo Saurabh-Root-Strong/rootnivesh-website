@@ -110,11 +110,53 @@ function canonIpo(r, feed) {
   };
 }
 
-/* The tab a row belongs in. Dates decide; the feed it arrived on is only a
-   fallback for the rare undated row, so an undated IPO shows up somewhere
-   instead of being silently dropped from every tab. */
+/* The tab a row belongs in. Dates decide first. For a tracker-sourced row with
+   no usable dates, its scraped status label is the next best signal. The feed
+   name is the final fallback so nothing is ever dropped from every tab. */
 function ipoTabOf(row) {
-  return ipoPhase(row) || row._feed || 'open';
+  const byDate = ipoPhase(row);
+  if (byDate) return byDate;
+  if (row._trackerStatus) {
+    const s = row._trackerStatus.toLowerCase();
+    if (s.indexOf('upcoming') >= 0) return 'upcoming';
+    if (s.indexOf('open') >= 0)     return 'open';
+    if (s.indexOf('close') >= 0 || s.indexOf('listed') >= 0) return 'closed';
+  }
+  return row._feed || 'open';
+}
+
+/* ISO "2026-07-16" -> NSE-style "16-Jul-2026", the display format the table and
+   parseNseDate() both expect. Lets a tracker row flow through the same date
+   classifier as an NSE row. */
+function isoToNseDate(iso) {
+  const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return '';
+  const mon = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][Number(m[2]) - 1];
+  return Number(m[3]) + '-' + mon + '-' + m[1];
+}
+
+/* Turn a GMP-tracker row into the canonical IPO shape, so it can stand in for
+   an NSE row on a tab NSE has not populated yet (NSE lists an issue only in a
+   narrow window; the trackers list it far earlier). Marked _feed:'tracker' and
+   _fromTracker so the merge keeps NSE authoritative wherever both exist. */
+function canonFromTracker(g) {
+  const start = isoToNseDate(g.open_date);
+  const end   = isoToNseDate(g.close_date);
+  return {
+    symbol:         null,
+    companyName:    g.name,
+    issueStartDate: start,
+    issueEndDate:   end,
+    series:         /sme/i.test(g.type || '') ? 'SME' : 'Mainboard',
+    issuePrice:     g.price_band || null,
+    noOfTime:       null,
+    status:         g.status || null,
+    _feed:          'upcoming',        // only ever used to fill the Upcoming/Open gap
+    _fromTracker:   true,
+    _trackerStatus: g.status || null,
+    _startDate:     parseNseDate(start),
+    _endDate:       parseNseDate(end)
+  };
 }
 
 function fmtIpoDate(s) {
@@ -747,6 +789,28 @@ async function fetchIpo(tab) {
   }
 
   const universe = mergeIpoFeeds(results.map(r => r.rows));
+
+  // Fill NSE's gaps with the trackers. NSE lists an issue only in a narrow
+  // window, so its Upcoming feed is routinely empty while the trackers already
+  // carry the next several issues. Add any tracker issue NSE does not already
+  // have (matched by normalised name), so Upcoming/Open are never blank when
+  // the market clearly has issues. NSE stays authoritative — a tracker row is
+  // only added when nothing in the NSE universe matches it.
+  if (GMP_MAP && GMP_MAP.size) {
+    const have = new Set(universe.map(r => gmpKey(r.companyName || r.symbol || '')));
+    GMP_MAP.forEach(g => {
+      // Need at least dates or a status to place it, and it must not duplicate
+      // an NSE row. Closed issues are left to NSE's own past-issues archive.
+      if (have.has(g.key)) return;
+      const t = canonFromTracker(g);
+      const phase = ipoTabOf(t);
+      if (phase === 'upcoming' || phase === 'open') {
+        universe.push(t);
+        have.add(g.key);
+      }
+    });
+  }
+
   let arr;
 
   if (tab === 'all') {
@@ -755,7 +819,7 @@ async function fetchIpo(tab) {
     // for (upcoming, opening soonest), then the archive (closed, newest).
     // A single date sort would bury a live IPO under yesterday's listings.
     const rank = { open: 0, upcoming: 1, closed: 2 };
-    arr = universe.filter(r => r._startDate || r._endDate);
+    arr = universe.filter(r => r._startDate || r._endDate || r._trackerStatus);
     arr.sort((a, b) => {
       const ra = rank[ipoTabOf(a)] ?? 3, rb = rank[ipoTabOf(b)] ?? 3;
       if (ra !== rb) return ra - rb;
