@@ -711,6 +711,26 @@
      hidden — a chip that vanishes is more confusing than one that says "0". */
   .ipo-chip.empty { opacity: 0.45; }
 
+  /* ====== IPO PAGER ====== */
+  .ipo-pager {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap; margin-top: 16px;
+  }
+  .ipo-pager-info {
+    font-size: 11px; color: var(--grey); font-family: 'Space Mono', monospace;
+  }
+  .ipo-pager-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .ipo-page {
+    min-width: 34px; padding: 6px 10px; border-radius: 6px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--grey2); font-size: 12px; cursor: pointer;
+    transition: var(--transition);
+  }
+  .ipo-page:hover:not(:disabled) { border-color: var(--border2); color: var(--white); }
+  .ipo-page.active { background: rgba(201,168,76,0.12); border-color: var(--gold); color: var(--gold); }
+  .ipo-page:disabled { opacity: 0.35; cursor: not-allowed; }
+  .ipo-page-gap { color: var(--grey); padding: 0 2px; align-self: center; font-size: 12px; }
+
   /* ====== IPO ALLOTMENT STATUS PANEL ====== */
   .allot-intro {
     text-align: center;

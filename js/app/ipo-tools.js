@@ -478,7 +478,29 @@ function renderIpoTable(rows, tab) {
    one or the other, so selecting both can only ever yield nothing.
    ================================================================ */
 let IPO_ROWS  = [];                                    // the active tab's rows, pre-chip
-let IPO_CHIPS = { gmp: false, seg: null, closing: false };
+let IPO_CHIPS = { gmp: false, seg: null, closing: false, range: '3m' };
+let IPO_PAGE  = 1;
+const IPO_PAGE_SIZE = 25;
+
+/* How far back the Closed tab reaches. NSE's past-issues feed carries years of
+   history (~1,400 rows) and we already hold all of it client-side, so the
+   period selector is free — it's a slice of memory, not another request. */
+const IPO_RANGES = [
+  { id: '1m',  label: '1M',  days: 31,   text: 'last 1 month'  },
+  { id: '3m',  label: '3M',  days: 92,   text: 'last 3 months' },
+  { id: '6m',  label: '6M',  days: 183,  text: 'last 6 months' },
+  { id: '1y',  label: '1Y',  days: 366,  text: 'last 1 year'   },
+  { id: 'all', label: 'All', days: null, text: 'full history'  }
+];
+
+function ipoInRange(r) {
+  const def = IPO_RANGES.find(x => x.id === IPO_CHIPS.range);
+  if (!def || def.days === null) return true;
+  if (!r._endDate) return false;
+  const cutoff = istToday();
+  cutoff.setDate(cutoff.getDate() - def.days);
+  return r._endDate >= cutoff;
+}
 
 function ipoIsSme(r)       { return /sme/i.test(r.series || ''); }
 function ipoIsMainboard(r) { return !ipoIsSme(r); }    // NSE marks SME explicitly; everything else is mainboard
@@ -520,12 +542,33 @@ function ipoChipDefs(tab) {
 
 function applyIpoChips(rows, tab) {
   return rows.filter(r => {
+    // The period only bounds history — it has no meaning for a live or a
+    // not-yet-opened issue.
+    if (tab === 'closed' && !ipoInRange(r))       return false;
     if (IPO_CHIPS.gmp     && !ipoHasGmp(r))       return false;
     if (IPO_CHIPS.closing && !ipoClosingToday(r)) return false;
     if (IPO_CHIPS.seg === 'sme'       && !ipoIsSme(r))       return false;
     if (IPO_CHIPS.seg === 'mainboard' && !ipoIsMainboard(r)) return false;
     return true;
   });
+}
+
+/* Period selector — Closed only. Rendered as its own labelled group so it
+   reads as "how far back", not as another on/off filter sitting beside SME. */
+function renderIpoPeriod(tab) {
+  if (tab !== 'closed') return '';
+  let h = '<span class="ipo-chips-label" style="margin-left:10px">Period</span>';
+  IPO_RANGES.forEach(r => {
+    const on = IPO_CHIPS.range === r.id;
+    h += `<button class="ipo-chip${on ? ' active' : ''}" onclick="setIpoRange('${r.id}')">${r.label}</button>`;
+  });
+  return h;
+}
+
+function setIpoRange(id) {
+  IPO_CHIPS.range = id;
+  IPO_PAGE = 1;                 // a wider window with the old page number would land on a blank page
+  paintIpoRows();
 }
 
 function renderIpoChips(tab) {
@@ -546,9 +589,14 @@ function renderIpoChips(tab) {
     return n;
   };
 
+  // "All" means all rows in the CURRENT PERIOD, not all of NSE's history —
+  // on the Closed tab the period is a separate axis, so counting the full
+  // 1,400-row feed here would contradict what the table can actually show.
+  const base = (tab === 'closed') ? IPO_ROWS.filter(ipoInRange).length : IPO_ROWS.length;
+
   let html = '<span class="ipo-chips-label">Filter</span>' +
     `<button class="ipo-chip${anyOn ? '' : ' active'}" onclick="clearIpoChips()">All` +
-    `<span class="chip-count">${IPO_ROWS.length}</span></button>`;
+    `<span class="chip-count">${base}</span></button>`;
 
   defs.forEach(d => {
     const on = d.on();
@@ -557,26 +605,76 @@ function renderIpoChips(tab) {
             `onclick="toggleIpoChip('${d.id}')">${escapeHtml(d.label)}` +
             `<span class="chip-count">${n}</span></button>`;
   });
-  box.innerHTML = html;
+  box.innerHTML = html + renderIpoPeriod(tab);
 }
 
 function toggleIpoChip(id) {
   const d = ipoChipDefs(currentIpoTab).find(x => x.id === id);
   if (!d) return;
   d.toggle();
+  IPO_PAGE = 1;                 // the result set just changed under the old page number
   paintIpoRows();
 }
 
 function clearIpoChips() {
-  IPO_CHIPS = { gmp: false, seg: null, closing: false };
+  IPO_CHIPS = { gmp: false, seg: null, closing: false, range: IPO_CHIPS.range };
+  IPO_PAGE  = 1;
   paintIpoRows();
 }
 
-/* Re-render from the rows we already have — chip toggles must not refetch. */
+function gotoIpoPage(p) {
+  IPO_PAGE = p;
+  paintIpoRows();
+  const el = document.getElementById('ipoTable');
+  if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* Windowed pager. With years of history a full page-number strip would run to
+   50+ links, so we show first / last / a window around the current page and
+   elide the rest. */
+function renderIpoPager(total, pages) {
+  const box = document.getElementById('ipoPager');
+  if (!box) return;
+  if (total === 0) { box.innerHTML = ''; return; }
+
+  const from = (IPO_PAGE - 1) * IPO_PAGE_SIZE + 1;
+  const to   = Math.min(IPO_PAGE * IPO_PAGE_SIZE, total);
+  let h = `<span class="ipo-pager-info">Showing ${from}–${to} of ${total}</span>`;
+
+  if (pages > 1) {
+    h += '<div class="ipo-pager-btns">';
+    h += `<button class="ipo-page" ${IPO_PAGE === 1 ? 'disabled' : ''} onclick="gotoIpoPage(${IPO_PAGE - 1})">&larr; Prev</button>`;
+
+    const nums = new Set([1, pages, IPO_PAGE, IPO_PAGE - 1, IPO_PAGE + 1]);
+    const list = Array.from(nums).filter(n => n >= 1 && n <= pages).sort((a, b) => a - b);
+    let prev = 0;
+    list.forEach(n => {
+      if (n - prev > 1) h += '<span class="ipo-page-gap">…</span>';
+      h += `<button class="ipo-page${n === IPO_PAGE ? ' active' : ''}" onclick="gotoIpoPage(${n})">${n}</button>`;
+      prev = n;
+    });
+
+    h += `<button class="ipo-page" ${IPO_PAGE === pages ? 'disabled' : ''} onclick="gotoIpoPage(${IPO_PAGE + 1})">Next &rarr;</button>`;
+    h += '</div>';
+  }
+  box.innerHTML = h;
+}
+
+/* Re-render from the rows we already have — chips, period and paging must
+   never refetch. Only the current PAGE is handed to renderIpoTable, which is
+   what keeps the company-info lookups bounded: the Closed feed is ~1,400 rows
+   and running a proxied lookup for every one of them would be thousands of
+   requests per page load. */
 function paintIpoRows() {
-  renderIpoTable(applyIpoChips(IPO_ROWS, currentIpoTab), currentIpoTab);
+  const filtered = applyIpoChips(IPO_ROWS, currentIpoTab);
+  const pages    = Math.max(1, Math.ceil(filtered.length / IPO_PAGE_SIZE));
+  if (IPO_PAGE > pages) IPO_PAGE = pages;      // filters shrank the set under our feet
+
+  const start = (IPO_PAGE - 1) * IPO_PAGE_SIZE;
+  renderIpoTable(filtered.slice(start, start + IPO_PAGE_SIZE), currentIpoTab);
   renderIpoChips(currentIpoTab);
-  autoFillIpoBusinessCells();
+  renderIpoPager(filtered.length, pages);
+  autoFillIpoBusinessCells();                  // only ever sees the 25 rows on screen
 }
 
 /* One feed. Fails soft: a dead endpoint returns no rows rather than throwing,
@@ -627,11 +725,10 @@ async function fetchIpo(tab) {
   let arr = universe.filter(r => ipoTabOf(r) === tab);
 
   if (tab === 'closed') {
-    // Only the recent window, newest first.
-    const cutoff = istToday();
-    cutoff.setDate(cutoff.getDate() - IPO_CLOSED_DAYS);
-    arr = arr.filter(r => r._endDate && r._endDate >= cutoff)
-             .sort((a, b) => b._endDate - a._endDate);
+    // Keep the FULL history here, newest first. The window is applied later by
+    // the period selector, so switching 1M -> All is a slice of memory rather
+    // than another trip to NSE.
+    arr = arr.filter(r => r._endDate).sort((a, b) => b._endDate - a._endDate);
   } else {
     // Open: closing soonest first. Upcoming: opening soonest first.
     const k = tab === 'open' ? '_endDate' : '_startDate';
@@ -647,7 +744,8 @@ async function fetchIpo(tab) {
     const at      = primary.payload && primary.payload.fetched_at
       ? new Date(primary.payload.fetched_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
       : '';
-    const dayCap  = tab === 'closed' ? ' Showing the last ' + IPO_CLOSED_DAYS + ' days.' : '';
+    const rng     = IPO_RANGES.find(r => r.id === IPO_CHIPS.range);
+    const dayCap  = tab === 'closed' ? ' Past issues — ' + (rng ? rng.text : '') + '.' : '';
     const gmpSrc  = (GMP_META && GMP_META.source)
       ? ' • GMP: ' + GMP_META.source + (GMP_META.stale ? ' (stale)' : '')
       : '';
