@@ -35,6 +35,12 @@ RewriteRule ^sitemap\.xml$ sitemap.php [L]
 # blog.php falls back to index.html on any failure, so this can't break links.
 RewriteRule ^blog/([a-z0-9-]+)/?$ blog.php?slug=$1 [L,QSA]
 
+# Server-rendered per-IPO pages: /ipo/<company-slug> is rendered by
+# ipo-detail.php to capture "[company] ipo gmp" long-tail searches. Bare /ipo
+# (the tool) is NOT matched and still falls through to the SPA. ipo-detail.php
+# falls back to the SPA on failure and 404s an unknown issue.
+RewriteRule ^ipo/([a-z0-9-]+)/?$ ipo-detail.php?slug=$1 [L,QSA]
+
 # ────────────────────────────────────────────────────────────
 # 3. SPA ROUTING (unchanged behaviour)
 # ────────────────────────────────────────────────────────────

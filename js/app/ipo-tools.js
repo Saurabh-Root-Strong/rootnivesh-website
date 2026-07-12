@@ -159,6 +159,16 @@ function canonFromTracker(g) {
   };
 }
 
+/* Canonical IPO slug — MUST match ipo_slug() in ipo-detail.php so the row link
+   and the server-rendered page agree on the URL. */
+function ipoSlug(name) {
+  return String(name || '')
+    .toLowerCase()
+    .replace(/\b(limited|ltd|private|pvt)\b/g, ' ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 function fmtIpoDate(s) {
   // NSE returns "23-Apr-2026" — pass through as-is, that matches the screenshot style
   return s || '—';
@@ -574,9 +584,15 @@ function renderIpoTable(rows, tab) {
     // could not be moved, and a cell holding two loose elements (GMP = ₹35 plus
     // the % beneath it) would have been split to opposite edges.
     const v = (html, extra) => `<span class="ipo-v"${extra || ''}>${html}</span>`;
+    // Company name links to its server-rendered detail page (/ipo/<slug>) — the
+    // long-tail SEO landing page. Undated placeholder rows (rare) get no link.
+    const slug = ipoSlug(name);
+    const nameCell = slug
+      ? `<a href="/ipo/${slug}" style="color:var(--white); text-decoration:none">${escapeHtml(name)}</a>`
+      : escapeHtml(name);
     return `
     <tr>
-      <td class="ipo-c-name" style="color:var(--white); font-weight:600">${escapeHtml(name)}${pill}${sub}</td>
+      <td class="ipo-c-name" style="color:var(--white); font-weight:600">${nameCell}${pill}${sub}</td>
       <td data-label="Type">${v(`<span style="text-transform:capitalize; color:var(--grey2)">${escapeHtml(r.series || 'Mainboard')}</span>`)}</td>
       <td data-label="GMP"    style="text-align:center">${v(gmpCell(name))}</td>
       <td data-label="Rating" style="text-align:center">${v(gmpRatingCell(name))}</td>

@@ -77,4 +77,29 @@ foreach ($posts as $p) {
     echo "  </url>\n";
 }
 
+/* Per-IPO pages (/ipo/<slug>) — only issues we hold substantive data for
+   (GMP trackers + Groww), never the thin NSE-only closed archive. daily
+   changefreq because GMP/subscription move day to day while an issue is live. */
+$ipoSlug = function ($name) {
+    $n = strtolower((string) $name);
+    $n = preg_replace('/\b(limited|ltd|private|pvt)\b/', ' ', $n);
+    return trim(preg_replace('/[^a-z0-9]+/', '-', $n), '-');
+};
+$ipoSlugs = [];
+$gc = @json_decode(@file_get_contents(__DIR__ . '/data/gmp-cache.json'), true);
+foreach (($gc['rows'] ?? []) as $r) { if (!empty($r['name'])) $ipoSlugs[$ipoSlug($r['name'])] = true; }
+$wc = @json_decode(@file_get_contents(__DIR__ . '/data/groww-cache.json'), true);
+foreach (['open', 'upcoming', 'closed'] as $t) {
+    foreach (($wc['data'][$t] ?? []) as $r) { if (!empty($r['companyName'])) $ipoSlugs[$ipoSlug($r['companyName'])] = true; }
+}
+foreach (array_keys($ipoSlugs) as $slug) {
+    if ($slug === '') continue;
+    echo "  <url>\n";
+    echo "    <loc>" . htmlspecialchars($ORIGIN . '/ipo/' . rawurlencode($slug), ENT_XML1) . "</loc>\n";
+    echo "    <lastmod>$today</lastmod>\n";
+    echo "    <changefreq>daily</changefreq>\n";
+    echo "    <priority>0.7</priority>\n";
+    echo "  </url>\n";
+}
+
 echo '</urlset>' . "\n";
