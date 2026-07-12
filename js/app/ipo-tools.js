@@ -13,36 +13,108 @@ let currentIpoTab = 'open';
 // Normalize the past-issues feed (different field names) to the shape
 // renderIpoTable expects, and keep only rows whose end date is within
 // the last IPO_CLOSED_DAYS days.
-function normalizeClosedIpos(rows) {
-  if (!Array.isArray(rows)) return [];
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - IPO_CLOSED_DAYS);
-  cutoff.setHours(0, 0, 0, 0);
+// "21-APR-2026" -> Date (midnight local)
+function parseNseDate(s) {
+  if (!s || typeof s !== 'string') return null;
+  const m = s.match(/^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/);
+  if (!m) return null;
+  const months = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+  const mi = months[m[2].toUpperCase()];
+  if (mi == null) return null;
+  return new Date(Number(m[3]), mi, Number(m[1]));
+}
 
-  // "21-APR-2026" -> Date
-  const parseNseDate = s => {
-    if (!s || typeof s !== 'string') return null;
-    const m = s.match(/^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/);
-    if (!m) return null;
-    const months = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
-    const mi = months[m[2].toUpperCase()];
-    if (mi == null) return null;
-    return new Date(Number(m[3]), mi, Number(m[1]));
+/* Today's calendar date in IST. NSE stamps its dates in IST, so a browser on
+   any other clock (or a phone with the wrong timezone) must not be allowed to
+   decide whether an IPO is open — at the day boundary it would get it wrong. */
+function istToday() {
+  const now = new Date();
+  const ist = new Date(now.getTime() + (330 + now.getTimezoneOffset()) * 60000);
+  ist.setHours(0, 0, 0, 0);
+  return ist;
+}
+
+/* WHICH ENDPOINT A ROW CAME FROM IS NOT ITS STATUS.
+   NSE's /all-upcoming-issues keeps returning an IPO after it has opened — a
+   live issue comes back byte-identical from BOTH the current-issue and the
+   upcoming endpoint, so "Upcoming" ends up echoing "Open". And the reverse
+   happens too: on day 1 the current-issue feed can lag while the upcoming
+   feed already carries the row. So we merge every feed into one universe and
+   classify each row by its own dates:
+
+     upcoming : today <  start
+     open     : start <= today <= end     (an IPO closing TODAY is still open)
+     closed   : end   <  today                                             */
+function ipoPhase(row) {
+  const today = istToday();
+  const start = parseNseDate(row.issueStartDate || row.ipoStartDate);
+  const end   = parseNseDate(row.issueEndDate   || row.ipoEndDate);
+  if (start && today < start) return 'upcoming';
+  if (end   && today > end)   return 'closed';
+  if (start || end)           return 'open';
+  return null;   // undated — don't guess
+}
+
+/* Identity of an IPO across feeds. Symbol when NSE gives one, else the name —
+   the past-issues feed doesn't always carry a symbol. */
+function ipoIdent(row) {
+  const sym = (row.symbol || '').trim().toUpperCase();
+  if (sym) return 'S:' + sym;
+  return 'N:' + gmpKey(row.companyName || row.company || '');
+}
+
+/* Merge the feeds into one de-duplicated universe. The same IPO can arrive
+   from two endpoints with different richness (the upcoming feed often lacks
+   the price band, the current-issue feed carries bid data), so on a collision
+   we keep the row with more populated fields rather than whichever landed
+   first. */
+function mergeIpoFeeds(feeds) {
+  const byId = new Map();
+  const weight = r => Object.keys(r).filter(k => r[k] !== null && r[k] !== '' && r[k] !== undefined).length;
+  feeds.forEach(rows => {
+    (rows || []).forEach(r => {
+      if (!r || (!r.companyName && !r.symbol && !r.company)) return;
+      const id = ipoIdent(r);
+      const prev = byId.get(id);
+      if (!prev) { byId.set(id, r); return; }
+      // Prefer the richer row, but never lose a field the other one had.
+      const base = weight(r) > weight(prev) ? r : prev;
+      const other = base === r ? prev : r;
+      Object.keys(other).forEach(k => {
+        if (base[k] === null || base[k] === '' || base[k] === undefined) base[k] = other[k];
+      });
+      byId.set(id, base);
+    });
+  });
+  return Array.from(byId.values());
+}
+
+/* One shape for every feed. The three NSE endpoints name the same fields
+   differently (past-issues says ipoStartDate/priceRange, current-issue says
+   issueStartDate/issuePrice), so canonicalise on the way in — after this,
+   nothing downstream needs to know which endpoint a row came from.
+   `_feed` is kept only as a last-resort fallback for undated rows. */
+function canonIpo(r, feed) {
+  return {
+    symbol:         r.symbol,
+    companyName:    r.companyName || r.company,
+    issueStartDate: r.issueStartDate || r.ipoStartDate,
+    issueEndDate:   r.issueEndDate   || r.ipoEndDate,
+    series:         r.series || (r.securityType === 'IV' ? 'InvIT' : (r.securityType === 'BE' ? 'SME' : 'Mainboard')),
+    issuePrice:     r.issuePrice || r.priceRange || r.priceBand,
+    noOfTime:       r.noOfTime,
+    status:         r.status,
+    _feed:          feed,
+    _startDate:     parseNseDate(r.issueStartDate || r.ipoStartDate),
+    _endDate:       parseNseDate(r.issueEndDate   || r.ipoEndDate)
   };
+}
 
-  return rows
-    .map(r => ({
-      symbol:           r.symbol,
-      companyName:      r.companyName || r.company,
-      issueStartDate:   r.ipoStartDate || r.issueStartDate,
-      issueEndDate:     r.ipoEndDate   || r.issueEndDate,
-      series:           r.series || (r.securityType === 'IV' ? 'InvIT' : (r.securityType === 'BE' ? 'SME' : 'Mainboard')),
-      issuePrice:       r.priceRange || r.issuePrice || r.priceBand,
-      noOfTime:         r.noOfTime,
-      _endDate:         parseNseDate(r.ipoEndDate || r.issueEndDate)
-    }))
-    .filter(r => r._endDate && r._endDate >= cutoff)
-    .sort((a, b) => b._endDate - a._endDate);
+/* The tab a row belongs in. Dates decide; the feed it arrived on is only a
+   fallback for the rare undated row, so an undated IPO shows up somewhere
+   instead of being silently dropped from every tab. */
+function ipoTabOf(row) {
+  return ipoPhase(row) || row._feed || 'open';
 }
 
 function fmtIpoDate(s) {
@@ -386,45 +458,79 @@ function renderIpoTable(rows, tab) {
   }).join('');
 }
 
+/* One feed. Fails soft: a dead endpoint returns no rows rather than throwing,
+   so one broken NSE endpoint can't take the whole page down with it. */
+async function fetchIpoFeed(feed) {
+  // /ipo.php (not /proxy.php) — NSE's API needs a cookie handshake first.
+  const url = '/ipo.php?tab=' + encodeURIComponent(feed) + '&cb=' + Date.now();
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) throw new Error('ipo.php ' + res.status);
+    const payload = await res.json();
+    const inner = payload && payload.data ? payload.data : null;
+    const rows  = Array.isArray(inner) ? inner : (inner && inner.data) || [];
+    return { feed, ok: true, payload, rows: rows.map(r => canonIpo(r, feed)) };
+  } catch (e) {
+    return { feed, ok: false, payload: null, rows: [] };
+  }
+}
+
 async function fetchIpo(tab) {
   currentIpoTab = tab;
   const status = document.getElementById('ipoStatus');
   const tbody  = document.getElementById('ipoBody');
   if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px; color:var(--grey)">Loading IPO data from NSE…</td></tr>';
 
-  // Use /ipo.php (cookie-handshake-aware) instead of /proxy.php — the plain
-  // proxy was returning intermittent stale/empty data because NSE's API
-  // requires a session-cookie handshake first. ipo.php replicates the
-  // pattern from indices.php and gainers-losers.php.
-  const url = '/ipo.php?tab=' + encodeURIComponent(tab) + '&cb=' + Date.now();
-  try {
-    // GMP is a second, independent upstream. Fetch both in parallel and let the
-    // GMP side fail soft — a dead GMP scraper must never blank the NSE table.
-    const [res] = await Promise.all([
-      fetch(url, { signal: AbortSignal.timeout(15000) }),
-      loadGmp()
-    ]);
-    if (!res.ok) throw new Error('ipo.php ' + res.status);
-    const payload = await res.json();
-    const inner = payload && payload.data ? payload.data : null;
-    let arr = Array.isArray(inner) ? inner : (inner && inner.data) || [];
-    if (tab === 'closed') arr = normalizeClosedIpos(arr);
-    renderIpoTable(arr, tab);
-    autoFillIpoBusinessCells(); // async; updates cells in place when lookups land
-    if (status) {
-      const stale  = !!(payload && payload.stale);
-      const at     = payload && payload.fetched_at
-        ? new Date(payload.fetched_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
-        : '';
-      const dayCap = tab === 'closed' ? ' Showing the last ' + IPO_CLOSED_DAYS + ' days.' : '';
-      const gmpSrc = (GMP_META && GMP_META.source)
-        ? ' • GMP: ' + GMP_META.source + (GMP_META.stale ? ' (stale)' : '')
-        : '';
-      status.textContent = (stale ? 'Stale — last fetched ' : 'Updated ') + at + ' • Source: NSE India.' + dayCap + gmpSrc;
-    }
-  } catch (e) {
+  // Read EVERY feed, not just the one named after the tab. NSE's endpoints
+  // overlap (a live IPO is returned by both current-issue and upcoming) and
+  // they lag (a just-opened IPO can still be missing from current-issue, a
+  // just-closed one missing from past-issues). Reading one endpoint per tab
+  // therefore both duplicates rows and drops them. Instead: merge all feeds
+  // into one universe, then let the dates decide which tab each row lands in.
+  const feeds = ['open', 'upcoming'];
+  if (tab === 'closed') feeds.push('closed');
+
+  // GMP is an independent upstream — fetched in parallel, fails soft.
+  const [results] = await Promise.all([
+    Promise.all(feeds.map(fetchIpoFeed)),
+    loadGmp()
+  ]);
+
+  if (!results.some(r => r.ok)) {          // every NSE endpoint down
     renderIpoTable([], tab);
     if (status) status.textContent = 'Could not fetch live IPO data. Please refresh in a few seconds.';
+    return;
+  }
+
+  const universe = mergeIpoFeeds(results.map(r => r.rows));
+  let arr = universe.filter(r => ipoTabOf(r) === tab);
+
+  if (tab === 'closed') {
+    // Only the recent window, newest first.
+    const cutoff = istToday();
+    cutoff.setDate(cutoff.getDate() - IPO_CLOSED_DAYS);
+    arr = arr.filter(r => r._endDate && r._endDate >= cutoff)
+             .sort((a, b) => b._endDate - a._endDate);
+  } else {
+    // Open: closing soonest first. Upcoming: opening soonest first.
+    const k = tab === 'open' ? '_endDate' : '_startDate';
+    arr.sort((a, b) => (a[k] ? a[k].getTime() : Infinity) - (b[k] ? b[k].getTime() : Infinity));
+  }
+
+  renderIpoTable(arr, tab);
+  autoFillIpoBusinessCells();   // async; updates cells in place when lookups land
+
+  if (status) {
+    const primary = results.find(r => r.feed === tab && r.ok) || results.find(r => r.ok);
+    const stale   = !!(primary.payload && primary.payload.stale) || results.some(r => !r.ok);
+    const at      = primary.payload && primary.payload.fetched_at
+      ? new Date(primary.payload.fetched_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+      : '';
+    const dayCap  = tab === 'closed' ? ' Showing the last ' + IPO_CLOSED_DAYS + ' days.' : '';
+    const gmpSrc  = (GMP_META && GMP_META.source)
+      ? ' • GMP: ' + GMP_META.source + (GMP_META.stale ? ' (stale)' : '')
+      : '';
+    status.textContent = (stale ? 'Stale — last fetched ' : 'Updated ') + at + ' • Source: NSE India.' + dayCap + gmpSrc;
   }
 }
 
