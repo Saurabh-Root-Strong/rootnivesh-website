@@ -56,6 +56,94 @@ function fmtIssuePrice(s) {
   return s.replace(/Rs\./g, '₹').replace(/\s+to\s+/g, ' - ');
 }
 
+/* ================================================================
+   GMP (Grey Market Premium) — /gmp.php
+   The grey market is unofficial; NSE has no GMP feed. gmp.php scrapes
+   the IPO trackers, derives a rating from the estimated listing gain,
+   and caches. Here we just join it onto the NSE rows by company name.
+   ================================================================ */
+let GMP_MAP  = null;   // key -> row
+let GMP_META = null;   // { source, fetched_at, stale }
+let GMP_AT   = 0;      // when we last loaded it, so the 60s table refresh re-pulls
+const GMP_CLIENT_TTL = 10 * 60 * 1000;   // 10 min (server caches 30 min anyway)
+
+/* Must mirror gmp_key() in gmp.php, so both sides of the join agree. */
+function gmpKey(name) {
+  return String(name || '')
+    .toLowerCase()
+    .replace(/\b(limited|ltd|private|pvt|india|ipo|the)\b/g, ' ')
+    .replace(/\((?:bse|nse)?\s*sme\)|\(mainboard\)|\(eq\)/g, ' ')
+    .replace(/[^a-z0-9 ]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+async function loadGmp() {
+  if (GMP_MAP && (Date.now() - GMP_AT) < GMP_CLIENT_TTL) return GMP_MAP;
+  try {
+    const res = await fetch('/gmp.php?cb=' + Date.now(), { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) throw new Error('gmp.php ' + res.status);
+    const p = await res.json();
+    GMP_MAP  = new Map((p.rows || []).map(r => [r.key, r]));
+    GMP_META = { source: p.source, fetched_at: p.fetched_at, stale: !!p.stale };
+    GMP_AT   = Date.now();
+  } catch (e) {
+    GMP_MAP  = new Map();   // empty map => every cell renders "—", page still fine
+    GMP_META = null;
+    GMP_AT   = Date.now();  // don't hammer a dead endpoint on every 60s refresh
+  }
+  return GMP_MAP;
+}
+
+/* Exact key first; else best token-overlap match. NSE says "Laser Power &
+   Infra Limited", the tracker says "Laser Power & Infra" — after gmpKey()
+   both are "laser power infra", so exact hits most of the time. The fuzzy
+   pass catches the rest (abbreviations, dropped words), but only on a
+   strong overlap and a shared first token, so we never show one company's
+   GMP against another's row. */
+function gmpFor(companyName) {
+  if (!GMP_MAP || GMP_MAP.size === 0) return null;
+  const k = gmpKey(companyName);
+  if (!k) return null;
+  if (GMP_MAP.has(k)) return GMP_MAP.get(k);
+
+  const qt = k.split(' ').filter(Boolean);
+  if (!qt.length) return null;
+  let best = null, bestScore = 0;
+  GMP_MAP.forEach((row, rk) => {
+    const rt = rk.split(' ').filter(Boolean);
+    if (!rt.length || rt[0] !== qt[0]) return;             // first token must agree
+    const hits = qt.filter(t => rt.includes(t)).length;
+    const score = hits / Math.max(qt.length, rt.length);   // Jaccard-ish
+    if (score > bestScore) { bestScore = score; best = row; }
+  });
+  return bestScore >= 0.6 ? best : null;
+}
+
+function gmpCell(companyName) {
+  const g = gmpFor(companyName);
+  if (!g || g.gmp === null) return '<span style="color:var(--grey)">—</span>';
+  const up   = g.gmp > 0;
+  const flat = g.gmp === 0;
+  const col  = flat ? 'var(--grey2)' : (up ? '#22c55e' : '#ef4444');
+  const sign = up ? '+' : '';
+  const sub  = (g.est_gain_pct !== null && !flat)
+    ? `<div style="font-size:10px; color:var(--grey); font-family:'Space Mono',monospace">${sign}${g.est_gain_pct}%</div>`
+    : '';
+  return `<span style="color:${col}; font-weight:700; white-space:nowrap">${sign}₹${escapeHtml(String(g.gmp))}</span>${sub}`;
+}
+
+function gmpRatingCell(companyName) {
+  const g = gmpFor(companyName);
+  if (!g || !g.rating_stars) return '<span style="color:var(--grey)">—</span>';
+  const stars = '★'.repeat(g.rating_stars) + '☆'.repeat(5 - g.rating_stars);
+  const col = g.rating_stars >= 4 ? '#22c55e'
+            : g.rating_stars === 3 ? 'var(--gold)'
+            : g.rating_stars === 2 ? 'var(--grey2)' : '#ef4444';
+  return `<span title="Derived from grey-market listing gain — not a recommendation" style="color:${col}; white-space:nowrap">${stars}</span>` +
+         `<div style="font-size:10px; color:var(--grey); font-family:'Space Mono',monospace">${escapeHtml(g.rating_label)}</div>`;
+}
+
 function ipoSubscriptionLabel(item) {
   // Active IPOs have noOfTime as a string like "3.16"
   const t = parseFloat(item.noOfTime);
@@ -279,25 +367,30 @@ function renderIpoTable(rows, tab) {
   const tbody = document.getElementById('ipoBody');
   if (!tbody) return;
   if (!rows || rows.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:var(--grey)">No IPOs to show in this tab right now.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px; color:var(--grey)">No IPOs to show in this tab right now.</td></tr>';
     return;
   }
-  tbody.innerHTML = rows.map(r => `
+  tbody.innerHTML = rows.map(r => {
+    const name = r.companyName || r.symbol || '—';
+    return `
     <tr>
-      <td style="color:var(--white); font-weight:600">${escapeHtml(r.companyName || r.symbol || '—')}</td>
+      <td style="color:var(--white); font-weight:600">${escapeHtml(name)}</td>
       <td><span style="text-transform:capitalize; color:var(--grey2)">${escapeHtml(r.series || 'Mainboard')}</span></td>
+      <td style="text-align:center">${gmpCell(name)}</td>
+      <td style="text-align:center">${gmpRatingCell(name)}</td>
       <td>${escapeHtml(fmtIpoDate(r.issueStartDate))}</td>
       <td>${escapeHtml(fmtIpoDate(r.issueEndDate))}</td>
       <td>${escapeHtml(fmtIssuePrice(r.issuePrice || r.priceBand))}</td>
       <td>${ipoBusinessCell(r)}</td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 }
 
 async function fetchIpo(tab) {
   currentIpoTab = tab;
   const status = document.getElementById('ipoStatus');
   const tbody  = document.getElementById('ipoBody');
-  if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:var(--grey)">Loading IPO data from NSE…</td></tr>';
+  if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px; color:var(--grey)">Loading IPO data from NSE…</td></tr>';
 
   // Use /ipo.php (cookie-handshake-aware) instead of /proxy.php — the plain
   // proxy was returning intermittent stale/empty data because NSE's API
@@ -305,7 +398,12 @@ async function fetchIpo(tab) {
   // pattern from indices.php and gainers-losers.php.
   const url = '/ipo.php?tab=' + encodeURIComponent(tab) + '&cb=' + Date.now();
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+    // GMP is a second, independent upstream. Fetch both in parallel and let the
+    // GMP side fail soft — a dead GMP scraper must never blank the NSE table.
+    const [res] = await Promise.all([
+      fetch(url, { signal: AbortSignal.timeout(15000) }),
+      loadGmp()
+    ]);
     if (!res.ok) throw new Error('ipo.php ' + res.status);
     const payload = await res.json();
     const inner = payload && payload.data ? payload.data : null;
@@ -319,7 +417,10 @@ async function fetchIpo(tab) {
         ? new Date(payload.fetched_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
         : '';
       const dayCap = tab === 'closed' ? ' Showing the last ' + IPO_CLOSED_DAYS + ' days.' : '';
-      status.textContent = (stale ? 'Stale — last fetched ' : 'Updated ') + at + ' • Source: NSE India.' + dayCap;
+      const gmpSrc = (GMP_META && GMP_META.source)
+        ? ' • GMP: ' + GMP_META.source + (GMP_META.stale ? ' (stale)' : '')
+        : '';
+      status.textContent = (stale ? 'Stale — last fetched ' : 'Updated ') + at + ' • Source: NSE India.' + dayCap + gmpSrc;
     }
   } catch (e) {
     renderIpoTable([], tab);

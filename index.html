@@ -1368,6 +1368,8 @@
               <tr>
                 <th>Company Name</th>
                 <th>Type</th>
+                <th style="text-align:center">GMP <span title="Grey Market Premium — unofficial, unregulated market price. Not a recommendation." style="color:var(--grey); cursor:help">&#9432;</span></th>
+                <th style="text-align:center">Rating <span title="Derived from the estimated listing gain (GMP as a % of the issue cap price). Sentiment indicator, not a recommendation." style="color:var(--grey); cursor:help">&#9432;</span></th>
                 <th>Open Date</th>
                 <th>Close Date</th>
                 <th>Price Range</th>
@@ -1375,7 +1377,7 @@
               </tr>
             </thead>
             <tbody id="ipoBody">
-              <tr><td colspan="6" style="text-align:center; padding:40px; color:var(--grey)">Loading IPO data from NSE&#8230;</td></tr>
+              <tr><td colspan="8" style="text-align:center; padding:40px; color:var(--grey)">Loading IPO data from NSE&#8230;</td></tr>
             </tbody>
           </table>
         </div>
@@ -1409,6 +1411,7 @@
       <div class="disclaimer" style="margin-top:32px">
         <h4>⚠️ IPO Investment Disclaimer</h4>
         <p>IPO data sourced from NSE India and may be delayed. Investment in IPOs involves market risks. Read the prospectus carefully before investing. Past listing performance is not indicative of future results. SEBI Registration No. INH000XXXXX.</p>
+        <p style="margin-top:10px"><strong>On GMP &amp; Rating:</strong> Grey Market Premium (GMP) is an <strong>unofficial, unregulated</strong> price quoted outside the exchanges. It is shown here for information only, is sourced from public IPO trackers, and can change or be wrong at any time. Root Nivesh does <strong>not</strong> deal, trade or transact in the grey market. The Rating shown is <strong>derived arithmetically</strong> from GMP as a percentage of the issue price &mdash; it is a sentiment indicator, <strong>not a recommendation</strong> to subscribe. Do not invest in an IPO on the basis of GMP alone; read the prospectus and assess the company's fundamentals.</p>
       </div>
     </div>
   </section>
@@ -2340,7 +2343,7 @@
 <script src="js/app/market.js?v=84"></script>
 <script src="js/app/content.js?v=76"></script>
 <script src="js/app/trade.js?v=76"></script>
-<script src="js/app/ipo-tools.js?v=78"></script>
+<script src="js/app/ipo-tools.js?v=79"></script>
 <script src="js/app/tools.js?v=86"></script>
 
 
