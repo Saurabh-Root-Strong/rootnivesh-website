@@ -29,6 +29,12 @@ RewriteRule ^.*\.md$           - [F,L]
 # always includes the latest published blog posts.
 RewriteRule ^sitemap\.xml$ sitemap.php [L]
 
+# Server-rendered blog articles: /blog/<slug> is rendered by blog.php so
+# shared links preview correctly and the content is crawlable without JS.
+# Bare /blog (the list) is NOT matched here and still falls through to the SPA.
+# blog.php falls back to index.html on any failure, so this can't break links.
+RewriteRule ^blog/([a-z0-9-]+)/?$ blog.php?slug=$1 [L,QSA]
+
 # ────────────────────────────────────────────────────────────
 # 3. SPA ROUTING (unchanged behaviour)
 # ────────────────────────────────────────────────────────────
