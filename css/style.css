@@ -2664,7 +2664,7 @@
       min-width: 0 !important;
     }
     /* Company name — first cell becomes the card title */
-    #ipoTable td:first-child {
+    #ipoTable td.ipo-c-name {
       font-size: 1.05rem !important;
       font-weight: 700 !important;
       color: var(--white) !important;
@@ -2672,13 +2672,39 @@
       padding-bottom: 10px !important;
       border-bottom: 1px solid var(--border) !important;
     }
-    /* Inline "field: value" labels for the middle cells */
-    #ipoTable td:nth-child(2)::before { content: 'Type: ';      color: var(--grey); margin-right: 4px; }
-    #ipoTable td:nth-child(3)::before { content: 'Open: ';      color: var(--grey); margin-right: 4px; }
-    #ipoTable td:nth-child(4)::before { content: 'Close: ';     color: var(--grey); margin-right: 4px; }
-    #ipoTable td:nth-child(5)::before { content: 'Price: ';     color: var(--grey); margin-right: 4px; }
+    /* "field: value" rows. The label comes from the cell's own data-label — it
+       is NOT tied to column position, so adding or reordering a column can no
+       longer silently mislabel every row. */
+    #ipoTable td[data-label] {
+      display: flex !important;
+      align-items: baseline;
+      gap: 8px;
+      text-align: right !important;
+    }
+    /* .ipo-v wraps the whole value, so it moves right as one piece. */
+    #ipoTable td[data-label] > .ipo-v {
+      margin-left: auto;
+      text-align: right;
+      display: inline-flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    #ipoTable td[data-label]::before {
+      content: attr(data-label);
+      color: var(--grey);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-family: 'Space Mono', monospace;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+    /* GMP / Rating are centred in the desktop table; stacked, that centring
+       fights the label layout. */
+    #ipoTable td[data-label] { text-align: right !important; }
+    #ipoTable td[data-label] .ipo-v div { text-align: right !important; }
+
     /* About Company — section break + clamp so the card never goes huge */
-    #ipoTable td:nth-child(6) {
+    #ipoTable td.ipo-c-about {
       margin-top: 10px;
       padding-top: 10px !important;
       border-top: 1px solid var(--border) !important;

@@ -465,16 +465,26 @@ function renderIpoTable(rows, tab) {
     const ph = ipoTabOf(r);
     const pill = (tab === 'all' && ph)
       ? `<div><span class="ipo-status ${ph}">${ph}</span></div>` : '';
+    // data-label drives the MOBILE card view: below 720px the table collapses to
+    // stacked cards and each cell prints its own label via content: attr(data-label).
+    // The labels used to be hardcoded by column position in CSS — adding GMP and
+    // Rating silently shifted every one of them ("Open: +₹35"). Carrying the
+    // label on the cell keeps it correct no matter how the columns change.
+    // Every value is wrapped in one .ipo-v element. On mobile the card layout
+    // pushes that single wrapper to the right of its label; a bare text node
+    // could not be moved, and a cell holding two loose elements (GMP = ₹35 plus
+    // the % beneath it) would have been split to opposite edges.
+    const v = (html, extra) => `<span class="ipo-v"${extra || ''}>${html}</span>`;
     return `
     <tr>
-      <td style="color:var(--white); font-weight:600">${escapeHtml(name)}${pill}</td>
-      <td><span style="text-transform:capitalize; color:var(--grey2)">${escapeHtml(r.series || 'Mainboard')}</span></td>
-      <td style="text-align:center">${gmpCell(name)}</td>
-      <td style="text-align:center">${gmpRatingCell(name)}</td>
-      <td>${escapeHtml(fmtIpoDate(r.issueStartDate))}</td>
-      <td>${escapeHtml(fmtIpoDate(r.issueEndDate))}</td>
-      <td>${ipoPriceCell(r)}</td>
-      <td>${ipoBusinessCell(r)}</td>
+      <td class="ipo-c-name" style="color:var(--white); font-weight:600">${escapeHtml(name)}${pill}</td>
+      <td data-label="Type">${v(`<span style="text-transform:capitalize; color:var(--grey2)">${escapeHtml(r.series || 'Mainboard')}</span>`)}</td>
+      <td data-label="GMP"    style="text-align:center">${v(gmpCell(name))}</td>
+      <td data-label="Rating" style="text-align:center">${v(gmpRatingCell(name))}</td>
+      <td data-label="Opens">${v(escapeHtml(fmtIpoDate(r.issueStartDate)))}</td>
+      <td data-label="Closes">${v(escapeHtml(fmtIpoDate(r.issueEndDate)))}</td>
+      <td data-label="Price band">${v(ipoPriceCell(r))}</td>
+      <td class="ipo-c-about">${ipoBusinessCell(r)}</td>
     </tr>`;
   }).join('');
 }
