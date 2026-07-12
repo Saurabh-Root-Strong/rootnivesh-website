@@ -737,32 +737,55 @@
   }
   .ipo-chips .ipo-chips-label { margin-right: auto; }   /* label left, controls right */
 
-  .ipo-daterange { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .ipo-daterange label {
-    display: inline-flex; align-items: center; gap: 6px;
+  /* One button; the range lives in a popover behind it. The button also reads
+     out the window currently in force, so the collapsed state still answers
+     "what am I looking at". */
+  .ipo-picker { position: relative; display: inline-block; }
+  .ipo-pick-btn { gap: 8px; }
+  .ipo-pick-btn .pick-ico   { font-size: 12px; }
+  .ipo-pick-btn .pick-caret { font-size: 9px; opacity: 0.7; }
+
+  .ipo-pop {
+    position: absolute; top: calc(100% + 8px); right: 0; z-index: 40;
+    min-width: 260px; padding: 14px;
+    background: var(--bg2, #0e1420); border: 1px solid var(--border2);
+    border-radius: 12px; box-shadow: 0 18px 40px rgba(0,0,0,0.55);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .ipo-pop-title {
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--gold); font-family: 'Space Mono', monospace;
+  }
+  .ipo-pop label {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
     font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
     color: var(--grey); font-family: 'Space Mono', monospace;
   }
-  .ipo-daterange input[type="date"] {
-    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-    border-radius: 8px; padding: 5px 10px; color: var(--white);
+  .ipo-pop input[type="date"] {
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 10px; color: var(--white);
     font-size: 12px; font-family: inherit; letter-spacing: normal;
     text-transform: none; cursor: pointer; transition: var(--transition);
-    color-scheme: dark;                 /* makes the native picker render dark */
+    color-scheme: dark;                 /* native picker renders dark */
+    flex: 1 1 auto; min-width: 0;
   }
-  .ipo-daterange input[type="date"]:hover  { border-color: var(--border2); }
-  .ipo-daterange input[type="date"]:focus  { outline: none; border-color: var(--gold); }
-  .ipo-daterange input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(0.7); cursor: pointer;
+  .ipo-pop input[type="date"]:hover { border-color: var(--border2); }
+  .ipo-pop input[type="date"]:focus { outline: none; border-color: var(--gold); }
+  .ipo-pop input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
+
+  .ipo-pop-actions {
+    display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;
+    border-top: 1px solid var(--border); padding-top: 10px; margin-top: 2px;
   }
+  .ipo-pop-apply { background: rgba(201,168,76,0.14); border-color: var(--gold); color: var(--gold); }
 
   @media (max-width: 640px) {
-    /* Stack, and let the inputs share the row rather than overflow it. */
     .ipo-chips { justify-content: flex-start; }
     .ipo-chips .ipo-chips-label { margin-right: 0; width: 100%; }
-    .ipo-daterange { width: 100%; }
-    .ipo-daterange label { flex: 1 1 45%; }
-    .ipo-daterange input[type="date"] { width: 100%; }
+    .ipo-picker { width: 100%; }
+    .ipo-pick-btn { width: 100%; justify-content: center; }
+    /* Anchor to both edges so the popover can't hang off the viewport. */
+    .ipo-pop { left: 0; right: 0; min-width: 0; }
   }
   .ipo-chips-label {
     font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;

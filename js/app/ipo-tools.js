@@ -540,33 +540,76 @@ function applyIpoPeriod(rows, tab) {
   return rows.filter(r => ipoTabOf(r) !== 'closed' || ipoInRange(r));
 }
 
+/* The range lives behind ONE button that opens a popover. The two bare date
+   inputs were permanently on screen for a control most visitors never touch;
+   collapsed, the button doubles as the read-out of the window in force. */
+let IPO_PICKER_OPEN = false;
+
+function ipoRangeLabel() {
+  if (!IPO_FROM && !IPO_TO) return 'All time';
+  const f = d => d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  if (IPO_FROM && IPO_TO) return f(IPO_FROM) + ' – ' + f(IPO_TO);
+  return IPO_FROM ? 'Since ' + f(IPO_FROM) : 'Up to ' + f(IPO_TO);
+}
+
 /* Date range control — only where history exists (All and Closed). On Open and
    Upcoming there is nothing to bound, so it is not rendered. */
 function renderIpoPeriod(tab) {
   const box = document.getElementById('ipoChips');
   if (!box) return;
-  if (tab !== 'closed' && tab !== 'all') { box.innerHTML = ''; return; }
+  if (tab !== 'closed' && tab !== 'all') { box.innerHTML = ''; IPO_PICKER_OPEN = false; return; }
 
-  // Bound the pickers by the data we actually hold, so the user cannot select
-  // a window that could never contain a row.
-  const dated = IPO_ROWS.filter(r => r._endDate && ipoTabOf(r) === 'closed');
+  // Never rebuild the control while its popover is open — paintIpoRows() also
+  // runs on the 60s auto-refresh, and re-rendering would blow away a half-typed
+  // date under the user's hands.
+  if (IPO_PICKER_OPEN && box.querySelector('.ipo-pop')) return;
+
+  // Bound the pickers by the data we actually hold, so a window that could
+  // never contain a row cannot be selected.
+  const dated  = IPO_ROWS.filter(r => r._endDate && ipoTabOf(r) === 'closed');
   const oldest = dated.length ? new Date(Math.min(...dated.map(r => r._endDate.getTime()))) : null;
-  const maxDay = istToday();
+  const minD   = oldest ? ipoYmd(oldest) : '';
+  const maxD   = ipoYmd(istToday());
 
   box.innerHTML =
     '<span class="ipo-chips-label">Past issues</span>' +
-    '<div class="ipo-daterange">' +
-      '<label>From' +
-        `<input type="date" id="ipoFrom" value="${ipoYmd(IPO_FROM)}" ` +
-          `min="${oldest ? ipoYmd(oldest) : ''}" max="${ipoYmd(maxDay)}" onchange="applyIpoDates()">` +
-      '</label>' +
-      '<label>To' +
-        `<input type="date" id="ipoTo" value="${ipoYmd(IPO_TO)}" ` +
-          `min="${oldest ? ipoYmd(oldest) : ''}" max="${ipoYmd(maxDay)}" onchange="applyIpoDates()">` +
-      '</label>' +
-      '<button class="ipo-chip" onclick="setIpoAllTime()" title="Show the full archive">All time</button>' +
-      '<button class="ipo-chip" onclick="resetIpoDates()" title="Back to the last 3 months">Reset</button>' +
+    '<div class="ipo-picker">' +
+      `<button class="ipo-chip ipo-pick-btn${IPO_PICKER_OPEN ? ' active' : ''}" onclick="toggleIpoPicker(event)">` +
+        `<span class="pick-ico">📅</span>${escapeHtml(ipoRangeLabel())}<span class="pick-caret">▾</span>` +
+      '</button>' +
+      (IPO_PICKER_OPEN ? (
+        '<div class="ipo-pop" onclick="event.stopPropagation()">' +
+          '<div class="ipo-pop-title">Custom date range</div>' +
+          '<label>From<input type="date" id="ipoFrom" ' +
+            `value="${ipoYmd(IPO_FROM)}" min="${minD}" max="${maxD}"></label>` +
+          '<label>To<input type="date" id="ipoTo" ' +
+            `value="${ipoYmd(IPO_TO)}" min="${minD}" max="${maxD}"></label>` +
+          '<div class="ipo-pop-actions">' +
+            '<button class="ipo-chip" onclick="setIpoAllTime()">All time</button>' +
+            '<button class="ipo-chip" onclick="resetIpoDates()">Last 3 months</button>' +
+            '<button class="ipo-chip ipo-pop-apply" onclick="applyIpoDates()">Apply</button>' +
+          '</div>' +
+        '</div>'
+      ) : '') +
     '</div>';
+}
+
+function toggleIpoPicker(e) {
+  if (e) e.stopPropagation();
+  IPO_PICKER_OPEN = !IPO_PICKER_OPEN;
+  renderIpoPeriod(currentIpoTab);
+}
+
+function closeIpoPicker() {
+  if (!IPO_PICKER_OPEN) return;
+  IPO_PICKER_OPEN = false;
+  renderIpoPeriod(currentIpoTab);
+}
+
+/* Click-away and Esc both dismiss. Registered once, at module level. */
+if (typeof document !== 'undefined' && document.addEventListener) {
+  document.addEventListener('click', closeIpoPicker);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeIpoPicker(); });
 }
 
 function applyIpoDates() {
@@ -577,17 +620,20 @@ function applyIpoDates() {
   if (f && t && f > t) { IPO_FROM = t; IPO_TO = f; }
   else                 { IPO_FROM = f; IPO_TO = t; }
   IPO_PAGE = 1;
+  IPO_PICKER_OPEN = false;
   paintIpoRows();
 }
 
 function setIpoAllTime() {
   IPO_FROM = null; IPO_TO = null; IPO_PAGE = 1;
+  IPO_PICKER_OPEN = false;
   paintIpoRows();
 }
 
 function resetIpoDates() {
   const d = ipoDefaultRange();
   IPO_FROM = d.from; IPO_TO = d.to; IPO_PAGE = 1;
+  IPO_PICKER_OPEN = false;
   paintIpoRows();
 }
 
