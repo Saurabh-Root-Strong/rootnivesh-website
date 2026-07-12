@@ -684,6 +684,33 @@
   }
   .tab.active, .tab:hover { background: rgba(201,168,76,0.1); border-color: var(--border2); color: var(--gold); }
 
+  /* ====== IPO FILTER CHIPS ======
+     Deliberately lighter than .tab. The tabs carry STATUS (open / upcoming /
+     closed); these chips are filters applied *within* the current tab. Making
+     them visually subordinate keeps that hierarchy readable — otherwise two
+     rows of pills look like two competing sets of tabs. */
+  .ipo-chips { display: flex; gap: 6px; margin: -22px 0 22px; flex-wrap: wrap; align-items: center; }
+  .ipo-chips-label {
+    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--grey); font-family: 'Space Mono', monospace; margin-right: 4px;
+  }
+  .ipo-chip {
+    padding: 5px 12px; border-radius: 999px; border: 1px solid var(--border);
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    background: transparent; color: var(--grey2); transition: var(--transition);
+    display: inline-flex; align-items: center; gap: 6px; line-height: 1.4;
+  }
+  .ipo-chip:hover { border-color: var(--border2); color: var(--white); }
+  .ipo-chip.active { background: rgba(201,168,76,0.12); border-color: var(--gold); color: var(--gold); }
+  .ipo-chip .chip-count {
+    font-size: 10px; font-family: 'Space Mono', monospace; color: var(--grey);
+    background: rgba(255,255,255,0.05); border-radius: 999px; padding: 1px 6px;
+  }
+  .ipo-chip.active .chip-count { color: var(--gold); background: rgba(201,168,76,0.14); }
+  /* A filter that would empty the table is shown struck-through rather than
+     hidden — a chip that vanishes is more confusing than one that says "0". */
+  .ipo-chip.empty { opacity: 0.45; }
+
   /* ====== IPO ALLOTMENT STATUS PANEL ====== */
   .allot-intro {
     text-align: center;

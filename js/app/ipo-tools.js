@@ -439,7 +439,13 @@ function renderIpoTable(rows, tab) {
   const tbody = document.getElementById('ipoBody');
   if (!tbody) return;
   if (!rows || rows.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px; color:var(--grey)">No IPOs to show in this tab right now.</td></tr>';
+    // Distinguish "nothing here" from "your filters hid everything" — otherwise
+    // a user who left a chip on thinks the feed is broken.
+    const filtered = IPO_CHIPS.gmp || IPO_CHIPS.seg || IPO_CHIPS.closing;
+    const msg = filtered
+      ? 'No IPOs match these filters. <a href="javascript:void(0)" onclick="clearIpoChips()" style="color:var(--gold)">Clear filters</a>'
+      : 'No IPOs to show in this tab right now.';
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px; color:var(--grey)">' + msg + '</td></tr>';
     return;
   }
   tbody.innerHTML = rows.map(r => {
@@ -456,6 +462,121 @@ function renderIpoTable(rows, tab) {
       <td>${ipoBusinessCell(r)}</td>
     </tr>`;
   }).join('');
+}
+
+/* ================================================================
+   FILTER CHIPS
+
+   The tabs already carry status (open / upcoming / closed), so the chips
+   must be ORTHOGONAL to them — filters applied within the active tab.
+   Cloning a chip row that repeats the status (as the reference sites do,
+   because they have no tabs) would let the user pick "Upcoming" tab +
+   "Open" chip and stare at an empty table wondering what they broke.
+
+   Chips are independent of each other and AND together, except the
+   segment pair (SME / Mainboard) which is mutually exclusive — an IPO is
+   one or the other, so selecting both can only ever yield nothing.
+   ================================================================ */
+let IPO_ROWS  = [];                                    // the active tab's rows, pre-chip
+let IPO_CHIPS = { gmp: false, seg: null, closing: false };
+
+function ipoIsSme(r)       { return /sme/i.test(r.series || ''); }
+function ipoIsMainboard(r) { return !ipoIsSme(r); }    // NSE marks SME explicitly; everything else is mainboard
+function ipoHasGmp(r) {
+  const g = gmpFor(r.companyName || r.symbol);
+  return !!(g && g.gmp !== null && g.gmp !== 0);
+}
+function ipoClosingToday(r) {
+  if (!r._endDate) return false;
+  return r._endDate.getTime() === istToday().getTime();
+}
+
+/* Which chips make sense in which tab. "Closing today" is meaningless on
+   Upcoming (nothing is open) and on Closed (everything already ended), so it
+   is not offered there — an inert control is worse than no control. */
+function ipoChipDefs(tab) {
+  const defs = [];
+  // The grey market stops trading at listing, so a closed IPO never carries a
+  // live GMP — offering the filter there would be a control that always
+  // returns nothing.
+  if (tab !== 'closed') {
+    defs.push({ id: 'gmp', label: 'Only Active GMP', test: ipoHasGmp,
+      on: () => IPO_CHIPS.gmp, toggle: () => { IPO_CHIPS.gmp = !IPO_CHIPS.gmp; } });
+  }
+  if (tab === 'open') {
+    defs.push({ id: 'closing', label: 'Closing Today', test: ipoClosingToday,
+      on: () => IPO_CHIPS.closing, toggle: () => { IPO_CHIPS.closing = !IPO_CHIPS.closing; } });
+  }
+  defs.push(
+    { id: 'sme', label: 'SME', test: ipoIsSme,
+      on: () => IPO_CHIPS.seg === 'sme',
+      toggle: () => { IPO_CHIPS.seg = IPO_CHIPS.seg === 'sme' ? null : 'sme'; } },
+    { id: 'mainboard', label: 'Mainboard', test: ipoIsMainboard,
+      on: () => IPO_CHIPS.seg === 'mainboard',
+      toggle: () => { IPO_CHIPS.seg = IPO_CHIPS.seg === 'mainboard' ? null : 'mainboard'; } }
+  );
+  return defs;
+}
+
+function applyIpoChips(rows, tab) {
+  return rows.filter(r => {
+    if (IPO_CHIPS.gmp     && !ipoHasGmp(r))       return false;
+    if (IPO_CHIPS.closing && !ipoClosingToday(r)) return false;
+    if (IPO_CHIPS.seg === 'sme'       && !ipoIsSme(r))       return false;
+    if (IPO_CHIPS.seg === 'mainboard' && !ipoIsMainboard(r)) return false;
+    return true;
+  });
+}
+
+function renderIpoChips(tab) {
+  const box = document.getElementById('ipoChips');
+  if (!box) return;
+  const defs   = ipoChipDefs(tab);
+  const anyOn  = defs.some(d => d.on());
+  const shown  = applyIpoChips(IPO_ROWS, tab).length;
+
+  // Counts are computed against the OTHER active chips, not the raw list, so
+  // a count always answers "how many rows will I see if I click this" rather
+  // than a number that turns out to be a lie once combined with the rest.
+  const countFor = d => {
+    const prev = JSON.parse(JSON.stringify(IPO_CHIPS));
+    d.toggle();
+    const n = applyIpoChips(IPO_ROWS, tab).length;
+    IPO_CHIPS = prev;
+    return n;
+  };
+
+  let html = '<span class="ipo-chips-label">Filter</span>' +
+    `<button class="ipo-chip${anyOn ? '' : ' active'}" onclick="clearIpoChips()">All` +
+    `<span class="chip-count">${IPO_ROWS.length}</span></button>`;
+
+  defs.forEach(d => {
+    const on = d.on();
+    const n  = on ? shown : countFor(d);
+    html += `<button class="ipo-chip${on ? ' active' : ''}${n === 0 && !on ? ' empty' : ''}" ` +
+            `onclick="toggleIpoChip('${d.id}')">${escapeHtml(d.label)}` +
+            `<span class="chip-count">${n}</span></button>`;
+  });
+  box.innerHTML = html;
+}
+
+function toggleIpoChip(id) {
+  const d = ipoChipDefs(currentIpoTab).find(x => x.id === id);
+  if (!d) return;
+  d.toggle();
+  paintIpoRows();
+}
+
+function clearIpoChips() {
+  IPO_CHIPS = { gmp: false, seg: null, closing: false };
+  paintIpoRows();
+}
+
+/* Re-render from the rows we already have — chip toggles must not refetch. */
+function paintIpoRows() {
+  renderIpoTable(applyIpoChips(IPO_ROWS, currentIpoTab), currentIpoTab);
+  renderIpoChips(currentIpoTab);
+  autoFillIpoBusinessCells();
 }
 
 /* One feed. Fails soft: a dead endpoint returns no rows rather than throwing,
@@ -517,8 +638,8 @@ async function fetchIpo(tab) {
     arr.sort((a, b) => (a[k] ? a[k].getTime() : Infinity) - (b[k] ? b[k].getTime() : Infinity));
   }
 
-  renderIpoTable(arr, tab);
-  autoFillIpoBusinessCells();   // async; updates cells in place when lookups land
+  IPO_ROWS = arr;
+  paintIpoRows();               // renders the table + the chips, honouring any active filter
 
   if (status) {
     const primary = results.find(r => r.feed === tab && r.ok) || results.find(r => r.ok);
@@ -555,6 +676,10 @@ function filterIpo(tab, btn) {
   }
   if (tablePanel) tablePanel.style.display = 'block';
   if (allotPanel) allotPanel.style.display = 'none';
+  // Chips are reset on a tab change — the set on offer differs per tab
+  // ("Closing Today" only exists on Open), and a filter silently carried over
+  // from the last tab is the classic way to make a full table look empty.
+  IPO_CHIPS = { gmp: false, seg: null, closing: false };
   fetchIpo(tab);
   // Keep the active IPO tab fresh during market hours — 60s refresh.
   ipoRefreshTimer = setInterval(() => {

@@ -190,7 +190,7 @@
 <link rel="dns-prefetch" href="https://www.bseindia.com">
 <link rel="dns-prefetch" href="https://www.nseindia.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=102">
+<link rel="stylesheet" href="css/style.css?v=103">
 </head>
 <body>
 
@@ -1362,6 +1362,10 @@
 
       <!-- IPO Table panel (Open / Upcoming / Closed) -->
       <div id="ipoTablePanel">
+        <!-- Filters applied WITHIN the active tab. Built by renderIpoChips()
+             so each one can carry a live count and disable itself when it
+             would match nothing. -->
+        <div class="ipo-chips" id="ipoChips"></div>
         <div class="table-wrap">
           <table id="ipoTable">
             <thead>
@@ -2343,7 +2347,7 @@
 <script src="js/app/market.js?v=84"></script>
 <script src="js/app/content.js?v=76"></script>
 <script src="js/app/trade.js?v=76"></script>
-<script src="js/app/ipo-tools.js?v=80"></script>
+<script src="js/app/ipo-tools.js?v=81"></script>
 <script src="js/app/tools.js?v=86"></script>
 
 
