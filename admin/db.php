@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /* admin/db.php â€” single PDO instance shared across admin/calls.php endpoints */
 
 if (!file_exists(__DIR__ . '/config.php')) {

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /* admin/auth.php â€” session-based admin auth helper.
    Include this at the top of every admin page that requires login.
    It auto-redirects unauthenticated users to login.php. */
