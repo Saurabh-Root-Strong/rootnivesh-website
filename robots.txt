@@ -12,6 +12,8 @@ Disallow: /gainers-losers.php
 Disallow: /fii-dii.php
 Disallow: /fii-dii-history.php
 Disallow: /ipo.php
+Disallow: /gmp.php
+Disallow: /groww.php
 Disallow: /calls.php
 Disallow: /contact.php
 Disallow: /data/

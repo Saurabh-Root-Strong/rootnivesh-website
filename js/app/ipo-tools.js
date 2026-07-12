@@ -225,6 +225,54 @@ async function loadGmp() {
   return GMP_MAP;
 }
 
+/* ---- Groww listings (a second listings source, like NSE) ---- */
+let GROWW = null;      // { open:[], upcoming:[], closed:[] } canonical rows
+let GROWW_SUB = null;  // name-key -> subscription (x), to enrich NSE rows
+let GROWW_AT  = 0;
+const GROWW_CLIENT_TTL = 10 * 60 * 1000;
+
+async function loadGroww() {
+  if (GROWW && (Date.now() - GROWW_AT) < GROWW_CLIENT_TTL) return GROWW;
+  try {
+    const res = await fetch('/groww.php?cb=' + Date.now(), { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) throw new Error('groww.php ' + res.status);
+    const p = await res.json();
+    const d = (p && p.data) || { open: [], upcoming: [], closed: [] };
+    GROWW = d;
+    // Live subscription, keyed by normalised name, to overlay onto any row.
+    GROWW_SUB = new Map();
+    ['open', 'upcoming', 'closed'].forEach(t => (d[t] || []).forEach(r => {
+      if (r.subscription != null) GROWW_SUB.set(gmpKey(r.companyName), r.subscription);
+    }));
+    GROWW_AT = Date.now();
+  } catch (e) {
+    GROWW = { open: [], upcoming: [], closed: [] };   // fail soft — NSE still renders
+    GROWW_SUB = new Map();
+    GROWW_AT = Date.now();
+  }
+  return GROWW;
+}
+
+/* A Groww row is already close to canonical; finish it (Date objects + feed
+   tag) so it merges with NSE rows. Marked _fromGroww so NSE stays authoritative
+   on any name collision. */
+function canonFromGroww(r, feed) {
+  return {
+    symbol:         r.symbol || null,
+    companyName:    r.companyName,
+    issueStartDate: r.issueStartDate || '',
+    issueEndDate:   r.issueEndDate || '',
+    series:         r.series || 'Mainboard',
+    issuePrice:     r.issuePrice || null,
+    noOfTime:       r.subscription != null ? String(r.subscription) : null,
+    _feed:          feed,
+    _fromGroww:     true,
+    _subscription:  r.subscription,
+    _startDate:     parseNseDate(r.issueStartDate),
+    _endDate:       parseNseDate(r.issueEndDate)
+  };
+}
+
 /* Exact key first; else best token-overlap match. NSE says "Laser Power &
    Infra Limited", the tracker says "Laser Power & Infra" — after gmpKey()
    both are "laser power infra", so exact hits most of the time. The fuzzy
@@ -507,6 +555,15 @@ function renderIpoTable(rows, tab) {
     const ph = ipoTabOf(r);
     const pill = (tab === 'all' && ph)
       ? `<div><span class="ipo-status ${ph}">${ph}</span></div>` : '';
+    // Live subscription (from Groww) — only meaningful for an issue that is
+    // actually open. Shown as a small demand badge under the name.
+    let sub = '';
+    if (ph === 'open' && r._subscription != null && r._subscription > 0) {
+      const x = r._subscription >= 10 ? Math.round(r._subscription) : Math.round(r._subscription * 10) / 10;
+      const hot = r._subscription >= 1;
+      sub = `<div style="font-size:11px; margin-top:3px; color:${hot ? '#22c55e' : 'var(--grey2)'}; font-family:'Space Mono',monospace">`
+          + `${hot ? '🔥 ' : ''}${x}x subscribed</div>`;
+    }
     // data-label drives the MOBILE card view: below 720px the table collapses to
     // stacked cards and each cell prints its own label via content: attr(data-label).
     // The labels used to be hardcoded by column position in CSS — adding GMP and
@@ -519,7 +576,7 @@ function renderIpoTable(rows, tab) {
     const v = (html, extra) => `<span class="ipo-v"${extra || ''}>${html}</span>`;
     return `
     <tr>
-      <td class="ipo-c-name" style="color:var(--white); font-weight:600">${escapeHtml(name)}${pill}</td>
+      <td class="ipo-c-name" style="color:var(--white); font-weight:600">${escapeHtml(name)}${pill}${sub}</td>
       <td data-label="Type">${v(`<span style="text-transform:capitalize; color:var(--grey2)">${escapeHtml(r.series || 'Mainboard')}</span>`)}</td>
       <td data-label="GMP"    style="text-align:center">${v(gmpCell(name))}</td>
       <td data-label="Rating" style="text-align:center">${v(gmpRatingCell(name))}</td>
@@ -763,9 +820,8 @@ async function fetchIpoFeed(feed) {
 
 async function fetchIpo(tab) {
   currentIpoTab = tab;
-  const status = document.getElementById('ipoStatus');
-  const tbody  = document.getElementById('ipoBody');
-  if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px; color:var(--grey)">Loading IPO data from NSE…</td></tr>';
+  const tbody = document.getElementById('ipoBody');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px; color:var(--grey)">Loading IPO data…</td></tr>';
 
   // Read EVERY feed, not just the one named after the tab. NSE's endpoints
   // overlap (a live IPO is returned by both current-issue and upcoming) and
@@ -776,38 +832,65 @@ async function fetchIpo(tab) {
   const feeds = ['open', 'upcoming'];
   if (tab === 'closed' || tab === 'all') feeds.push('closed');
 
-  // GMP is an independent upstream — fetched in parallel, fails soft.
+  // GMP and Groww are independent upstreams — fetched in parallel, fail soft.
   const [results] = await Promise.all([
     Promise.all(feeds.map(fetchIpoFeed)),
-    loadGmp()
+    loadGmp(),
+    loadGroww()
   ]);
 
-  if (!results.some(r => r.ok)) {          // every NSE endpoint down
-    renderIpoTable([], tab);
-    if (status) status.textContent = 'Could not fetch live IPO data. Please refresh in a few seconds.';
-    return;
+  // NSE may be entirely down. That is no longer fatal — Groww and the GMP
+  // trackers are independent sources that carry the page on their own. The
+  // tab simply renders whatever the surviving sources provide (or an empty
+  // state if truly nothing responded).
+  const universe = mergeIpoFeeds(results.map(r => r.rows));
+  const have = new Set(universe.map(r => gmpKey(r.companyName || r.symbol || '')));
+
+  // Source priority: NSE (official) > Groww (rich listings) > GMP trackers.
+  // Each lower tier only ADDS issues the higher tiers do not already have,
+  // matched on normalised company name, so nothing duplicates and NSE always
+  // wins where it has an issue.
+  const supplement = (rows, allow) => {
+    rows.forEach(r => {
+      const k = gmpKey(r.companyName || r.symbol || '');
+      if (!k || have.has(k)) return;
+      if (allow.indexOf(ipoTabOf(r)) < 0) return;
+      universe.push(r);
+      have.add(k);
+    });
+  };
+
+  // Groww fills Open / Upcoming only (its rumours were dropped server-side).
+  // Closed is deliberately NOT supplemented from Groww: NSE's past-issues feed
+  // is the comprehensive archive (1,300+), and imperfect name matching against
+  // it would risk duplicating a closed issue rather than filling a real gap.
+  if (GROWW) {
+    supplement((GROWW.open || []).map(r => canonFromGroww(r, 'open')),        ['open', 'upcoming']);
+    supplement((GROWW.upcoming || []).map(r => canonFromGroww(r, 'upcoming')), ['open', 'upcoming']);
   }
 
-  const universe = mergeIpoFeeds(results.map(r => r.rows));
-
-  // Fill NSE's gaps with the trackers. NSE lists an issue only in a narrow
-  // window, so its Upcoming feed is routinely empty while the trackers already
-  // carry the next several issues. Add any tracker issue NSE does not already
-  // have (matched by normalised name), so Upcoming/Open are never blank when
-  // the market clearly has issues. NSE stays authoritative — a tracker row is
-  // only added when nothing in the NSE universe matches it.
+  // GMP trackers are the last-resort fill for Open / Upcoming, so those tabs
+  // are never blank when even one source has the issue.
   if (GMP_MAP && GMP_MAP.size) {
-    const have = new Set(universe.map(r => gmpKey(r.companyName || r.symbol || '')));
-    GMP_MAP.forEach(g => {
-      // Need at least dates or a status to place it, and it must not duplicate
-      // an NSE row. Closed issues are left to NSE's own past-issues archive.
-      if (have.has(g.key)) return;
-      const t = canonFromTracker(g);
-      const phase = ipoTabOf(t);
-      if (phase === 'upcoming' || phase === 'open') {
-        universe.push(t);
-        have.add(g.key);
-      }
+    const trackerRows = [];
+    GMP_MAP.forEach(g => trackerRows.push(canonFromTracker(g)));
+    supplement(trackerRows, ['open', 'upcoming']);
+  }
+
+  // Closed FALLBACK: only if NSE gave us no closed history at all (its
+  // past-issues feed down). Then Groww's recent-closed list keeps the Closed /
+  // All tabs from going blank. When NSE is up we skip this to avoid dupes.
+  const haveClosed = universe.some(r => ipoTabOf(r) === 'closed');
+  if (!haveClosed && GROWW && (GROWW.closed || []).length) {
+    supplement(GROWW.closed.map(r => canonFromGroww(r, 'closed')), ['closed']);
+  }
+
+  // Overlay live subscription (from Groww) onto every row that has it, whatever
+  // its source — so an NSE-sourced open issue still shows demand.
+  if (GROWW_SUB && GROWW_SUB.size) {
+    universe.forEach(r => {
+      const s = GROWW_SUB.get(gmpKey(r.companyName || r.symbol || ''));
+      if (s != null && (r._subscription == null)) r._subscription = s;
     });
   }
 
@@ -843,24 +926,6 @@ async function fetchIpo(tab) {
 
   IPO_ROWS = arr;
   paintIpoRows();               // renders the table + the chips, honouring any active filter
-
-  if (status) {
-    const primary = results.find(r => r.feed === tab && r.ok) || results.find(r => r.ok);
-    const stale   = !!(primary.payload && primary.payload.stale) || results.some(r => !r.ok);
-    const at      = primary.payload && primary.payload.fetched_at
-      ? new Date(primary.payload.fetched_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
-      : '';
-    const fmtD    = d => d ? d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : null;
-    const dayCap  = (tab === 'closed' || tab === 'all')
-      ? ' Past issues — ' + ((IPO_FROM || IPO_TO)
-          ? (fmtD(IPO_FROM) || 'start') + ' to ' + (fmtD(IPO_TO) || 'today')
-          : 'all time') + '.'
-      : '';
-    const gmpSrc  = (GMP_META && GMP_META.source)
-      ? ' • GMP: ' + GMP_META.source + (GMP_META.stale ? ' (stale)' : '')
-      : '';
-    status.textContent = (stale ? 'Stale — last fetched ' : 'Updated ') + at + ' • Source: NSE India.' + dayCap + gmpSrc;
-  }
 }
 
 let ipoRefreshTimer = null;
