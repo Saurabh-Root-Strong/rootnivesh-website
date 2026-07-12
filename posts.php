@@ -39,7 +39,10 @@ try {
 
     // Listing — no body, lighter payload.
     $category = trim($_GET['category'] ?? '');
-    $allowedCats = ['education', 'strategy', 'markets', 'quant'];
+    // Must list EVERY category the blog actually uses, or filtering by a missing
+    // one (investing, personal-finance) silently falls through and returns the
+    // whole list instead of that category.
+    $allowedCats = ['education', 'strategy', 'markets', 'quant', 'investing', 'personal-finance'];
     $sql  = 'SELECT id, slug, title, category, excerpt, cover_image, author,
                     read_minutes, published_at
              FROM posts WHERE status = :st';
