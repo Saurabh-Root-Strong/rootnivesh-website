@@ -122,11 +122,30 @@ function showBlogListView() {
 }
 
 /* lite-markdown → HTML + a heading list for the "In this article" TOC.
-   ## → h2, ### → h3, blank line separates paragraphs, **x** → bold. */
+   ## → h2, ### → h3, blank line separates paragraphs, **x** → bold,
+   [text](/path) → link.
+
+   Links matter for more than convenience: internal links are how a blog passes
+   authority to the pages that earn money (the IPO tool, Performance, Calls) and
+   how Google works out what this site is actually about. Without them every post
+   was a dead end.
+
+   Safety: the text is escaped FIRST, then the link pattern is applied to the
+   escaped string, and the href is whitelisted to same-site paths and https URLs
+   only. A body row is admin-authored, but it is still stored data — a
+   javascript: or data: href must never survive into the DOM. */
 function blogRenderBody(raw) {
   const lines = String(raw || '').replace(/\r\n/g, '\n').split('\n');
   const toc = []; let html = ''; let para = []; let n = 0;
-  const inline = s => escapeHtml(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  const safeHref = h => (/^\/[^\/]/.test(h) || /^https:\/\//i.test(h)) ? h : null;
+  const inline = s => escapeHtml(s)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m, text, href) => {
+      const h = safeHref(href);
+      if (!h) return text;                                   // drop the link, keep the words
+      const ext = /^https:\/\//i.test(h) && !/rootnivesh\.in/i.test(h);
+      return `<a href="${h}"${ext ? ' target="_blank" rel="noopener nofollow"' : ''}>${text}</a>`;
+    });
   const flush = () => { if (para.length) { html += '<p>' + inline(para.join(' ')) + '</p>'; para = []; } };
   lines.forEach(line => {
     const t = line.trim();
