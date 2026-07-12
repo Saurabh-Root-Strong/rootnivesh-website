@@ -480,66 +480,114 @@ function renderIpoTable(rows, tab) {
 }
 
 /* ================================================================
-   TABS, PERIOD, PAGING
+   TABS, DATE RANGE, PAGING
 
-   The tabs are the only filter: All / Open / Upcoming / Closed. The
-   earlier chip row (Active GMP, Closing Today, SME, Mainboard) is gone —
-   four extra controls to shave a table that is usually 2-15 rows long
-   was interface for its own sake.
+   Tabs are the only status filter: All / Open / Upcoming / Closed.
 
-   The period selector stays, but only where history exists (All and
-   Closed). Without it "All" would mean 1,325 issues back to 2012.
+   History is bounded by an explicit From/To date range rather than fixed
+   1M/3M/1Y presets — the archive runs to 2012 and a preset can only ever
+   answer "how far back from today", never "show me March 2024".
+
+   IMPORTANT SEMANTICS: the range bounds PAST issues only. On the All tab,
+   open and upcoming IPOs stay visible whatever dates are chosen. Two
+   reasons: a window set in 2019 should not hide today's live IPO, and an
+   upcoming issue closes in the FUTURE, so any range ending at "today"
+   would silently erase every upcoming row. The control is labelled "Past
+   issues" so that behaviour reads as intended rather than as a bug.
    ================================================================ */
-let IPO_ROWS  = [];                                    // the active tab's rows, pre-period
-let IPO_RANGE = '3m';
+let IPO_ROWS  = [];                                    // the active tab's rows, pre-range
 let IPO_PAGE  = 1;
-const IPO_PAGE_SIZE = 25;
+const IPO_PAGE_SIZE = 10;
+const IPO_DEFAULT_BACK_DAYS = 92;                      // ~3 months, the opening view
 
-/* How far back the Closed tab reaches. NSE's past-issues feed carries years of
-   history (~1,400 rows) and we already hold all of it client-side, so the
-   period selector is free — it's a slice of memory, not another request. */
-const IPO_RANGES = [
-  { id: '1m',  label: '1M',  days: 31,   text: 'last 1 month'  },
-  { id: '3m',  label: '3M',  days: 92,   text: 'last 3 months' },
-  { id: '6m',  label: '6M',  days: 183,  text: 'last 6 months' },
-  { id: '1y',  label: '1Y',  days: 366,  text: 'last 1 year'   },
-  { id: 'all', label: 'All', days: null, text: 'full history'  }
-];
-
-function ipoInRange(r) {
-  const def = IPO_RANGES.find(x => x.id === IPO_RANGE);
-  if (!def || def.days === null) return true;
-  if (!r._endDate) return false;
-  const cutoff = istToday();
-  cutoff.setDate(cutoff.getDate() - def.days);
-  return r._endDate >= cutoff;
+function ipoYmd(d) {
+  if (!d) return '';
+  const p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+}
+function ipoParseYmd(s) {
+  if (!s) return null;
+  const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return null;
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  return isNaN(d.getTime()) ? null : d;
 }
 
-/* The period bounds history only. A live or not-yet-opened issue is always in
-   scope no matter how far back the window reaches. */
+function ipoDefaultRange() {
+  const to   = istToday();
+  const from = istToday();
+  from.setDate(from.getDate() - IPO_DEFAULT_BACK_DAYS);
+  return { from, to };
+}
+
+/* Opening window: the last ~3 months. "All time" deliberately sets both bounds
+   to null, so these must be declared AFTER ipoDefaultRange() and never
+   re-seeded on a tab change — otherwise picking "All time" and switching tabs
+   would silently snap back to 3 months. */
+let IPO_FROM = ipoDefaultRange().from;                 // Date | null (null = unbounded)
+let IPO_TO   = ipoDefaultRange().to;
+
+function ipoInRange(r) {
+  if (!r._endDate) return false;
+  if (IPO_FROM && r._endDate < IPO_FROM) return false;
+  if (IPO_TO   && r._endDate > IPO_TO)   return false;
+  return true;
+}
+
+/* The range bounds history only — see the semantics note above. */
 function applyIpoPeriod(rows, tab) {
   if (tab !== 'closed' && tab !== 'all') return rows;
   return rows.filter(r => ipoTabOf(r) !== 'closed' || ipoInRange(r));
 }
 
-/* Period selector — only where history exists (All and Closed). On Open and
-   Upcoming there is no history to bound, so the control is not offered. */
+/* Date range control — only where history exists (All and Closed). On Open and
+   Upcoming there is nothing to bound, so it is not rendered. */
 function renderIpoPeriod(tab) {
   const box = document.getElementById('ipoChips');
   if (!box) return;
   if (tab !== 'closed' && tab !== 'all') { box.innerHTML = ''; return; }
 
-  let h = '<span class="ipo-chips-label">Past issues</span>';
-  IPO_RANGES.forEach(r => {
-    const on = IPO_RANGE === r.id;
-    h += `<button class="ipo-chip${on ? ' active' : ''}" onclick="setIpoRange('${r.id}')">${r.label}</button>`;
-  });
-  box.innerHTML = h;
+  // Bound the pickers by the data we actually hold, so the user cannot select
+  // a window that could never contain a row.
+  const dated = IPO_ROWS.filter(r => r._endDate && ipoTabOf(r) === 'closed');
+  const oldest = dated.length ? new Date(Math.min(...dated.map(r => r._endDate.getTime()))) : null;
+  const maxDay = istToday();
+
+  box.innerHTML =
+    '<span class="ipo-chips-label">Past issues</span>' +
+    '<div class="ipo-daterange">' +
+      '<label>From' +
+        `<input type="date" id="ipoFrom" value="${ipoYmd(IPO_FROM)}" ` +
+          `min="${oldest ? ipoYmd(oldest) : ''}" max="${ipoYmd(maxDay)}" onchange="applyIpoDates()">` +
+      '</label>' +
+      '<label>To' +
+        `<input type="date" id="ipoTo" value="${ipoYmd(IPO_TO)}" ` +
+          `min="${oldest ? ipoYmd(oldest) : ''}" max="${ipoYmd(maxDay)}" onchange="applyIpoDates()">` +
+      '</label>' +
+      '<button class="ipo-chip" onclick="setIpoAllTime()" title="Show the full archive">All time</button>' +
+      '<button class="ipo-chip" onclick="resetIpoDates()" title="Back to the last 3 months">Reset</button>' +
+    '</div>';
 }
 
-function setIpoRange(id) {
-  IPO_RANGE = id;
-  IPO_PAGE  = 1;                // a new window with the old page number can land on a blank page
+function applyIpoDates() {
+  const f = ipoParseYmd((document.getElementById('ipoFrom') || {}).value);
+  const t = ipoParseYmd((document.getElementById('ipoTo')   || {}).value);
+  // A reversed range is a slip, not an intent — swap rather than show an empty
+  // table and make the user work out what they did wrong.
+  if (f && t && f > t) { IPO_FROM = t; IPO_TO = f; }
+  else                 { IPO_FROM = f; IPO_TO = t; }
+  IPO_PAGE = 1;
+  paintIpoRows();
+}
+
+function setIpoAllTime() {
+  IPO_FROM = null; IPO_TO = null; IPO_PAGE = 1;
+  paintIpoRows();
+}
+
+function resetIpoDates() {
+  const d = ipoDefaultRange();
+  IPO_FROM = d.from; IPO_TO = d.to; IPO_PAGE = 1;
   paintIpoRows();
 }
 
@@ -682,9 +730,12 @@ async function fetchIpo(tab) {
     const at      = primary.payload && primary.payload.fetched_at
       ? new Date(primary.payload.fetched_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
       : '';
-    const rng     = IPO_RANGES.find(r => r.id === IPO_RANGE);
+    const fmtD    = d => d ? d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : null;
     const dayCap  = (tab === 'closed' || tab === 'all')
-      ? ' Past issues — ' + (rng ? rng.text : '') + '.' : '';
+      ? ' Past issues — ' + ((IPO_FROM || IPO_TO)
+          ? (fmtD(IPO_FROM) || 'start') + ' to ' + (fmtD(IPO_TO) || 'today')
+          : 'all time') + '.'
+      : '';
     const gmpSrc  = (GMP_META && GMP_META.source)
       ? ' • GMP: ' + GMP_META.source + (GMP_META.stale ? ' (stale)' : '')
       : '';

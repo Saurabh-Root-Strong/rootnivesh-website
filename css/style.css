@@ -729,7 +729,41 @@
      closed); these chips are filters applied *within* the current tab. Making
      them visually subordinate keeps that hierarchy readable — otherwise two
      rows of pills look like two competing sets of tabs. */
-  .ipo-chips { display: flex; gap: 6px; margin: -22px 0 22px; flex-wrap: wrap; align-items: center; }
+  /* Right-aligned above the table: the range is a scoping control, not a
+     primary action, so it sits out of the reading path of the tabs. */
+  .ipo-chips {
+    display: flex; gap: 6px; margin: -22px 0 18px; flex-wrap: wrap;
+    align-items: center; justify-content: flex-end;
+  }
+  .ipo-chips .ipo-chips-label { margin-right: auto; }   /* label left, controls right */
+
+  .ipo-daterange { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .ipo-daterange label {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--grey); font-family: 'Space Mono', monospace;
+  }
+  .ipo-daterange input[type="date"] {
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 8px; padding: 5px 10px; color: var(--white);
+    font-size: 12px; font-family: inherit; letter-spacing: normal;
+    text-transform: none; cursor: pointer; transition: var(--transition);
+    color-scheme: dark;                 /* makes the native picker render dark */
+  }
+  .ipo-daterange input[type="date"]:hover  { border-color: var(--border2); }
+  .ipo-daterange input[type="date"]:focus  { outline: none; border-color: var(--gold); }
+  .ipo-daterange input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.7); cursor: pointer;
+  }
+
+  @media (max-width: 640px) {
+    /* Stack, and let the inputs share the row rather than overflow it. */
+    .ipo-chips { justify-content: flex-start; }
+    .ipo-chips .ipo-chips-label { margin-right: 0; width: 100%; }
+    .ipo-daterange { width: 100%; }
+    .ipo-daterange label { flex: 1 1 45%; }
+    .ipo-daterange input[type="date"] { width: 100%; }
+  }
   .ipo-chips-label {
     font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
     color: var(--grey); font-family: 'Space Mono', monospace; margin-right: 4px;
