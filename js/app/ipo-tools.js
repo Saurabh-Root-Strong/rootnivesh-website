@@ -128,6 +128,22 @@ function fmtIssuePrice(s) {
   return s.replace(/Rs\./g, '₹').replace(/\s+to\s+/g, ' - ');
 }
 
+/* Price band with a fallback. NSE's SME feed frequently omits issuePrice
+   entirely (Happy Steels came through blank), but the IPO trackers carry the
+   band. NSE stays authoritative — the tracker is only consulted when NSE has
+   nothing, and the fallback is marked so a scraped number is never passed off
+   as exchange data. */
+function ipoPriceCell(r) {
+  const nse = r.issuePrice || r.priceBand;
+  if (nse) return escapeHtml(fmtIssuePrice(nse));
+  const g = gmpFor(r.companyName || r.symbol);
+  if (g && g.price_band) {
+    return `<span title="Price band via ${escapeHtml(String((GMP_META && GMP_META.source) || 'IPO tracker'))} — NSE did not publish one for this issue">` +
+           `${escapeHtml(g.price_band)}<span style="color:var(--grey); font-size:10px">*</span></span>`;
+  }
+  return '—';
+}
+
 /* ================================================================
    GMP (Grey Market Premium) — /gmp.php
    The grey market is unofficial; NSE has no GMP feed. gmp.php scrapes
@@ -457,7 +473,7 @@ function renderIpoTable(rows, tab) {
       <td style="text-align:center">${gmpRatingCell(name)}</td>
       <td>${escapeHtml(fmtIpoDate(r.issueStartDate))}</td>
       <td>${escapeHtml(fmtIpoDate(r.issueEndDate))}</td>
-      <td>${escapeHtml(fmtIssuePrice(r.issuePrice || r.priceBand))}</td>
+      <td>${ipoPriceCell(r)}</td>
       <td>${ipoBusinessCell(r)}</td>
     </tr>`;
   }).join('');

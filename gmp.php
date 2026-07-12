@@ -127,8 +127,24 @@ function gmp_rating($gainPct, $hasGmp) {
     return ['stars' => 1, 'label' => 'Weak'];
 }
 
+/* Tidy a price-band string for display: "₹105-111" / "545-574" -> "₹105 - ₹111".
+   Returns null when the band is absent or a placeholder ("-", "0-0"). */
+function gmp_band_text($raw) {
+    preg_match_all('/\d[\d,]*(?:\.\d+)?/', (string) $raw, $m);
+    if (empty($m[0])) return null;
+    $vals = array_values(array_unique(array_map(function ($x) {
+        return floatval(str_replace(',', '', $x));
+    }, $m[0])));
+    $vals = array_values(array_filter($vals, function ($v) { return $v > 0; }));
+    if (!$vals) return null;
+    sort($vals, SORT_NUMERIC);
+    $fmt = function ($v) { return '₹' . rtrim(rtrim(number_format($v, 2, '.', ''), '0'), '.'); };
+    if (count($vals) === 1) return $fmt($vals[0]);
+    return $fmt($vals[0]) . ' - ' . $fmt(end($vals));
+}
+
 /* Assemble one normalised row + its derived fields. */
-function gmp_row($name, $gmp, $capPrice, $type, $status, $updated) {
+function gmp_row($name, $gmp, $capPrice, $type, $status, $updated, $bandRaw = null) {
     $hasGmp = ($gmp !== null);
     $gain   = null;
     $est    = null;
@@ -142,6 +158,9 @@ function gmp_row($name, $gmp, $capPrice, $type, $status, $updated) {
         'key'           => gmp_key($name),
         'gmp'           => $hasGmp ? round($gmp, 2) : null,
         'cap_price'     => $capPrice,
+        // NSE's SME feed often omits the price band entirely, so the tracker's
+        // band is used as a display fallback on the IPO table.
+        'price_band'    => gmp_band_text($bandRaw),
         'est_listing'   => $est,
         'est_gain_pct'  => $gain,
         'rating_stars'  => $r['stars'],
@@ -171,7 +190,7 @@ function fetch_ipowatch() {
 
         $gmp  = gmp_num($c[1]);                 // "₹2" / "₹0" / "₹-"
         $band = gmp_cap_price($c[3]);           // "₹105" or "₹105-111"
-        $rows[] = gmp_row($name, $gmp, $band, $c[6], $c[7], $c[8] ?? null);
+        $rows[] = gmp_row($name, $gmp, $band, $c[6], $c[7], $c[8] ?? null, $c[3]);
     }
     return $rows;
 }
@@ -197,30 +216,71 @@ function fetch_ipopremium() {
         $gmp  = gmp_num($c[2]);
         $band = gmp_cap_price($c[5]);           // "545-574"; 0-0 means unannounced
         if ($band !== null && $band <= 0) $band = null;
-        $rows[] = gmp_row($name, $gmp, $band, $c[1], null, null);
+        $rows[] = gmp_row($name, $gmp, $band, $c[1], null, null, $c[5]);
     }
     return $rows;
 }
 
-/* ---------- fetch with fallback ---------- */
+/* ---------- fetch + merge ----------
+   The two sources are COMPLEMENTARY, not merely a failover pair:
+     • ipowatch  — GMP, trend, status. Its price column is only the CAP price
+                   ("₹574"), not the band.
+     • ipopremium — carries the full band ("545-574") and covers issues whose
+                   band ipowatch leaves blank.
+   So both are fetched and merged rather than taking the first that answers.
+   ipowatch stays authoritative for GMP; ipopremium only fills the gaps. If
+   either is down the other still produces a usable table on its own. */
+
+function gmp_merge($primary, $secondary) {
+    $byKey = [];
+    foreach ($primary as $r) { $byKey[$r['key']] = $r; }
+
+    foreach ($secondary as $s) {
+        $k = $s['key'];
+        if (!isset($byKey[$k])) { $byKey[$k] = $s; continue; }   // an issue the primary missed
+        $p = $byKey[$k];
+
+        // Prefer a real BAND ("₹545 - ₹574") over a lone cap price ("₹574").
+        $pHasRange = $p['price_band'] !== null && strpos($p['price_band'], '-') !== false;
+        $sHasRange = $s['price_band'] !== null && strpos($s['price_band'], '-') !== false;
+        if ((!$pHasRange && $sHasRange) || ($p['price_band'] === null && $s['price_band'] !== null)) {
+            $p['price_band'] = $s['price_band'];
+        }
+        // Fill anything else the primary simply doesn't have. GMP is NOT
+        // overwritten — two trackers quote slightly different premiums and
+        // mixing them would produce a number neither source published.
+        foreach (['cap_price', 'type', 'status', 'updated'] as $f) {
+            if (($p[$f] === null || $p[$f] === '') && isset($s[$f]) && $s[$f] !== null && $s[$f] !== '') {
+                $p[$f] = $s[$f];
+            }
+        }
+        $byKey[$k] = $p;
+    }
+    return array_values($byKey);
+}
 
 $cache = null;
 if (file_exists($cacheFile)) $cache = json_decode(file_get_contents($cacheFile), true);
 $fresh = $cache && !empty($cache['ts']) && ($now - intval($cache['ts'])) < $TTL;
 
 if (!$fresh) {
-    $rows = [];
-    $src  = null;
-    foreach ([['ipowatch.in', 'fetch_ipowatch'], ['ipopremium.in', 'fetch_ipopremium']] as $s) {
-        $r = $s[1]();
-        if (count($r) > 0) { $rows = $r; $src = $s[0]; break; }
-    }
+    $watch   = fetch_ipowatch();
+    $premium = fetch_ipopremium();
+
+    $srcs = [];
+    if ($watch)   $srcs[] = 'ipowatch.in';
+    if ($premium) $srcs[] = 'ipopremium.in';
+
+    // Whichever answered leads; if both did, ipowatch leads and ipopremium fills.
+    if ($watch)        $rows = gmp_merge($watch, $premium);
+    elseif ($premium)  $rows = $premium;
+    else               $rows = [];
 
     if ($rows) {
         $cache = [
             'ts'         => $now,
             'fetched_at' => $istNow->format(DateTime::ATOM),
-            'source'     => $src,
+            'source'     => implode(' + ', $srcs),
             'count'      => count($rows),
             'stale'      => false,
             'rows'       => $rows,
