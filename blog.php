@@ -281,7 +281,7 @@ function blog_shell($title, $desc, $canonical, $ogImage, $robots, $bodyInner, $e
   /* DEFENSIVE RESET — style.css targets BARE ELEMENTS (`nav { position: fixed }`,
      `footer { background; padding: 60px 0 }`) because the SPA relies on them for
      its chrome. Any semantic tag reused here inherits that and breaks the layout
-     (a <nav> table-of-contents pinned itself over the article title). We avoid
+     (a nav-tag table of contents pinned itself over the article title). We avoid
      those tags for content, and belt-and-braces neutralise the properties here so
      a future edit to style.css cannot silently break these pages again. */
   .bp-toc, .bp-foot, .bp-article, .bp-head, .bp-body {
