@@ -362,6 +362,29 @@ function ipo_shell($title, $desc, $canonical, $ogImage, $robots, $bodyInner, $ex
   .ip-notfound { text-align: center; padding: 40px 0; }
   .ip-notfound h1 { font-family: 'Cormorant Garamond', serif; color: var(--white); }
   .ip-notfound p { color: var(--grey2); }
+
+  /* MOBILE — see the note in blog.php: the global `nav` rule forces
+     height: var(--nav-h) (48px under 640px), which is shorter than this bar's
+     content, and the wordmark plus four links overflow a 360px viewport. */
+  .ip-nav { height: auto; min-height: 52px; }
+  @media (max-width: 640px) {
+    .ip-nav { padding: 9px 14px; min-height: 48px; }
+    .ip-nav img { height: 24px; }
+    .ip-nav .ip-brand span { display: none; }
+    .ip-nav .ip-links a { margin-left: 14px; font-size: 13px; padding: 6px 0; }
+    .ip-wrap { padding: 76px 16px 48px; }
+    .ip-head h1 { font-size: 1.75rem; }
+    /* Two tiles per row on a phone rather than one long column. */
+    .ip-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 20px 0 28px; }
+    .ip-tile { padding: 12px 13px; }
+    .ip-tile-v { font-size: 1.05rem; }
+    .ip-prose { font-size: 1rem; }
+    .ip-prose h2 { font-size: 1.4rem; }
+  }
+  @media (max-width: 380px) {
+    .ip-nav .ip-links a { margin-left: 10px; font-size: 12px; }
+    .ip-wrap { padding-left: 13px; padding-right: 13px; }
+  }
 </style>
 </head>
 <body class="bp-page">

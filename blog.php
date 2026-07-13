@@ -334,6 +334,30 @@ function blog_shell($title, $desc, $canonical, $ogImage, $robots, $bodyInner, $e
   .bp-notfound { text-align: center; padding: 40px 0; }
   .bp-notfound h1 { font-family: 'Cormorant Garamond', serif; color: var(--white); font-size: 2.2rem; }
   .bp-notfound p { color: var(--grey2); }
+
+  /* MOBILE. Two things must be overridden explicitly, not left to the cascade:
+     (1) the global `nav` rule sets height: var(--nav-h), which drops to 48px
+         under 640px — shorter than this bar's own content, so it must be
+         height: auto or the logo overflows the bar;
+     (2) the brand text plus four links exceed a 360px viewport, so the wordmark
+         is dropped to the logo alone and the links tighten. */
+  .bp-nav { height: auto; min-height: 52px; }
+  @media (max-width: 640px) {
+    .bp-nav { padding: 9px 14px; min-height: 48px; }
+    .bp-nav img { height: 24px; }
+    .bp-nav .bp-brand span { display: none; }        /* logo only — frees ~90px */
+    .bp-nav .bp-links a { margin-left: 14px; font-size: 13px; padding: 6px 0; }
+    .bp-wrap { padding: 76px 16px 48px; }
+    .bp-head h1 { font-size: 1.75rem; }
+    .bp-excerpt { font-size: 1.05rem; }
+    .bp-body { font-size: 1rem; }
+    .bp-body h2 { font-size: 1.45rem; }
+    .bp-cover { margin: 20px 0; border-radius: 10px; }
+  }
+  @media (max-width: 380px) {
+    .bp-nav .bp-links a { margin-left: 10px; font-size: 12px; }
+    .bp-wrap { padding-left: 13px; padding-right: 13px; }
+  }
 </style>
 </head>
 <body class="bp-page">
