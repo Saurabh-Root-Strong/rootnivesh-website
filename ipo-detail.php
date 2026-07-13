@@ -264,11 +264,13 @@ $body =
   . '<div class="ip-prose">' . $analysis . '</div>'
   . '<aside class="ip-related"><h2>IPO investing guides</h2><ul>' . $relHtml . '</ul></aside>'
   . '<p style="margin-top:26px"><a class="ip-btn" href="/ipo">→ Compare all live IPOs & GMP</a></p>'
-  . '<footer class="ip-foot"><p class="ip-disc"><strong>Disclaimer:</strong> IPO and grey-market data are sourced from '
+  // A <div>, deliberately NOT a <footer>: style.css styles the bare `footer`
+  // element (site-footer background + 60px/90px padding) for the SPA.
+  . '<div class="ip-foot"><p class="ip-disc"><strong>Disclaimer:</strong> IPO and grey-market data are sourced from '
   . 'public trackers and exchanges and may be delayed or inaccurate. Grey Market Premium is unofficial and unregulated; '
   . 'Root Nivesh does not deal in the grey market. This page is for education only and is not a recommendation to '
   . 'subscribe to any issue. Investments in securities are subject to market risk; read all offer documents carefully. '
-  . 'SEBI Registered Research Analyst, Reg. No. ' . h($SEBI) . '.</p></footer>';
+  . 'SEBI Registered Research Analyst, Reg. No. ' . h($SEBI) . '.</p></div>';
 
 http_response_code(200);
 header('Content-Type: text/html; charset=utf-8');
@@ -309,6 +311,15 @@ function ipo_shell($title, $desc, $canonical, $ogImage, $robots, $bodyInner, $ex
 <link rel="stylesheet" href="/css/style.css?v=108">
 <?php echo $extraHead; ?>
 <style>
+  /* DEFENSIVE RESET — style.css targets BARE ELEMENTS (`nav { position: fixed }`,
+     `footer { background; padding: 60px 0 }`) for the SPA's chrome. Content blocks
+     here must not inherit that, so we avoid those tags and neutralise the
+     properties, making the page immune to future style.css edits. */
+  .ip-foot, .ip-head, .ip-grid, .ip-prose, .ip-related {
+    position: static; float: none; width: auto; height: auto; min-height: 0;
+    inset: auto; z-index: auto; backdrop-filter: none; background: none;
+  }
+
   .ip-wrap { max-width: 820px; margin: 0 auto; padding: 90px 20px 60px; }
   .ip-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 20; display: flex; align-items: center;
     justify-content: space-between; padding: 14px 20px; background: rgba(7,19,31,0.85);

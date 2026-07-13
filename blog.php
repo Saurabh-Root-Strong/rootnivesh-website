@@ -184,13 +184,17 @@ if ($pub) $ld['datePublished'] = $pub;
 if ($mod) $ld['dateModified']  = $mod;
 
 /* ---- build the article body markup ---- */
+/* NOTE: a <div role="navigation">, deliberately NOT a <nav>. The site stylesheet
+   styles the bare `nav` element (position: fixed, top: 0, display: flex) for the
+   SPA's header chrome, so a <nav> here inherits that and pins itself over the
+   article. Same reason the footer below is a <div>, not a <footer>. */
 $tocHtml = '';
 if (count($toc) >= 3) {
-    $tocHtml = '<nav class="bp-toc" aria-label="In this article"><p class="bp-toc-title">In this article</p><ul>';
+    $tocHtml = '<div class="bp-toc" role="navigation" aria-label="In this article"><p class="bp-toc-title">In this article</p><ul>';
     foreach ($toc as $t) {
         $tocHtml .= '<li class="bp-toc-l' . $t['lvl'] . '"><a href="#' . h($t['id']) . '">' . h($t['text']) . '</a></li>';
     }
-    $tocHtml .= '</ul></nav>';
+    $tocHtml .= '</ul></div>';
 }
 
 $meta = [];
@@ -215,13 +219,13 @@ $article =
   . ($excerpt ? '<p class="bp-excerpt">' . h($excerpt) . '</p>' : '')
   . $tocHtml
   . '<div class="bp-body">' . $bodyHtml . '</div>'
-  . '<footer class="bp-foot">'
+  . '<div class="bp-foot">'
   . '<p class="bp-disc"><strong>Disclaimer:</strong> This article is for educational purposes only and is not '
   . 'investment advice or a recommendation to buy or sell any security. Investments in securities are subject to '
   . 'market risk; read all related documents carefully. RootNivesh is a SEBI Registered Research Analyst '
   . '(Reg. No. ' . h($SEBI) . ').</p>'
   . '<p><a class="bp-btn" href="/blog">← Back to all articles</a></p>'
-  . '</footer>'
+  . '</div>'
   . '</article>';
 
 $head = '<script type="application/ld+json">' . json_encode($ld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . '</script>';
@@ -274,6 +278,17 @@ function blog_shell($title, $desc, $canonical, $ogImage, $robots, $bodyInner, $e
 <link rel="stylesheet" href="/css/style.css?v=108">
 <?php echo $extraHead; ?>
 <style>
+  /* DEFENSIVE RESET — style.css targets BARE ELEMENTS (`nav { position: fixed }`,
+     `footer { background; padding: 60px 0 }`) because the SPA relies on them for
+     its chrome. Any semantic tag reused here inherits that and breaks the layout
+     (a <nav> table-of-contents pinned itself over the article title). We avoid
+     those tags for content, and belt-and-braces neutralise the properties here so
+     a future edit to style.css cannot silently break these pages again. */
+  .bp-toc, .bp-foot, .bp-article, .bp-head, .bp-body {
+    position: static; float: none; width: auto; height: auto; min-height: 0;
+    inset: auto; z-index: auto; backdrop-filter: none; background: none;
+  }
+
   .bp-wrap { max-width: 760px; margin: 0 auto; padding: 90px 20px 60px; }
   .bp-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 20; display: flex;
     align-items: center; justify-content: space-between; padding: 14px 20px;
